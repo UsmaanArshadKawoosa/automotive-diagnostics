@@ -14,6 +14,18 @@ class Settings(BaseSettings):
 
     database_url: str | None = None
 
+    embedding_provider: str = "sentence-transformers"
+    embedding_model: str = "sentence-transformers/all-MiniLM-L6-v2"
+    embedding_dimensions: int = 384
+    openai_api_key: str | None = None
+    openai_embedding_model: str = "text-embedding-3-small"
+
+    llm_provider: str = "ollama"
+    llm_model: str = "llama3.1:latest"
+    llm_base_url: str = "http://localhost:11434"
+    llm_temperature: float = 0.2
+    llm_max_tokens: int = 2048
+
     cors_origins: str = "http://localhost:3000"
 
     model_config = SettingsConfigDict(

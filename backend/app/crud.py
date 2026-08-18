@@ -1,5 +1,6 @@
 import uuid
 
+from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.db import models
@@ -51,3 +52,31 @@ def list_knowledge_entries(
     if category:
         query = query.filter(models.KnowledgeEntry.category == category)
     return query.offset(skip).limit(limit).all()
+
+
+def search_knowledge_entries(
+    db: Session,
+    query_embedding: list[float],
+    category: str | None = None,
+    top_k: int = 5,
+) -> list[models.KnowledgeEntry]:
+    distance = models.KnowledgeEntry.embedding.cosine_distance(query_embedding)
+    stmt = select(models.KnowledgeEntry, distance.label("distance")).where(
+        models.KnowledgeEntry.embedding.is_not(None)
+    )
+    if category:
+        stmt = stmt.where(models.KnowledgeEntry.category == category)
+    stmt = stmt.order_by(distance).limit(top_k)
+    return db.execute(stmt).all()
+
+
+def update_knowledge_entry_embedding(
+    db: Session, entry_id: uuid.UUID, embedding: list[float]
+) -> models.KnowledgeEntry | None:
+    entry = get_knowledge_entry(db, entry_id)
+    if entry is None:
+        return None
+    entry.embedding = embedding
+    db.commit()
+    db.refresh(entry)
+    return entry

@@ -11,13 +11,32 @@ from app.crud import (
 )
 from app.db.database import get_db
 from app.schemas import (
+    DiagnosticAnalyzeRequest,
+    DiagnosticAnalyzeResponse,
     DiagnosticResultCreate,
     DiagnosticResultRead,
     DiagnosticSessionCreate,
     DiagnosticSessionRead,
 )
+from app.services.diagnostic import DiagnosticService, DiagnosticServiceError, get_diagnostic_service
+from app.services.embeddings import EmbeddingService, get_embedding_service
+from app.services.llm import LLMService, get_llm_service
 
 router = APIRouter(prefix="/diagnostics", tags=["diagnostics"])
+
+
+@router.post("/analyze", response_model=DiagnosticAnalyzeResponse, status_code=201)
+def analyze_diagnostic(
+    request: DiagnosticAnalyzeRequest,
+    db: Session = Depends(get_db),
+    embedding_service: EmbeddingService = Depends(get_embedding_service),
+    llm_service: LLMService = Depends(get_llm_service),
+) -> DiagnosticAnalyzeResponse:
+    diagnostic_service = get_diagnostic_service(embedding_service, llm_service)
+    try:
+        return diagnostic_service.analyze(db, request)
+    except DiagnosticServiceError as exc:
+        raise HTTPException(status_code=503, detail=str(exc)) from exc
 
 
 @router.post("/sessions", response_model=DiagnosticSessionRead, status_code=201)
