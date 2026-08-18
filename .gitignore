@@ -1,0 +1,59 @@
+﻿# Environment
+.env
+.env.*
+!.env.example
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# IDE
+.vscode/
+.idea/
+
+# Build
+build/
+dist/
+*.egg-info/
+
+# ML datasets
+ml/data/raw/*
+ml/data/processed/*
+ml/data/embeddings/*
+!ml/data/raw/.gitkeep
+!ml/data/processed/.gitkeep
+!ml/data/embeddings/.gitkeep
+
+# ML models
+ml/models/*.bin
+ml/models/*.pt
+ml/models/*.pth
+ml/models/*.onnx
+
+# Logs
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Node
+node_modules/
+frontend/dist/
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+# Local pgvector source build
+pgvector/
