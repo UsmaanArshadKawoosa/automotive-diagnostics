@@ -1,0 +1,32 @@
+[
+  {
+    "category": "dtc",
+    "entry_key": "P0100",
+    "content": "P0100 - Mass or Volume Air Flow Circuit Malfunction. The MAF sensor circuit has no signal or an intermittent signal. Causes include damaged wiring, contaminated MAF element, or failed sensor. Inspect wiring and connector, then verify MAF operation.",
+    "source": "OBD-II DTC reference"
+  },
+  {
+    "category": "dtc",
+    "entry_key": "P0102",
+    "content": "P0102 - Mass or Volume Air Flow Circuit Low Input. The MAF sensor voltage is below the expected range. Causes include vacuum leaks, dirty MAF element, restricted air filter, or a failing sensor. Inspect for unmetered air and clean or replace MAF as needed.",
+    "source": "OBD-II DTC reference"
+  },
+  {
+    "category": "dtc",
+    "entry_key": "P0103",
+    "content": "P0103 - Mass or Volume Air Flow Circuit High Input. The MAF sensor voltage is above the expected range. Causes include intake air leaks downstream of the MAF, a shorted signal wire, or a failing sensor. Inspect wiring and intake path.",
+    "source": "OBD-II DTC reference"
+  },
+  {
+    "category": "dtc",
+    "entry_key": "P0107",
+    "content": "P0107 - Manifold Absolute Pressure/Barometric Pressure Circuit Low Input. The MAP sensor signal voltage is below the minimum threshold. Causes include a shorted signal wire, open reference circuit, or failed MAP sensor. Inspect wiring and sensor.",
+    "source": "OBD-II DTC reference"
+  },
+  {
+    "category": "dtc",
+    "entry_key": "P0108",
+    "content": "P0108 - Manifold Absolute Pressure/Barometric Pressure Circuit High Input. The MAP sensor signal voltage is above the maximum threshold. Causes include an open ground, shorted signal wire, or failed MAP sensor. Inspect wiring and ground connections.",
+    "source": "OBD-II DTC reference"
+  }
+]

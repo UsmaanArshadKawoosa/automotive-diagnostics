@@ -1,0 +1,32 @@
+[
+  {
+    "category": "repair",
+    "entry_key": "fuel_injector_cleaning",
+    "content": "Clean fuel injectors with an ultrasonic cleaner or use a fuel system cleaner additive. Inspect spray pattern for uniformity. Replace injectors if cleaning does not restore proper operation. Clear DTCs and verify fuel trim after repair.",
+    "source": "automotive-diagnostics-v1"
+  },
+  {
+    "category": "repair",
+    "entry_key": "fuel_injector_replacement",
+    "content": "Replace faulty fuel injectors with the correct OEM or equivalent part. Replace injector O-rings and inspect the fuel rail for debris. Reset fuel trim adaptations after replacement and verify idle quality.",
+    "source": "automotive-diagnostics-v1"
+  },
+  {
+    "category": "repair",
+    "entry_key": "fuel_pump_replacement",
+    "content": "Replace the fuel pump assembly with the correct OEM or equivalent part. Inspect the fuel strainer and tank for contamination. Prime the system and verify fuel pressure meets specification before starting the engine.",
+    "source": "automotive-diagnostics-v1"
+  },
+  {
+    "category": "repair",
+    "entry_key": "fuel_pressure_regulator_replacement",
+    "content": "Replace the fuel pressure regulator with the correct OEM or equivalent part. Inspect vacuum hose for fuel contamination. Verify fuel pressure matches specification at idle and under load after replacement.",
+    "source": "automotive-diagnostics-v1"
+  },
+  {
+    "category": "repair",
+    "entry_key": "fuel_filter_replacement",
+    "content": "Replace the fuel filter with the correct OEM or equivalent part. Relieve fuel system pressure before disconnecting lines. Verify fuel pressure after replacement and inspect for leaks.",
+    "source": "automotive-diagnostics-v1"
+  }
+]

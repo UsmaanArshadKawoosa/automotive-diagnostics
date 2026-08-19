@@ -1,0 +1,104 @@
+[
+  {
+    "category": "dtc",
+    "entry_key": "P0440",
+    "content": "P0440 - Evaporative Emission Control System Malfunction. The EVAP system has a general fault. Causes include a leaking fuel cap, cracked purge or vent hoses, failed purge or vent valve, or a leaking EVAP canister. Perform a smoke test to locate leaks.",
+    "source": "OBD-II DTC reference"
+  },
+  {
+    "category": "dtc",
+    "entry_key": "P0441",
+    "content": "P0441 - Evaporative Emission Control System Incorrect Purge Flow. The EVAP purge flow is outside the expected range. Causes include a clogged purge line, failed purge valve, or a leaking canister. Inspect purge line and valve operation.",
+    "source": "OBD-II DTC reference"
+  },
+  {
+    "category": "dtc",
+    "entry_key": "P0442",
+    "content": "P0442 - Evaporative Emission Control System Leak Detected (Small Leak). A small leak is detected in the EVAP system. Causes include a loose fuel cap, cracked hoses, or a leaking purge/vent valve. Inspect cap seal and hoses.",
+    "source": "OBD-II DTC reference"
+  },
+  {
+    "category": "dtc",
+    "entry_key": "P0443",
+    "content": "P0443 - Evaporative Emission Control System Purge Control Valve Circuit Malfunction. The EVAP purge valve circuit has an open, short, or poor connection. Causes include damaged wiring, failed purge valve, or a bad ECM driver. Inspect wiring and valve operation.",
+    "source": "OBD-II DTC reference"
+  },
+  {
+    "category": "dtc",
+    "entry_key": "P0444",
+    "content": "P0444 - Evaporative Emission Control System Purge Control Valve Circuit Open. The EVAP purge valve circuit is open. Causes include a broken wire, failed purge valve, or poor connector contact. Inspect wiring and valve.",
+    "source": "OBD-II DTC reference"
+  },
+  {
+    "category": "dtc",
+    "entry_key": "P0445",
+    "content": "P0445 - Evaporative Emission Control System Purge Control Valve Circuit Short. The EVAP purge valve circuit is shorted. Causes include damaged wiring, failed purge valve, or a short to ground or power. Inspect wiring and valve.",
+    "source": "OBD-II DTC reference"
+  },
+  {
+    "category": "dtc",
+    "entry_key": "P0446",
+    "content": "P0446 - Evaporative Emission Control System Vent Control Circuit Malfunction. The EVAP vent valve circuit has an open, short, or poor connection. Causes include damaged wiring, failed vent valve, or a bad ECM driver. Inspect wiring and valve operation.",
+    "source": "OBD-II DTC reference"
+  },
+  {
+    "category": "dtc",
+    "entry_key": "P0447",
+    "content": "P0447 - Evaporative Emission Control System Vent Control Circuit Open. The EVAP vent valve circuit is open. Causes include a broken wire, failed vent valve, or poor connector contact. Inspect wiring and valve.",
+    "source": "OBD-II DTC reference"
+  },
+  {
+    "category": "dtc",
+    "entry_key": "P0448",
+    "content": "P0448 - Evaporative Emission Control System Vent Valve Circuit Short. The EVAP vent valve circuit is shorted. Causes include damaged wiring, failed vent valve, or a short to ground or power. Inspect wiring and valve.",
+    "source": "OBD-II DTC reference"
+  },
+  {
+    "category": "dtc",
+    "entry_key": "P0449",
+    "content": "P0449 - Evaporative Emission Control System Vent Valve Circuit Malfunction. The EVAP vent valve has an intermittent fault. Causes include damaged wiring, poor connector contact, or a failing vent valve. Inspect wiring and valve.",
+    "source": "OBD-II DTC reference"
+  },
+  {
+    "category": "dtc",
+    "entry_key": "P0450",
+    "content": "P0450 - Evaporative Emission Control System Pressure Sensor Malfunction. The EVAP pressure sensor circuit has an intermittent fault. Causes include a failed sensor, damaged wiring, or a leak in the EVAP system. Inspect sensor and system pressure.",
+    "source": "OBD-II DTC reference"
+  },
+  {
+    "category": "dtc",
+    "entry_key": "P0451",
+    "content": "P0451 - Evaporative Emission Control System Pressure Sensor Range/Performance Problem. The EVAP pressure sensor signal is out of expected range. Causes include a failing sensor, damaged wiring, or a blocked vent path. Inspect sensor and vent system.",
+    "source": "OBD-II DTC reference"
+  },
+  {
+    "category": "dtc",
+    "entry_key": "P0452",
+    "content": "P0452 - Evaporative Emission Control System Pressure Sensor Low Input. The EVAP pressure sensor voltage is below the expected range. Causes include a shorted signal wire, failed sensor, or open circuit. Inspect wiring and sensor.",
+    "source": "OBD-II DTC reference"
+  },
+  {
+    "category": "dtc",
+    "entry_key": "P0453",
+    "content": "P0453 - Evaporative Emission Control System Pressure Sensor High Input. The EVAP pressure sensor voltage is above the expected range. Causes include an open signal wire or a failed sensor. Inspect wiring and ground connections.",
+    "source": "OBD-II DTC reference"
+  },
+  {
+    "category": "dtc",
+    "entry_key": "P0455",
+    "content": "P0455 - Evaporative Emission Control System Leak Detected (Large Leak). A large leak is detected in the EVAP system. Causes include a missing or damaged fuel cap, cracked hoses, or a failed purge/vent valve. Inspect cap seal and hoses.",
+    "source": "OBD-II DTC reference"
+  },
+  {
+    "category": "dtc",
+    "entry_key": "P0456",
+    "content": "P0456 - Evaporative Emission Control System Leak Detected (Very Small Leak). A very small leak is detected in the EVAP system. Causes include a slightly loose fuel cap, hairline crack in a hose, or a failing purge/vent valve seal. Inspect cap and hoses carefully.",
+    "source": "OBD-II DTC reference"
+  },
+  {
+    "category": "dtc",
+    "entry_key": "P0457",
+    "content": "P0457 - Evaporative Emission Control System Leak Detected (Fuel Cap Loose/Off). The fuel cap is loose, missing, or not sealing properly. Causes include a damaged cap seal, improperly seated cap, or a missing cap. Inspect and replace fuel cap if necessary.",
+    "source": "OBD-II DTC reference"
+  }
+]

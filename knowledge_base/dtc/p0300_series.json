@@ -1,0 +1,32 @@
+[
+  {
+    "category": "dtc",
+    "entry_key": "P0300",
+    "content": "P0300 - Random/Multiple Cylinder Misfire Detected. Indicates that the ECM has detected misfires across multiple cylinders. Common causes include faulty spark plugs, ignition coils, fuel injectors, low compression, vacuum leaks, or contaminated fuel. Recommended checks: scan freeze-frame data, inspect spark plugs and coils, perform cylinder compression test, check fuel pressure and injector balance.",
+    "source": "OBD-II DTC reference"
+  },
+  {
+    "category": "dtc",
+    "entry_key": "P0301",
+    "content": "P0301 - Cylinder 1 Misfire Detected. A misfire is occurring in cylinder 1. Check the spark plug, ignition coil, fuel injector, and compression specifically for cylinder 1. Swap coil/plug to adjacent cylinder to isolate component failure.",
+    "source": "OBD-II DTC reference"
+  },
+  {
+    "category": "dtc",
+    "entry_key": "P0302",
+    "content": "P0302 - Cylinder 2 Misfire Detected. A misfire is occurring in cylinder 2. Inspect spark plug, ignition coil, fuel injector, and compression for cylinder 2. Consider intake manifold leaks near cylinder 2 port.",
+    "source": "OBD-II DTC reference"
+  },
+  {
+    "category": "dtc",
+    "entry_key": "P0303",
+    "content": "P0303 - Cylinder 3 Misfire Detected. A misfire is occurring in cylinder 3. Inspect spark plug, ignition coil, fuel injector, and compression for cylinder 3.",
+    "source": "OBD-II DTC reference"
+  },
+  {
+    "category": "dtc",
+    "entry_key": "P0304",
+    "content": "P0304 - Cylinder 4 Misfire Detected. A misfire is occurring in cylinder 4. Inspect spark plug, ignition coil, fuel injector, and compression for cylinder 4.",
+    "source": "OBD-II DTC reference"
+  }
+]

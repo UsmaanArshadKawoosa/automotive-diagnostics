@@ -1,0 +1,21 @@
+[
+  {
+    "category": "component",
+    "entry_key": "exhaust_manifold",
+    "content": "The exhaust manifold collects exhaust gases from the cylinder head and routes them to the exhaust pipe. A cracked or leaking manifold causes ticking noises, loss of power, and false lean O2 readings. Inspect for cracks, warpage, and leaking gaskets.",
+    "source": "automotive-diagnostics-v1"
+  },
+  {
+    "category": "component",
+    "entry_key": "muffler",
+    "content": "The muffler reduces exhaust noise using baffles and sound-absorbing material. A failing muffler causes increased exhaust noise, rust holes, or restricted flow. Inspect for rust, holes, and loose hangers.",
+    "source": "automotive-diagnostics-v1"
+  },
+  {
+    "category": "component",
+    "entry_key": "resonator",
+    "content": "The resonator fine-tunes exhaust tone and reduces specific frequencies. A damaged resonator causes unusual exhaust noise. Inspect for rust, holes, or loose mounting.",
+    "source": "automotive-diagnostics-v1"
+  }
+]
+

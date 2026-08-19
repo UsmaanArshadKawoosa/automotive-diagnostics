@@ -1,0 +1,44 @@
+[
+  {
+    "category": "dtc",
+    "entry_key": "P0400",
+    "content": "P0400 - Exhaust Gas Recirculation (EGR) Flow Malfunction. The EGR flow is lower or higher than expected. Causes include a clogged EGR passage, faulty EGR valve, damaged vacuum lines, or a failed EGR position sensor. Inspect EGR valve and passages.",
+    "source": "OBD-II DTC reference"
+  },
+  {
+    "category": "dtc",
+    "entry_key": "P0401",
+    "content": "P0401 - Exhaust Gas Recirculation (EGR) Flow Insufficient. The EGR flow is lower than the calibrated limit. Causes include a clogged EGR passage, stuck-closed EGR valve, or damaged vacuum lines. Inspect EGR valve and clean passages.",
+    "source": "OBD-II DTC reference"
+  },
+  {
+    "category": "dtc",
+    "entry_key": "P0402",
+    "content": "P0402 - Exhaust Gas Recirculation (EGR) Flow Excessive. The EGR flow is higher than the calibrated limit. Causes include a stuck-open EGR valve, failed EGR position sensor, or a vacuum leak in the EGR control line. Inspect EGR valve and sensor.",
+    "source": "OBD-II DTC reference"
+  },
+  {
+    "category": "dtc",
+    "entry_key": "P0403",
+    "content": "P0403 - Exhaust Gas Recirculation (EGR) Control Circuit Malfunction. The EGR valve control circuit has an open, short, or poor connection. Causes include damaged wiring, failed EGR solenoid, or a bad ECM driver. Inspect wiring and solenoid.",
+    "source": "OBD-II DTC reference"
+  },
+  {
+    "category": "dtc",
+    "entry_key": "P0404",
+    "content": "P0404 - Exhaust Gas Recirculation (EGR) Control Circuit Range/Performance Problem. The EGR valve position is out of expected range or shows slow response. Causes include a failing EGR valve, carbon buildup, or a bad position sensor. Inspect valve and sensor.",
+    "source": "OBD-II DTC reference"
+  },
+  {
+    "category": "dtc",
+    "entry_key": "P0405",
+    "content": "P0405 - Exhaust Gas Recirculation (EGR) Position Sensor A Circuit Low Input. The EGR position sensor voltage is below the expected range. Causes include a shorted signal wire or a failed sensor. Inspect wiring and sensor.",
+    "source": "OBD-II DTC reference"
+  },
+  {
+    "category": "dtc",
+    "entry_key": "P0406",
+    "content": "P0406 - Exhaust Gas Recirculation (EGR) Position Sensor A Circuit High Input. The EGR position sensor voltage is above the expected range. Causes include an open signal wire or a failed sensor. Inspect wiring and ground circuit.",
+    "source": "OBD-II DTC reference"
+  }
+]

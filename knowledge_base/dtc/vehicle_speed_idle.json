@@ -1,0 +1,110 @@
+[
+  {
+    "category": "dtc",
+    "entry_key": "P0500",
+    "content": "P0500 - Vehicle Speed Sensor A Malfunction. The VSS has no signal or an intermittent signal. Causes include a failed sensor, damaged wiring, or a damaged reluctor ring. Inspect sensor and wiring.",
+    "source": "OBD-II DTC reference"
+  },
+  {
+    "category": "dtc",
+    "entry_key": "P0501",
+    "content": "P0501 - Vehicle Speed Sensor A Circuit Range/Performance Problem. The VSS signal is out of expected range. Causes include a failing sensor, damaged reluctor ring, or excessive air gap. Inspect sensor and reluctor ring.",
+    "source": "OBD-II DTC reference"
+  },
+  {
+    "category": "dtc",
+    "entry_key": "P0502",
+    "content": "P0502 - Vehicle Speed Sensor A Circuit Low Input. The VSS voltage is below the expected range. Causes include a shorted signal wire or a failed sensor. Inspect wiring and sensor.",
+    "source": "OBD-II DTC reference"
+  },
+  {
+    "category": "dtc",
+    "entry_key": "P0503",
+    "content": "P0503 - Vehicle Speed Sensor A Circuit Intermittent Malfunction. The VSS signal is intermittent. Causes include damaged wiring, loose connector, or a failing sensor. Inspect wiring and connector security.",
+    "source": "OBD-II DTC reference"
+  },
+  {
+    "category": "dtc",
+    "entry_key": "P0504",
+    "content": "P0504 - Brake Switch A/B Correlation. The brake switch signals are inconsistent. Causes include a failed brake switch, misadjusted switch, or damaged wiring. Inspect brake switch operation and adjustment.",
+    "source": "OBD-II DTC reference"
+  },
+  {
+    "category": "dtc",
+    "entry_key": "P0505",
+    "content": "P0505 - Idle Air Control System Malfunction. The IAC valve or idle control system is not maintaining commanded idle speed. Causes include a dirty or failed IAC valve, vacuum leaks, or a faulty throttle body. Inspect IAC valve and idle passages.",
+    "source": "OBD-II DTC reference"
+  },
+  {
+    "category": "dtc",
+    "entry_key": "P0506",
+    "content": "P0506 - Idle Speed Lower Than Expected. The idle speed is lower than the commanded target. Causes include a clogged IAC passage, vacuum leak, or dirty throttle body. Inspect IAC valve, throttle body, and vacuum system.",
+    "source": "OBD-II DTC reference"
+  },
+  {
+    "category": "dtc",
+    "entry_key": "P0507",
+    "content": "P0507 - Idle Speed Higher Than Expected. The idle speed is higher than the commanded target. Causes include a vacuum leak, dirty throttle body, or a failed IAC valve. Inspect vacuum system, throttle body, and IAC valve.",
+    "source": "OBD-II DTC reference"
+  },
+  {
+    "category": "dtc",
+    "entry_key": "P0510",
+    "content": "P0510 - Closed Throttle Position Switch Malfunction. The closed throttle position switch signal is intermittent or stuck. Causes include a failed throttle position sensor, damaged wiring, or a misadjusted switch. Inspect TPS and wiring.",
+    "source": "OBD-II DTC reference"
+  },
+  {
+    "category": "dtc",
+    "entry_key": "P0511",
+    "content": "P0511 - Idle Air Control Circuit Malfunction. The IAC valve control circuit has an open, short, or poor connection. Causes include damaged wiring, failed IAC valve, or a bad ECM driver. Inspect wiring and valve.",
+    "source": "OBD-II DTC reference"
+  },
+  {
+    "category": "dtc",
+    "entry_key": "P0512",
+    "content": "P0512 - Starter Request Circuit Malfunction. The starter request signal is intermittent or stuck. Causes include a failed starter switch, damaged wiring, or a bad ECM driver. Inspect starter circuit and wiring.",
+    "source": "OBD-II DTC reference"
+  },
+  {
+    "category": "dtc",
+    "entry_key": "P0513",
+    "content": "P0513 - Incorrect Immobilizer Key. The immobilizer does not recognize the transponder key. Causes include a damaged key, failed immobilizer antenna, or a faulty immobilizer module. Inspect key and immobilizer system.",
+    "source": "OBD-II DTC reference"
+  },
+  {
+    "category": "dtc",
+    "entry_key": "P0514",
+    "content": "P0514 - Battery Temperature Sensor Circuit Range/Performance Problem. The battery temperature sensor signal is out of expected range. Causes include a failing sensor, damaged wiring, or an open circuit. Inspect sensor and wiring.",
+    "source": "OBD-II DTC reference"
+  },
+  {
+    "category": "dtc",
+    "entry_key": "P0515",
+    "content": "P0515 - Battery Temperature Sensor Circuit. The battery temperature sensor circuit has an intermittent fault. Causes include damaged wiring, poor connector contact, or a failing sensor. Inspect wiring and connector.",
+    "source": "OBD-II DTC reference"
+  },
+  {
+    "category": "dtc",
+    "entry_key": "P0516",
+    "content": "P0516 - Battery Temperature Sensor Circuit Low Input. The battery temperature sensor voltage is below the expected range. Causes include a shorted signal wire or a failed sensor. Inspect wiring and sensor.",
+    "source": "OBD-II DTC reference"
+  },
+  {
+    "category": "dtc",
+    "entry_key": "P0517",
+    "content": "P0517 - Battery Temperature Sensor Circuit High Input. The battery temperature sensor voltage is above the expected range. Causes include an open signal wire or a failed sensor. Inspect wiring and ground connections.",
+    "source": "OBD-II DTC reference"
+  },
+  {
+    "category": "dtc",
+    "entry_key": "P0518",
+    "content": "P0518 - Idle Air Control Circuit Intermittent Malfunction. The IAC valve control signal is intermittent. Causes include damaged wiring, loose connector, or a failing IAC valve. Inspect wiring and connector security.",
+    "source": "OBD-II DTC reference"
+  },
+  {
+    "category": "dtc",
+    "entry_key": "P0519",
+    "content": "P0519 - Idle Air Control System Performance Problem. The IAC system is not maintaining idle within the expected tolerance. Causes include carbon buildup in the throttle body, failing IAC valve, or vacuum leaks. Inspect throttle body and IAC valve.",
+    "source": "OBD-II DTC reference"
+  }
+]

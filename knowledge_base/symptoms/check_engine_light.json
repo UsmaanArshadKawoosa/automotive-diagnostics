@@ -1,0 +1,32 @@
+[
+  {
+    "category": "symptom",
+    "entry_key": "check_engine_light_flashing",
+    "content": "A flashing check-engine light indicates a severe misfire that can damage the catalytic converter. Causes include severe misfire, fuel system failure, or major ignition fault. Stop driving if safe and diagnose immediately to prevent catalytic converter damage.",
+    "source": "automotive-diagnostics-v1"
+  },
+  {
+    "category": "symptom",
+    "entry_key": "check_engine_light_steady",
+    "content": "A steady check-engine light indicates a non-critical fault. Read DTCs to identify the cause. Common causes include sensor faults, minor emissions issues, or intermittent electrical faults. Address promptly to prevent escalation.",
+    "source": "automotive-diagnostics-v1"
+  },
+  {
+    "category": "symptom",
+    "entry_key": "cel_with_no_ noticeable_symptoms",
+    "content": "A check-engine light with no noticeable driveability issues is often caused by minor sensor faults, emissions leaks, or intermittent electrical faults. Retrieve DTCs and freeze-frame data to identify the root cause before it worsens.",
+    "source": "automotive-diagnostics-v1"
+  },
+  {
+    "category": "symptom",
+    "entry_key": "service_engine_soon",
+    "content": "Service engine soon light indicates a fault that may affect emissions or engine management. Retrieve DTCs and inspect the corresponding system. Common causes include O2 sensor faults, EVAP leaks, or fuel trim deviations.",
+    "source": "automotive-diagnostics-v1"
+  },
+  {
+    "category": "symptom",
+    "entry_key": "multiple_cel_codes",
+    "content": "Multiple check-engine light codes can indicate a common root cause or multiple independent faults. Start with the oldest or primary code, inspect related systems, and clear codes after repair to verify resolution.",
+    "source": "automotive-diagnostics-v1"
+  }
+]

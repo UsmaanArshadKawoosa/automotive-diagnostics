@@ -1,0 +1,32 @@
+[
+  {
+    "category": "fault",
+    "entry_key": "ignition_coil_failure",
+    "content": "A failed or degraded ignition coil produces weak or no spark, causing misfires, rough running, reduced power, and poor fuel economy. Coils often fail under heat or load. Diagnosis involves swapping coils between cylinders and observing whether the misfire follows the coil.",
+    "source": "automotive-diagnostics-v1"
+  },
+  {
+    "category": "fault",
+    "entry_key": "spark_plug_wear",
+    "content": "Worn or fouled spark plugs fail to ignite the air-fuel mixture consistently, leading to misfires, rough idle, hard starting, and reduced fuel economy. Inspect electrode gap, carbon fouling, oil fouling, and ceramic cracks.",
+    "source": "automotive-diagnostics-v1"
+  },
+  {
+    "category": "fault",
+    "entry_key": "vacuum_leak",
+    "content": "A vacuum leak introduces unmetered air into the intake manifold, causing a lean condition, rough idle, hesitation, and P0171/P0174 codes. Common leak points are intake manifold gaskets, vacuum hoses, PCV valve, and brake booster hose.",
+    "source": "automotive-diagnostics-v1"
+  },
+  {
+    "category": "fault",
+    "entry_key": "maf_sensor_fault",
+    "content": "A dirty or failing mass air flow sensor reports incorrect airflow, leading to incorrect fuel injection, lean or rich conditions, rough idle, hesitation, and poor acceleration. Cleaning with MAF-specific cleaner may restore function; replacement is needed if readings remain out of spec.",
+    "source": "automotive-diagnostics-v1"
+  },
+  {
+    "category": "fault",
+    "entry_key": "restricted_catalytic_converter",
+    "content": "A restricted catalytic converter creates excessive backpressure, reducing engine power, causing poor acceleration, overheating, and possible misfires. Diagnose with backpressure test or by monitoring manifold vacuum at idle.",
+    "source": "automotive-diagnostics-v1"
+  }
+]

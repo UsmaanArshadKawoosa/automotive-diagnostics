@@ -1,0 +1,38 @@
+[
+  {
+    "category": "component",
+    "entry_key": "spark_plug",
+    "content": "Spark plugs ignite the air-fuel mixture in the combustion chamber. Worn or fouled plugs cause misfires, rough idle, hard starting, and reduced fuel economy. Inspect electrode gap, carbon fouling, oil fouling, and ceramic cracks. Replace at manufacturer intervals.",
+    "source": "automotive-diagnostics-v1"
+  },
+  {
+    "category": "component",
+    "entry_key": "ignition_wire",
+    "content": "Ignition wires carry high voltage from the coil to the spark plug. Worn or damaged wires cause misfires, rough running, and poor fuel economy. Inspect for cracks, burns, and high-resistance spots. Replace if resistance exceeds specification.",
+    "source": "automotive-diagnostics-v1"
+  },
+  {
+    "category": "component",
+    "entry_key": "distributor",
+    "content": "The distributor routes high voltage to the correct spark plug in the correct firing order. A failing distributor causes misfire, no-start, and poor performance. Inspect rotor, cap, and advance mechanism. Replace if worn or cracked.",
+    "source": "automotive-diagnostics-v1"
+  },
+  {
+    "category": "component",
+    "entry_key": "starter_motor",
+    "content": "The starter motor cranks the engine during starting. A failing starter causes slow cranking or no-start. Inspect battery voltage at the starter during cranking. Check starter current draw and replace if worn or faulty.",
+    "source": "automotive-diagnostics-v1"
+  },
+  {
+    "category": "component",
+    "entry_key": "alternator",
+    "content": "The alternator generates electrical power to charge the battery and supply the vehicle electrical system. A failing alternator causes battery warning light, low battery voltage, and stalling. Inspect output voltage and current against specification.",
+    "source": "automotive-diagnostics-v1"
+  },
+  {
+    "category": "component",
+    "entry_key": "battery",
+    "content": "The battery supplies electrical power for starting and stabilizes voltage. A weak battery causes slow cranking, no-start, and electrical faults. Inspect voltage, load test results, and terminal connections. Replace if below specification.",
+    "source": "automotive-diagnostics-v1"
+  }
+]

@@ -1,0 +1,32 @@
+[
+  {
+    "category": "dtc",
+    "entry_key": "P0120",
+    "content": "P0120 - Throttle/Pedal Position Sensor/Switch A Circuit Malfunction. The TPS or APP sensor circuit has an intermittent fault. Causes include damaged wiring, poor connector contact, or a failing sensor. Inspect wiring and sensor voltage.",
+    "source": "OBD-II DTC reference"
+  },
+  {
+    "category": "dtc",
+    "entry_key": "P0121",
+    "content": "P0121 - Throttle/Pedal Position Sensor/Switch A Circuit Range/Performance Problem. The TPS or APP sensor voltage is outside the expected correlation. Causes include a misadjusted sensor, contaminated potentiometer track, or failing sensor. Inspect and replace if readings are erratic.",
+    "source": "OBD-II DTC reference"
+  },
+  {
+    "category": "dtc",
+    "entry_key": "P0122",
+    "content": "P0122 - Throttle/Pedal Position Sensor/Switch A Circuit Low Input. The TPS or APP sensor voltage is below the minimum limit. Causes include a shorted signal wire or a failed sensor. Inspect wiring and connector.",
+    "source": "OBD-II DTC reference"
+  },
+  {
+    "category": "dtc",
+    "entry_key": "P0123",
+    "content": "P0123 - Throttle/Pedal Position Sensor/Switch A Circuit High Input. The TPS or APP sensor voltage is above the maximum limit. Causes include an open signal wire or a failed sensor. Inspect wiring and sensor ground.",
+    "source": "OBD-II DTC reference"
+  },
+  {
+    "category": "dtc",
+    "entry_key": "P0125",
+    "content": "P0125 - Insufficient Coolant Temperature for Closed Loop Fuel Control. The ECT sensor does not reach the temperature required for closed-loop operation within the expected time. Causes include a failing thermostat, low coolant, or a failed ECT sensor. Inspect cooling system and sensor.",
+    "source": "OBD-II DTC reference"
+  }
+]

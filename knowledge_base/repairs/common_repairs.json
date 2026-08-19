@@ -1,0 +1,26 @@
+[
+  {
+    "category": "repair",
+    "entry_key": "spark_plug_replacement",
+    "content": "Replace spark plugs using the manufacturer-specified type, gap, and torque. Apply anti-seize to threads if recommended. Replace coils and wires if they show damage or if misfires persist after plug replacement.",
+    "source": "automotive-diagnostics-v1"
+  },
+  {
+    "category": "repair",
+    "entry_key": "ignition_coil_replacement",
+    "content": "Replace faulty ignition coils in sets or per-cylinder as indicated by diagnostics. Verify connector pins are clean and seated; clear DTCs and road test to confirm misfire resolution.",
+    "source": "automotive-diagnostics-v1"
+  },
+  {
+    "category": "repair",
+    "entry_key": "vacuum_leak_repair",
+    "content": "Repair vacuum leaks by replacing cracked hoses, resealing intake manifold gaskets, and verifying PCV valve operation. Smoke testing is the most reliable method to locate small leaks.",
+    "source": "automotive-diagnostics-v1"
+  },
+  {
+    "category": "repair",
+    "entry_key": "maf_sensor_service",
+    "content": "Clean the MAF sensor element with dedicated MAF cleaner. Do not use brake cleaner or compressed air directly on the element. If sensor readings remain out of specification, replace the sensor and reset adaptations.",
+    "source": "automotive-diagnostics-v1"
+  }
+]

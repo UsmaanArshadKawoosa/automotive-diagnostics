@@ -1,10 +1,24 @@
+import re
 import uuid
 
-from sqlalchemy import select
+from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
 from app.db import models
-from app.schemas import DiagnosticSessionCreate, DiagnosticResultCreate, KnowledgeEntryCreate
+from app.schemas import (
+    DiagnosticCheckOutcomeCreate,
+    DiagnosticCheckOutcomeUpdate,
+    DiagnosticResultCreate,
+    DiagnosticSessionCreate,
+    HypothesisOutcomeUpdate,
+    KnowledgeEntryCreate,
+)
+
+_DTC_PATTERN = re.compile(r"\b[PCBU][0-9]{4}\b", re.IGNORECASE)
+
+
+def _extract_dtc_codes(text: str) -> set[str]:
+    return {match.upper() for match in _DTC_PATTERN.findall(text)}
 
 
 def create_diagnostic_session(db: Session, session_in: DiagnosticSessionCreate) -> models.DiagnosticSession:
@@ -39,6 +53,40 @@ def create_knowledge_entry(db: Session, entry_in: KnowledgeEntryCreate) -> model
     db.commit()
     db.refresh(entry)
     return entry
+
+
+def get_existing_entry_keys(db: Session) -> set[tuple[str, str | None]]:
+    rows = db.execute(
+        select(models.KnowledgeEntry.category, models.KnowledgeEntry.entry_key)
+    ).all()
+    return {(row.category, row.entry_key) for row in rows}
+
+
+def bulk_create_knowledge_entries(
+    db: Session, entries: list[KnowledgeEntryCreate], skip_existing: bool = True
+) -> tuple[int, int, list[str]]:
+    created = 0
+    skipped = 0
+    errors: list[str] = []
+
+    existing_keys = get_existing_entry_keys(db) if skip_existing else set()
+
+    for idx, entry_in in enumerate(entries):
+        key = (entry_in.category, entry_in.entry_key)
+        if skip_existing and key in existing_keys:
+            skipped += 1
+            continue
+        try:
+            entry = models.KnowledgeEntry(**entry_in.model_dump())
+            db.add(entry)
+            existing_keys.add(key)
+            created += 1
+        except Exception as exc:
+            errors.append(f"Entry {idx}: {exc}")
+
+    if created:
+        db.commit()
+    return created, skipped, errors
 
 
 def get_knowledge_entry(db: Session, entry_id: uuid.UUID) -> models.KnowledgeEntry | None:
@@ -80,3 +128,108 @@ def update_knowledge_entry_embedding(
     db.commit()
     db.refresh(entry)
     return entry
+
+
+def hybrid_search_knowledge_entries(
+    db: Session,
+    query_embedding: list[float],
+    query_text: str,
+    category: str | None = None,
+    top_k: int = 5,
+) -> list[tuple[models.KnowledgeEntry, float]]:
+    dtc_codes = _extract_dtc_codes(query_text)
+
+    semantic_top_k = max(top_k * 3, 20)
+    semantic_rows = search_knowledge_entries(db, query_embedding, category, semantic_top_k)
+
+    tsquery = func.plainto_tsquery("english", query_text)
+    keyword_stmt = (
+        select(models.KnowledgeEntry, func.ts_rank(models.KnowledgeEntry.search_vector, tsquery).label("keyword_rank"))
+        .where(models.KnowledgeEntry.search_vector.op("@@")(tsquery))
+    )
+    if category:
+        keyword_stmt = keyword_stmt.where(models.KnowledgeEntry.category == category)
+    keyword_stmt = keyword_stmt.order_by(func.ts_rank(models.KnowledgeEntry.search_vector, tsquery).desc()).limit(semantic_top_k)
+    keyword_rows = db.execute(keyword_stmt).all()
+
+    entry_scores: dict[uuid.UUID, tuple[models.KnowledgeEntry, float, float]] = {}
+
+    for entry, distance in semantic_rows:
+        semantic_score = 1.0 - float(distance)
+        keyword_score = 0.0
+        if entry.entry_key and entry.entry_key.upper() in dtc_codes:
+            keyword_score = max(keyword_score, 1.0)
+        entry_scores[entry.id] = (entry, semantic_score, keyword_score)
+
+    for entry, keyword_rank in keyword_rows:
+        keyword_score = min(float(keyword_rank), 1.0)
+        if entry.entry_key and entry.entry_key.upper() in dtc_codes:
+            keyword_score = max(keyword_score, 1.0)
+        if entry.id in entry_scores:
+            existing_entry, semantic_score, existing_keyword_score = entry_scores[entry.id]
+            entry_scores[entry.id] = (existing_entry, semantic_score, max(existing_keyword_score, keyword_score))
+        else:
+            entry_scores[entry.id] = (entry, 0.0, keyword_score)
+
+    scored: list[tuple[models.KnowledgeEntry, float]] = []
+    for entry_id, (entry, semantic_score, keyword_score) in entry_scores.items():
+        dtc_bonus = 0.0
+        if entry.entry_key and entry.entry_key.upper() in dtc_codes:
+            dtc_bonus = 0.5
+        combined_score = semantic_score + keyword_score * 0.3 + dtc_bonus
+        scored.append((entry, combined_score))
+
+    scored.sort(key=lambda x: x[1], reverse=True)
+    return scored[:top_k]
+
+
+def get_diagnostic_result(db: Session, result_id: uuid.UUID) -> models.DiagnosticResult | None:
+    return db.get(models.DiagnosticResult, result_id)
+
+
+def update_hypothesis_outcome(
+    db: Session, result_id: uuid.UUID, outcome_in: HypothesisOutcomeUpdate
+) -> models.DiagnosticResult | None:
+    result = get_diagnostic_result(db, result_id)
+    if result is None:
+        return None
+    result.hypothesis_status = outcome_in.hypothesis_status
+    result.observed_result = outcome_in.observed_result
+    db.commit()
+    db.refresh(result)
+    return result
+
+
+def create_check_outcome(
+    db: Session, result_id: uuid.UUID, check_in: DiagnosticCheckOutcomeCreate
+) -> models.DiagnosticCheckOutcome:
+    outcome = models.DiagnosticCheckOutcome(result_id=result_id, **check_in.model_dump())
+    db.add(outcome)
+    db.commit()
+    db.refresh(outcome)
+    return outcome
+
+
+def get_check_outcome(db: Session, outcome_id: uuid.UUID) -> models.DiagnosticCheckOutcome | None:
+    return db.get(models.DiagnosticCheckOutcome, outcome_id)
+
+
+def update_check_outcome(
+    db: Session, outcome_id: uuid.UUID, check_update: DiagnosticCheckOutcomeUpdate
+) -> models.DiagnosticCheckOutcome | None:
+    outcome = get_check_outcome(db, outcome_id)
+    if outcome is None:
+        return None
+    if check_update.status is not None:
+        outcome.status = check_update.status
+    if check_update.observed_result is not None:
+        outcome.observed_result = check_update.observed_result
+    if check_update.technician_note is not None:
+        outcome.technician_note = check_update.technician_note
+    db.commit()
+    db.refresh(outcome)
+    return outcome
+
+
+def list_check_outcomes(db: Session, result_id: uuid.UUID) -> list[models.DiagnosticCheckOutcome]:
+    return db.query(models.DiagnosticCheckOutcome).filter(models.DiagnosticCheckOutcome.result_id == result_id).all()

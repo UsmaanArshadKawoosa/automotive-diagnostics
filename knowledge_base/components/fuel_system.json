@@ -1,0 +1,26 @@
+[
+  {
+    "category": "component",
+    "entry_key": "fuel_pump",
+    "content": "The fuel pump delivers pressurized fuel from the tank to the fuel rail. Electric pumps are typically located inside the tank. Failure causes low fuel pressure, hard starting, stalling, and loss of power. Inspect pump operation and measure rail pressure.",
+    "source": "automotive-diagnostics-v1"
+  },
+  {
+    "category": "component",
+    "entry_key": "fuel_pressure_regulator",
+    "content": "The fuel pressure regulator maintains constant rail pressure above manifold pressure. A failing regulator causes incorrect fuel pressure, rich or lean conditions, and hard starting. Inspect vacuum hose for fuel contamination and measure rail pressure.",
+    "source": "automotive-diagnostics-v1"
+  },
+  {
+    "category": "component",
+    "entry_key": "fuel_filter",
+    "content": "The fuel filter removes contaminants from the fuel before it reaches the injectors. A clogged filter restricts fuel flow and causes low pressure, hard starting, and stalling. Replace at manufacturer intervals and inspect for contamination.",
+    "source": "automotive-diagnostics-v1"
+  },
+  {
+    "category": "component",
+    "entry_key": "fuel_rail",
+    "content": "The fuel rail distributes pressurized fuel to each injector. It also houses the fuel pressure regulator on many designs. Inspect for leaks, cracks, or loose fittings. Verify fuel pressure at the rail matches specification.",
+    "source": "automotive-diagnostics-v1"
+  }
+]

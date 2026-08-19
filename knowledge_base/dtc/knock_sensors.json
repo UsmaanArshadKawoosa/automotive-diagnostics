@@ -1,0 +1,56 @@
+[
+  {
+    "category": "dtc",
+    "entry_key": "P0322",
+    "content": "P0322 - Knock Sensor Circuit Low Input. The knock sensor voltage is below the expected range. Causes include a shorted signal wire, failed sensor, or open circuit. Inspect wiring and sensor resistance.",
+    "source": "OBD-II DTC reference"
+  },
+  {
+    "category": "dtc",
+    "entry_key": "P0323",
+    "content": "P0323 - Knock Sensor Circuit High Input. The knock sensor voltage is above the expected range. Causes include an open signal wire or a failed sensor. Inspect wiring and ground circuit.",
+    "source": "OBD-II DTC reference"
+  },
+  {
+    "category": "dtc",
+    "entry_key": "P0324",
+    "content": "P0324 - Knock Sensor Circuit Input Range/Performance Problem. The knock sensor signal is out of expected range. Causes include a failing sensor, damaged wiring, or incorrect torque on sensor. Inspect sensor and wiring.",
+    "source": "OBD-II DTC reference"
+  },
+  {
+    "category": "dtc",
+    "entry_key": "P0329",
+    "content": "P0329 - Knock Sensor Circuit High Input (Bank 2). The knock sensor voltage for bank 2 is above the expected range. Causes include an open signal wire or a failed sensor. Inspect wiring and ground connections.",
+    "source": "OBD-II DTC reference"
+  },
+  {
+    "category": "dtc",
+    "entry_key": "P0330",
+    "content": "P0330 - Knock Sensor Circuit Malfunction (Bank 2). The knock sensor for bank 2 has an open, short, or poor connection. Causes include damaged wiring, failed sensor, or a bad ECM driver. Inspect wiring and sensor resistance.",
+    "source": "OBD-II DTC reference"
+  },
+  {
+    "category": "dtc",
+    "entry_key": "P0331",
+    "content": "P0331 - Knock Sensor Circuit Range/Performance Problem (Bank 2). The knock sensor signal for bank 2 is out of expected range. Causes include a failing sensor, damaged wiring, or incorrect torque on sensor. Inspect sensor and wiring.",
+    "source": "OBD-II DTC reference"
+  },
+  {
+    "category": "dtc",
+    "entry_key": "P0332",
+    "content": "P0332 - Knock Sensor Circuit Low Input (Bank 2). The knock sensor voltage for bank 2 is below the expected range. Causes include a shorted signal wire, failed sensor, or open circuit. Inspect wiring and sensor.",
+    "source": "OBD-II DTC reference"
+  },
+  {
+    "category": "dtc",
+    "entry_key": "P0333",
+    "content": "P0333 - Knock Sensor Circuit High Input (Bank 2). The knock sensor voltage for bank 2 is above the expected range. Causes include an open signal wire or a failed sensor. Inspect wiring and ground circuit.",
+    "source": "OBD-II DTC reference"
+  },
+  {
+    "category": "dtc",
+    "entry_key": "P0334",
+    "content": "P0334 - Knock Sensor Circuit Intermittent Malfunction (Bank 2). The knock sensor signal for bank 2 is intermittent. Causes include damaged wiring, loose connector, or a failing sensor. Inspect wiring and connector security.",
+    "source": "OBD-II DTC reference"
+  }
+]

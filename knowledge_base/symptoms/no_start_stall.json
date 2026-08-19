@@ -1,0 +1,14 @@
+[
+  {
+    "category": "symptom",
+    "entry_key": "stall_at_light",
+    "content": "Stalling specifically at stop lights or when coming to a stop is a common rough idle issue. Causes include vacuum leaks, dirty throttle body, failing IAC valve, or EGR valve sticking open. Inspect idle control system and vacuum leaks.",
+    "source": "automotive-diagnostics-v1"
+  },
+  {
+    "category": "symptom",
+    "entry_key": "crank_no_fire",
+    "content": "Crank-no-fire means the engine cranks but does not start. Causes include no fuel, no spark, or out-of-time camshaft/crankshaft sensor. Check for spark at the plug, fuel pressure, and camshaft/crankshaft sensor signals.",
+    "source": "automotive-diagnostics-v1"
+  }
+]

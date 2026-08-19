@@ -1,0 +1,26 @@
+[
+  {
+    "category": "component",
+    "entry_key": "mass_air_flow_sensor",
+    "content": "The mass air flow (MAF) sensor measures the mass of air entering the engine. The ECM uses this value to calculate fuel injection timing. Symptoms of MAF issues include rough idle, hesitation, poor acceleration, and lean/rich DTCs.",
+    "source": "automotive-diagnostics-v1"
+  },
+  {
+    "category": "component",
+    "entry_key": "oxygen_sensor",
+    "content": "Oxygen sensors monitor exhaust oxygen content to help the ECM maintain the stoichiometric air-fuel ratio. A failing O2 sensor can cause poor fuel economy, rough idle, failed emissions, and inaccurate fuel trim data.",
+    "source": "automotive-diagnostics-v1"
+  },
+  {
+    "category": "component",
+    "entry_key": "ignition_coil",
+    "content": "An ignition coil transforms low battery voltage into the high voltage needed to create a spark at the spark plug. Coil failure causes misfires, rough running, and reduced power.",
+    "source": "automotive-diagnostics-v1"
+  },
+  {
+    "category": "component",
+    "entry_key": "fuel_injector",
+    "content": "Fuel injectors deliver pressurized fuel into the combustion chamber. Clogged, leaking, or electrically faulty injectors cause misfires, rough idle, poor acceleration, and rich or lean conditions.",
+    "source": "automotive-diagnostics-v1"
+  }
+]

@@ -1,0 +1,26 @@
+[
+  {
+    "category": "symptom",
+    "entry_key": "engine_misfire",
+    "content": "Engine misfire is felt as hesitation, jerking, or loss of power under load. It may be accompanied by a flashing check-engine light. Common root causes include worn spark plugs, failing ignition coils, clogged fuel injectors, low cylinder compression, or vacuum leaks.",
+    "source": "automotive-diagnostics-v1"
+  },
+  {
+    "category": "symptom",
+    "entry_key": "rough_idle",
+    "content": "Rough idle presents as shaking, vibration, or RPM fluctuation when the vehicle is stationary. Causes include vacuum leaks, dirty throttle body, faulty idle air control valve, worn spark plugs, ignition coil issues, or imbalanced fuel injectors.",
+    "source": "automotive-diagnostics-v1"
+  },
+  {
+    "category": "symptom",
+    "entry_key": "poor_acceleration",
+    "content": "Poor acceleration or lack of power when pressing the accelerator may be caused by restricted air filter, failing fuel pump, clogged catalytic converter, faulty throttle position sensor, turbocharger issues, or transmission slippage.",
+    "source": "automotive-diagnostics-v1"
+  },
+  {
+    "category": "symptom",
+    "entry_key": "hesitation_on_acceleration",
+    "content": "Hesitation or stumbling during acceleration often points to fuel delivery issues, ignition problems, or sensor errors. Check fuel pressure, spark plugs, ignition coils, MAF sensor, and throttle position sensor.",
+    "source": "automotive-diagnostics-v1"
+  }
+]

@@ -1,0 +1,45 @@
+[
+  {
+    "category": "component",
+    "entry_key": "throttle_position_sensor",
+    "content": "The throttle position sensor reports throttle plate angle to the ECM. A failing TPS causes incorrect fuel delivery, hesitation, and poor idle. Inspect sensor voltage sweep from closed to open throttle for smooth transition.",
+    "source": "automotive-diagnostics-v1"
+  },
+  {
+    "category": "component",
+    "entry_key": "accelerator_pedal_position_sensor",
+    "content": "The accelerator pedal position sensor reports driver throttle demand to the ECM. A failing APP sensor causes hesitation, incorrect throttle response, or limp mode. Inspect sensor voltage sweep and correlate with throttle body position.",
+    "source": "automotive-diagnostics-v1"
+  },
+  {
+    "category": "component",
+    "entry_key": "intake_air_temp_sensor",
+    "content": "The intake air temperature sensor reports ambient air temperature to the ECM. The ECM uses this to adjust fuel delivery. A failing IAT sensor causes incorrect fuel mixture, rough idle, and hesitation. Inspect sensor resistance vs temperature.",
+    "source": "automotive-diagnostics-v1"
+  },
+  {
+    "category": "component",
+    "entry_key": "engine_coolant_temp_sensor",
+    "content": "The engine coolant temperature sensor reports engine temperature to the ECM. The ECM uses this for fuel enrichment, idle control, and transmission shift points. A failing ECT sensor causes poor cold-start, incorrect fuel mixture, and overheating warnings. Inspect sensor resistance vs temperature.",
+    "source": "automotive-diagnostics-v1"
+  },
+  {
+    "category": "component",
+    "entry_key": "crankshaft_position_sensor",
+    "content": "The crankshaft position sensor provides engine speed and piston position to the ECM. The ECM uses this for fuel injection timing and ignition control. A failing CKP sensor causes no-start, stalling, and misfire codes. Inspect sensor resistance and air gap.",
+    "source": "automotive-diagnostics-v1"
+  },
+  {
+    "category": "component",
+    "entry_key": "camshaft_position_sensor",
+    "content": "The camshaft position sensor provides camshaft position to the ECM. The ECM uses this for sequential fuel injection and variable valve timing control. A failing CMP sensor causes rough running, no-start, and poor timing control. Inspect sensor resistance and reluctor ring.",
+    "source": "automotive-diagnostics-v1"
+  },
+  {
+    "category": "component",
+    "entry_key": "knock_sensor",
+    "content": "The knock sensor detects engine detonation and signals the ECM to retard ignition timing. A failing knock sensor causes pinging, reduced power, and potential engine damage under load. Inspect sensor resistance and torque specification.",
+    "source": "automotive-diagnostics-v1"
+  }
+]
+

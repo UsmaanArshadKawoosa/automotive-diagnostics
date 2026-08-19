@@ -1,0 +1,32 @@
+[
+  {
+    "category": "fault",
+    "entry_key": "throttle_body_failure",
+    "content": "A dirty or failing throttle body causes rough idle, hesitation, high idle, and poor throttle response. Carbon buildup on the throttle plate and bore disrupts airflow. Clean the throttle body and inspect the throttle position sensor for erratic signals.",
+    "source": "automotive-diagnostics-v1"
+  },
+  {
+    "category": "fault",
+    "entry_key": "intake_manifold_gasket_failure",
+    "content": "A failed intake manifold gasket causes vacuum leaks, lean codes, rough idle, and overheating. Causes include cracked gasket, loose bolts, or thermal fatigue. Inspect for coolant or oil leakage around the manifold and perform a smoke test.",
+    "source": "automotive-diagnostics-v1"
+  },
+  {
+    "category": "fault",
+    "entry_key": "vacuum_hose_leak",
+    "content": "A cracked or disconnected vacuum hose causes unmetered air, lean codes, rough idle, and brake booster failure. Inspect all vacuum hoses for cracks, brittleness, and proper routing. Replace damaged hoses.",
+    "source": "automotive-diagnostics-v1"
+  },
+  {
+    "category": "fault",
+    "entry_key": "exhaust_manifold_leak",
+    "content": "An exhaust manifold leak causes ticking or popping noises, loss of power, and false lean O2 sensor readings. Causes include cracked manifold, failed gasket, or loose bolts. Inspect for soot marks and listen for leaks with the engine running.",
+    "source": "automotive-diagnostics-v1"
+  },
+  {
+    "category": "fault",
+    "entry_key": "air_filter_restriction",
+    "content": "A clogged or restricted air filter reduces airflow, causing poor acceleration, reduced power, and rich running. Inspect the air filter for dirt and debris. Replace the filter at recommended intervals.",
+    "source": "automotive-diagnostics-v1"
+  }
+]

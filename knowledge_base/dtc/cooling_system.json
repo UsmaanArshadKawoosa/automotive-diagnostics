@@ -1,0 +1,80 @@
+[
+  {
+    "category": "dtc",
+    "entry_key": "P0595",
+    "content": "P0595 - Cruise Control Servo Control Circuit Malfunction. The cruise control servo circuit has an open, short, or poor connection. Causes include damaged wiring, failed servo, or a bad ECM driver. Inspect wiring and servo.",
+    "source": "OBD-II DTC reference"
+  },
+  {
+    "category": "dtc",
+    "entry_key": "P0596",
+    "content": "P0596 - Cruise Control Servo Control Circuit Low. The cruise control servo signal is below the expected range. Causes include a shorted signal wire or a failed servo. Inspect wiring and servo.",
+    "source": "OBD-II DTC reference"
+  },
+  {
+    "category": "dtc",
+    "entry_key": "P0597",
+    "content": "P0597 - Cruise Control Servo Control Circuit High. The cruise control servo signal is above the expected range. Causes include an open signal wire or a failed servo. Inspect wiring and servo.",
+    "source": "OBD-II DTC reference"
+  },
+  {
+    "category": "dtc",
+    "entry_key": "P0598",
+    "content": "P0598 - Cruise Control Servo Control Circuit Open. The cruise control servo circuit is open. Causes include a broken wire, failed servo, or poor connector contact. Inspect wiring and servo.",
+    "source": "OBD-II DTC reference"
+  },
+  {
+    "category": "dtc",
+    "entry_key": "P0599",
+    "content": "P0599 - Cruise Control Servo Control Circuit Short. The cruise control servo circuit is shorted. Causes include damaged wiring, failed servo, or a short to ground or power. Inspect wiring and servo.",
+    "source": "OBD-II DTC reference"
+  },
+  {
+    "category": "dtc",
+    "entry_key": "P0610",
+    "content": "P0610 - Control Module Vehicle Options Error. The ECM calibration does not match vehicle options. Causes include incorrect ECM programming, recent ECM replacement, or programming error. Verify ECM calibration against VIN.",
+    "source": "OBD-II DTC reference"
+  },
+  {
+    "category": "dtc",
+    "entry_key": "P0620",
+    "content": "P0620 - Generator Control Circuit Malfunction. The alternator field control circuit has an open, short, or poor connection. Causes include damaged wiring, failed alternator, or a bad ECM driver. Inspect wiring and alternator.",
+    "source": "OBD-II DTC reference"
+  },
+  {
+    "category": "dtc",
+    "entry_key": "P0625",
+    "content": "P0625 - Generator Field/F Terminal Circuit Malfunction. The alternator field circuit has an intermittent fault. Causes include damaged wiring, failing alternator, or a bad ECM driver. Inspect wiring and alternator.",
+    "source": "OBD-II DTC reference"
+  },
+  {
+    "category": "dtc",
+    "entry_key": "P0626",
+    "content": "P0626 - Generator Output Circuit Malfunction. The alternator output circuit has an open or short. Causes include damaged wiring, failed alternator, or blown fusible link. Inspect wiring and alternator output.",
+    "source": "OBD-II DTC reference"
+  },
+  {
+    "category": "dtc",
+    "entry_key": "P0627",
+    "content": "P0627 - Fuel Pump A Control Circuit Malfunction. The fuel pump control circuit has an open, short, or poor connection. Causes include damaged wiring, failed fuel pump relay or module, or a bad ECM driver. Inspect wiring and pump operation.",
+    "source": "OBD-II DTC reference"
+  },
+  {
+    "category": "dtc",
+    "entry_key": "P0628",
+    "content": "P0628 - Fuel Pump A Control Circuit Low. The fuel pump control signal is below the expected range. Causes include a shorted signal wire or a failed fuel pump control circuit. Inspect wiring and pump relay.",
+    "source": "OBD-II DTC reference"
+  },
+  {
+    "category": "dtc",
+    "entry_key": "P0629",
+    "content": "P0629 - Fuel Pump A Control Circuit High. The fuel pump control signal is above the expected range. Causes include an open signal wire or a failed fuel pump control circuit. Inspect wiring and ground circuit.",
+    "source": "OBD-II DTC reference"
+  },
+  {
+    "category": "dtc",
+    "entry_key": "P0630",
+    "content": "P0630 - VIN Not Programmed or Incompatible in ECM. The VIN stored in the ECM is missing or does not match the vehicle VIN. Causes include an unprogrammed ECM, replaced ECM, or programming error. Verify ECM calibration against VIN.",
+    "source": "OBD-II DTC reference"
+  }
+]

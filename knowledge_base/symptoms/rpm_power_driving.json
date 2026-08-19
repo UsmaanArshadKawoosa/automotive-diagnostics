@@ -1,0 +1,26 @@
+[
+  {
+    "category": "symptom",
+    "entry_key": "hesitation_at_cruise",
+    "content": "Hesitation at steady cruise speed indicates inconsistent fuel delivery or ignition faults. Causes include failing fuel pump, clogged injector, or ignition coil breakdown under load. Inspect fuel pressure and ignition scope.",
+    "source": "automotive-diagnostics-v1"
+  },
+  {
+    "category": "symptom",
+    "entry_key": "surge_at_steady_speed",
+    "content": "Surge at steady speed is a rhythmic fluctuation in engine RPM under constant throttle. Causes include weak fuel pump, clogged fuel filter, failing MAF sensor, or vacuum leaks. Inspect fuel delivery and intake system.",
+    "source": "automotive-diagnostics-v1"
+  },
+  {
+    "category": "symptom",
+    "entry_key": "bogging_on_acceleration",
+    "content": "Bogging on acceleration indicates a severe hesitation or loss of power when pressing the throttle. Causes include clogged fuel filter, failing fuel pump, restricted air intake, or ignition failure. Inspect fuel pressure and spark quality.",
+    "source": "automotive-diagnostics-v1"
+  },
+  {
+    "category": "symptom",
+    "entry_key": "lope_at_idle",
+    "content": "Lope at idle is an uneven, lumpy idle characteristic often caused by camshaft profile, vacuum leaks, or inconsistent fuel delivery. Inspect for vacuum leaks and injector balance.",
+    "source": "automotive-diagnostics-v1"
+  }
+]

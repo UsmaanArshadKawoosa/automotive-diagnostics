@@ -1,0 +1,20 @@
+[
+  {
+    "category": "dtc",
+    "entry_key": "P0171",
+    "content": "P0171 - System Too Lean (Bank 1). The air-fuel mixture on bank 1 is leaner than the ECM can compensate for. Common causes include vacuum leaks after the MAF sensor, dirty MAF sensor, weak fuel pump, clogged fuel filter, faulty oxygen sensor, or exhaust leak before the O2 sensor.",
+    "source": "OBD-II DTC reference"
+  },
+  {
+    "category": "dtc",
+    "entry_key": "P0174",
+    "content": "P0174 - System Too Lean (Bank 2). The air-fuel mixture on bank 2 is leaner than the ECM can compensate for. Causes mirror P0171 but affect bank 2. Inspect intake manifold gaskets, vacuum lines, MAF sensor, and fuel delivery.",
+    "source": "OBD-II DTC reference"
+  },
+  {
+    "category": "dtc",
+    "entry_key": "P0101",
+    "content": "P0101 - Mass or Volume Air Flow Circuit Range/Performance Problem. Indicates the MAF sensor signal is out of expected range. Causes include dirty MAF element, intake air leak, faulty MAF sensor, or wiring issue.",
+    "source": "OBD-II DTC reference"
+  }
+]

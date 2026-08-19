@@ -1,0 +1,50 @@
+[
+  {
+    "category": "dtc",
+    "entry_key": "P0340",
+    "content": "P0340 - Camshaft Position Sensor A Circuit Malfunction (Bank 1). The CMP sensor has no signal or an intermittent signal. Causes include a failed sensor, damaged wiring, damaged reluctor ring, or excessive air gap. Inspect sensor, wiring, and reluctor ring.",
+    "source": "OBD-II DTC reference"
+  },
+  {
+    "category": "dtc",
+    "entry_key": "P0341",
+    "content": "P0341 - Camshaft Position Sensor A Circuit Range/Performance Problem (Bank 1). The CMP sensor signal is out of expected range or inconsistent. Causes include a failing sensor, damaged reluctor ring, or excessive air gap. Inspect sensor and reluctor ring condition.",
+    "source": "OBD-II DTC reference"
+  },
+  {
+    "category": "dtc",
+    "entry_key": "P0342",
+    "content": "P0342 - Camshaft Position Sensor A Circuit Low Input (Bank 1). The CMP sensor voltage is below the expected range. Causes include a shorted signal wire or a failed sensor. Inspect wiring and sensor.",
+    "source": "OBD-II DTC reference"
+  },
+  {
+    "category": "dtc",
+    "entry_key": "P0343",
+    "content": "P0343 - Camshaft Position Sensor A Circuit High Input (Bank 1). The CMP sensor voltage is above the expected range. Causes include an open signal wire or a failed sensor. Inspect wiring and ground connections.",
+    "source": "OBD-II DTC reference"
+  },
+  {
+    "category": "dtc",
+    "entry_key": "P0344",
+    "content": "P0344 - Camshaft Position Sensor A Circuit Intermittent Malfunction (Bank 1). The CMP sensor signal is intermittent. Causes include damaged wiring, loose connector, or a failing sensor. Inspect wiring and connector security.",
+    "source": "OBD-II DTC reference"
+  },
+  {
+    "category": "dtc",
+    "entry_key": "P0345",
+    "content": "P0345 - Camshaft Position Sensor A Circuit Malfunction (Bank 2). The CMP sensor for bank 2 has no signal or an intermittent signal. Causes include a failed sensor, damaged wiring, damaged reluctor ring, or excessive air gap. Inspect sensor, wiring, and reluctor ring.",
+    "source": "OBD-II DTC reference"
+  },
+  {
+    "category": "dtc",
+    "entry_key": "P0346",
+    "content": "P0346 - Camshaft Position Sensor A Circuit Range/Performance Problem (Bank 2). The CMP sensor signal for bank 2 is out of expected range. Causes include a failing sensor, damaged reluctor ring, or excessive air gap. Inspect sensor and reluctor ring condition.",
+    "source": "OBD-II DTC reference"
+  },
+  {
+    "category": "dtc",
+    "entry_key": "P0347",
+    "content": "P0347 - Camshaft Position Sensor A Circuit Low Input (Bank 2). The CMP sensor voltage for bank 2 is below the expected range. Causes include a shorted signal wire or a failed sensor. Inspect wiring and sensor.",
+    "source": "OBD-II DTC reference"
+  }
+]

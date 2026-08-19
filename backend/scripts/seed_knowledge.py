@@ -1,78 +1,65 @@
+import argparse
+import sys
+from pathlib import Path
+
 from sqlalchemy.orm import Session
 
 from app.db.database import engine
-from app.db.models import KnowledgeEntry
 from app.services.embeddings import EmbeddingService, get_embedding_service
+from app.services.knowledge_ingestion import KnowledgeIngestionService
+from app.services.knowledge_loader import KnowledgeLoader
 
 
-SAMPLE_ENTRIES: list[dict[str, str | None]] = [
-    {
-        "category": "symptom",
-        "entry_key": "engine_misfire",
-        "content": "Engine misfire is often caused by faulty spark plugs, ignition coils, or fuel injectors. Common accompanying signs include rough idle and loss of power.",
-        "source": "automotive-diagnostics-v1",
-    },
-    {
-        "category": "symptom",
-        "entry_key": "rough_idle",
-        "content": "Rough idle can be caused by vacuum leaks, dirty throttle body, faulty ignition coils, or worn spark plugs.",
-        "source": "automotive-diagnostics-v1",
-    },
-    {
-        "category": "dtc",
-        "entry_key": "P0300",
-        "content": "P0300 indicates random or multiple cylinder misfires. Inspect spark plugs, ignition coils, fuel injectors, and compression.",
-        "source": "OBD-II reference",
-    },
-    {
-        "category": "dtc",
-        "entry_key": "P0301",
-        "content": "P0301 indicates a misfire detected in cylinder 1. Check spark plug, ignition coil, and injector for cylinder 1.",
-        "source": "OBD-II reference",
-    },
-    {
-        "category": "fault",
-        "entry_key": "ignition_coil_failure",
-        "content": "A failed ignition coil can cause misfires, rough running, and reduced fuel economy. Replacement is the typical repair.",
-        "source": "automotive-diagnostics-v1",
-    },
-    {
-        "category": "repair",
-        "entry_key": "spark_plug_replacement",
-        "content": "Replace spark plugs at the manufacturer-recommended interval or when misfires are present. Use the correct plug type and torque specification.",
-        "source": "automotive-diagnostics-v1",
-    },
-    {
-        "category": "component",
-        "entry_key": "mass_air_flow_sensor",
-        "content": "The mass air flow (MAF) sensor measures incoming air. A dirty or failing MAF sensor can cause rough idle, hesitation, and poor fuel economy.",
-        "source": "automotive-diagnostics-v1",
-    },
-    {
-        "category": "symptom",
-        "entry_key": "poor_acceleration",
-        "content": "Poor acceleration may be caused by clogged air filter, failing fuel pump, restricted catalytic converter, or faulty throttle position sensor.",
-        "source": "automotive-diagnostics-v1",
-    },
-]
+DEFAULT_KNOWLEDGE_DIR = Path(__file__).resolve().parent.parent.parent / "knowledge_base"
 
 
-def seed(embedding_service: EmbeddingService | None = None) -> None:
+def seed(
+    embedding_service: EmbeddingService | None = None,
+    knowledge_dir: str | Path = DEFAULT_KNOWLEDGE_DIR,
+    skip_existing: bool = True,
+) -> None:
     if embedding_service is None:
         embedding_service = get_embedding_service()
 
-    texts = [
-        f"{entry['category']} {entry['entry_key'] or ''} {entry['content']}".strip()
-        for entry in SAMPLE_ENTRIES
-    ]
-    embeddings = embedding_service.embed(texts)
+    loader = KnowledgeLoader(knowledge_dir)
 
     with Session(engine) as session:
-        for entry_data, embedding in zip(SAMPLE_ENTRIES, embeddings):
-            session.add(KnowledgeEntry(**entry_data, embedding=embedding))
-        session.commit()
-        print(f"Seeded {len(SAMPLE_ENTRIES)} knowledge entries")
+        service = KnowledgeIngestionService(session, embedding_service, loader)
+        result = service.ingest_from_loader(skip_existing=skip_existing)
+
+    print(
+        f"Seeded knowledge base: {result.created} created, {result.skipped} skipped, "
+        f"{len(result.errors)} errors"
+    )
+    if result.errors:
+        for error in result.errors:
+            print(f"  error: {error}", file=sys.stderr)
+        sys.exit(1)
+
+
+def main() -> None:
+    parser = argparse.ArgumentParser(description="Seed the knowledge base from JSON files.")
+    parser.add_argument(
+        "--path",
+        type=Path,
+        default=DEFAULT_KNOWLEDGE_DIR,
+        help="Directory containing knowledge JSON/JSONL files",
+    )
+    parser.add_argument(
+        "--reset",
+        action="store_true",
+        help="Clear existing knowledge entries before seeding",
+    )
+    args = parser.parse_args()
+
+    if args.reset:
+        print("Truncating knowledge_entries table...")
+        with engine.connect() as conn:
+            conn.exec_driver_sql("TRUNCATE TABLE knowledge_entries RESTART IDENTITY CASCADE")
+            conn.commit()
+
+    seed(knowledge_dir=args.path, skip_existing=not args.reset)
 
 
 if __name__ == "__main__":
-    seed()
+    main()

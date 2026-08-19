@@ -1,0 +1,32 @@
+[
+  {
+    "category": "repair",
+    "entry_key": "timing_belt_replacement",
+    "content": "Replace the timing belt with the correct OEM or equivalent part. Inspect tensioner, idler pulleys, and water pump for wear. Rotate the camshaft and crankshaft to align timing marks. Verify timing marks before closing the timing cover.",
+    "source": "automotive-diagnostics-v1"
+  },
+  {
+    "category": "repair",
+    "entry_key": "timing_chain_replacement",
+    "content": "Replace the timing chain, guides, and tensioners with OEM or equivalent parts. Inspect sprockets for wear. Verify timing marks are aligned before installation. Check oil pressure as low pressure can cause chain tensioner failure.",
+    "source": "automotive-diagnostics-v1"
+  },
+  {
+    "category": "repair",
+    "entry_key": "head_gasket_replacement",
+    "content": "Replace the head gasket with the correct OEM or equivalent part. Inspect cylinder head for warpage and machine if necessary. Torque head bolts to specification in the correct sequence. Bleed cooling system and verify compression after repair.",
+    "source": "automotive-diagnostics-v1"
+  },
+  {
+    "category": "repair",
+    "entry_key": "valve_cover_gasket_replacement",
+    "content": "Replace the valve cover gasket with the correct OEM or equivalent part. Inspect the valve cover for cracks and warpage. Clean mating surfaces thoroughly. Torque fasteners to specification in the correct sequence.",
+    "source": "automotive-diagnostics-v1"
+  },
+  {
+    "category": "repair",
+    "entry_key": "pcv_valve_replacement",
+    "content": "Replace the PCV valve with the correct OEM or equivalent part. Inspect hoses for blockage or collapse. Verify the new valve rattles when shaken. Clear DTCs and confirm idle quality after replacement.",
+    "source": "automotive-diagnostics-v1"
+  }
+]

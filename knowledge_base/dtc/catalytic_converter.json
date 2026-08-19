@@ -1,0 +1,26 @@
+[
+  {
+    "category": "dtc",
+    "entry_key": "P0420",
+    "content": "P0420 - Catalyst System Efficiency Below Threshold (Bank 1). The catalytic converter is not reducing emissions as efficiently as expected. Causes include a failing catalytic converter, exhaust leaks upstream of the sensor, or failing O2 sensors. Inspect exhaust system and O2 sensor activity.",
+    "source": "OBD-II DTC reference"
+  },
+  {
+    "category": "dtc",
+    "entry_key": "P0430",
+    "content": "P0430 - Catalyst System Efficiency Below Threshold (Bank 2). The catalytic converter for bank 2 is not reducing emissions as efficiently as expected. Causes include a failing catalytic converter, exhaust leaks, or failing O2 sensors. Inspect exhaust system and O2 sensor activity.",
+    "source": "OBD-II DTC reference"
+  },
+  {
+    "category": "dtc",
+    "entry_key": "P0422",
+    "content": "P0422 - Catalyst System Efficiency Below Threshold (Bank 1, Bank 2 combined in some calibrations). The catalytic converter efficiency is below the minimum threshold. Causes include internal substrate breakdown, oil contamination, or physical damage. Inspect converter and exhaust system.",
+    "source": "OBD-II DTC reference"
+  },
+  {
+    "category": "dtc",
+    "entry_key": "P0432",
+    "content": "P0432 - Catalyst System Efficiency Below Threshold (Bank 2, Bank 1 combined in some calibrations). The catalytic converter efficiency for bank 2 is below the minimum threshold. Causes include internal substrate breakdown, oil contamination, or physical damage. Inspect converter and exhaust system.",
+    "source": "OBD-II DTC reference"
+  }
+]

@@ -1,0 +1,32 @@
+[
+  {
+    "category": "fault",
+    "entry_key": "fuel_injector_malfunction",
+    "content": "A clogged, leaking, or electrically faulty fuel injector causes misfires, rough idle, poor acceleration, and rich or lean conditions. Causes include carbon deposits, failed solenoid, leaking O-ring, or incorrect impedance. Inspect injector resistance, spray pattern, and leak-down test.",
+    "source": "automotive-diagnostics-v1"
+  },
+  {
+    "category": "fault",
+    "entry_key": "fuel_pump_weakness",
+    "content": "A weak fuel pump causes low fuel pressure, hard starting, stalling under load, and poor performance. Causes include worn impeller, clogged filter, or failing pump driver. Measure fuel pressure at idle and under load.",
+    "source": "automotive-diagnostics-v1"
+  },
+  {
+    "category": "fault",
+    "entry_key": "fuel_pressure_regulator_leak",
+    "content": "A leaking fuel pressure regulator diaphragm causes excessive fuel pressure, rich running, hard starting, and flooded engine. Causes include ruptured diaphragm or torn O-ring. Inspect for fuel in the vacuum hose and measure rail pressure.",
+    "source": "automotive-diagnostics-v1"
+  },
+  {
+    "category": "fault",
+    "entry_key": "fuel_contamination",
+    "content": "Fuel contamination from water, diesel, or bad gasoline causes misfires, stalling, poor acceleration, and engine damage. Inspect fuel sample for clarity and smell. Flush the fuel system and replace contaminated filters.",
+    "source": "automotive-diagnostics-v1"
+  },
+  {
+    "category": "fault",
+    "entry_key": "fuel_filter_clog",
+    "content": "A clogged fuel filter restricts fuel flow, causing low fuel pressure, hard starting, stalling under load, and poor performance. Inspect filter condition and measure fuel pressure before and after the filter.",
+    "source": "automotive-diagnostics-v1"
+  }
+]

@@ -1,0 +1,56 @@
+[
+  {
+    "category": "repair",
+    "entry_key": "oxygen_sensor_replacement",
+    "content": "Replace the oxygen sensor using the correct OEM or equivalent part. Apply anti-seize to the threads. Verify sensor heater and signal operation after installation. Clear DTCs and confirm fuel trim data returns to normal.",
+    "source": "automotive-diagnostics-v1"
+  },
+  {
+    "category": "repair",
+    "entry_key": "air_fuel_ratio_sensor_replacement",
+    "content": "Replace the air-fuel ratio sensor using the correct OEM or equivalent part. These sensors require proper calibration after replacement. Apply anti-seize to threads and verify sensor operation with a scan tool.",
+    "source": "automotive-diagnostics-v1"
+  },
+  {
+    "category": "repair",
+    "entry_key": "throttle_body_cleaning",
+    "content": "Clean the throttle body bore and plate with throttle body cleaner. Do not spray cleaner into the motor or sensors. Rotate the plate to clean all surfaces. Relearn throttle position after cleaning with a scan tool or battery disconnect.",
+    "source": "automotive-diagnostics-v1"
+  },
+  {
+    "category": "repair",
+    "entry_key": "maf_sensor_replacement",
+    "content": "Replace the MAF sensor with the correct OEM or equivalent part. Do not touch the sensor element. Install with the correct orientation and secure the connector. Verify MAF frequency or voltage matches specification after replacement.",
+    "source": "automotive-diagnostics-v1"
+  },
+  {
+    "category": "repair",
+    "entry_key": "map_sensor_replacement",
+    "content": "Replace the MAP sensor with the correct OEM or equivalent part. Verify the vacuum hose is not cracked or blocked. Compare sensor voltage against specification for the current manifold vacuum.",
+    "source": "automotive-diagnostics-v1"
+  },
+  {
+    "category": "repair",
+    "entry_key": "crankshaft_position_sensor_replacement",
+    "content": "Replace the crankshaft position sensor with the correct OEM or equivalent part. Verify the air gap meets specification. Inspect the reluctor ring for damage. Confirm engine starts and syncs after replacement.",
+    "source": "automotive-diagnostics-v1"
+  },
+  {
+    "category": "repair",
+    "entry_key": "camshaft_position_sensor_replacement",
+    "content": "Replace the camshaft position sensor with the correct OEM or equivalent part. Verify the air gap and reluctor ring condition. Confirm engine starts and timing is synchronized after replacement.",
+    "source": "automotive-diagnostics-v1"
+  },
+  {
+    "category": "repair",
+    "entry_key": "coolant_temperature_sensor_replacement",
+    "content": "Replace the engine coolant temperature sensor with the correct OEM or equivalent part. Bleed air from the cooling system if necessary. Verify sensor resistance matches the temperature curve after replacement.",
+    "source": "automotive-diagnostics-v1"
+  },
+  {
+    "category": "repair",
+    "entry_key": "knock_sensor_replacement",
+    "content": "Replace the knock sensor with the correct OEM or equivalent part. Torque to specification to ensure proper signal transmission. Verify no knock codes remain after replacement and normal operation resumes.",
+    "source": "automotive-diagnostics-v1"
+  }
+]

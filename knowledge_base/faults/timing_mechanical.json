@@ -1,0 +1,32 @@
+[
+  {
+    "category": "fault",
+    "entry_key": "timing_chain_wear",
+    "content": "A worn timing chain causes variable valve timing errors, rough idle, reduced power, and P0340/P0341 or P0335/P0336 codes. Causes include chain stretch, worn tensioner, or worn guides. Inspect timing marks and listen for chain rattle on cold start.",
+    "source": "automotive-diagnostics-v1"
+  },
+  {
+    "category": "fault",
+    "entry_key": "timing_belt_failure",
+    "content": "A broken or skipped timing belt causes no-start, severe misfire, or catastrophic engine damage in interference engines. Causes include belt wear, incorrect installation, or tensioner failure. Inspect belt condition and replace at manufacturer intervals.",
+    "source": "automotive-diagnostics-v1"
+  },
+  {
+    "category": "fault",
+    "entry_key": "valve_train_wear",
+    "content": "Worn valve train components cause low compression, misfire, and poor performance. Causes include worn camshaft lobes, worn lifters, or bent valves. Perform a wet/dry compression test and inspect camshaft lobes.",
+    "source": "automotive-diagnostics-v1"
+  },
+  {
+    "category": "fault",
+    "entry_key": "head_gasket_failure",
+    "content": "A blown head gasket causes coolant mixing with oil, white exhaust smoke, overheating, and misfire. Causes include overheating, detonation, or gasket aging. Inspect for coolant in oil, combustion gases in cooling system, and compression loss between cylinders.",
+    "source": "automotive-diagnostics-v1"
+  },
+  {
+    "category": "fault",
+    "entry_key": "low_compression",
+    "content": "Low compression causes misfire, hard starting, and reduced power. Causes include worn piston rings, worn valve seats, bent valves, or head gasket failure. Perform a wet/dry compression test to isolate the cause.",
+    "source": "automotive-diagnostics-v1"
+  }
+]

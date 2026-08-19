@@ -1,0 +1,87 @@
+[
+  {
+    "category": "symptom",
+    "entry_key": "hard_starting",
+    "content": "Hard starting presents as extended cranking before the engine fires. Causes include weak fuel pump, low fuel pressure, worn spark plugs, failing ignition coils, weak battery, or a failing crankshaft position sensor. Check fuel pressure, spark, and compression.",
+    "source": "automotive-diagnostics-v1"
+  },
+  {
+    "category": "symptom",
+    "entry_key": "no_start",
+    "content": "No-start means the engine does not fire at all. Causes include no fuel, no spark, no compression, or severe mechanical failure. Diagnose by checking for spark, fuel pressure, and compression. Also check DTCs for immobilizer or sensor faults.",
+    "source": "automotive-diagnostics-v1"
+  },
+  {
+    "category": "symptom",
+    "entry_key": "stalling",
+    "content": "Stalling occurs when the engine dies unexpectedly while idling or driving. Causes include vacuum leaks, failing idle air control valve, dirty throttle body, weak fuel pump, or a failing crankshaft position sensor. Inspect idle control system and fuel delivery.",
+    "source": "automotive-diagnostics-v1"
+  },
+  {
+    "category": "symptom",
+    "entry_key": "reduced_power",
+    "content": "Reduced power or loss of power under load may be caused by restricted catalytic converter, failing fuel pump, clogged fuel filter, turbocharger issues, or transmission slippage. Inspect exhaust backpressure, fuel delivery, and drivetrain.",
+    "source": "automotive-diagnostics-v1"
+  },
+  {
+    "category": "symptom",
+    "entry_key": "poor_fuel_economy",
+    "content": "Poor fuel economy can be caused by failing oxygen sensors, dirty MAF sensor, leaking fuel injectors, low tire pressure, dragging brakes, or restricted air filter. Inspect sensors, injectors, and intake/exhaust restrictions.",
+    "source": "automotive-diagnostics-v1"
+  },
+  {
+    "category": "symptom",
+    "entry_key": "engine_knocking",
+    "content": "Engine knocking or pinging is a metallic noise under load. Causes include incorrect ignition timing, low-octane fuel, carbon buildup in cylinders, or failing knock sensor. Inspect ignition timing, fuel quality, and knock sensor operation.",
+    "source": "automotive-diagnostics-v1"
+  },
+  {
+    "category": "symptom",
+    "entry_key": "engine_overheating",
+    "content": "Engine overheating presents as high coolant temperature gauge reading, steam, or warning light. Causes include low coolant, failing thermostat, water pump failure, cooling fan failure, or a clogged radiator. Inspect cooling system components and coolant level.",
+    "source": "automotive-diagnostics-v1"
+  },
+  {
+    "category": "symptom",
+    "entry_key": "excessive_exhaust_smoke",
+    "content": "Excessive exhaust smoke can be black (rich), white (coolant leak or cold start), or blue (oil burning). Black smoke indicates overly rich mixture; white smoke may indicate head gasket failure; blue smoke indicates worn piston rings or valve seals.",
+    "source": "automotive-diagnostics-v1"
+  },
+  {
+    "category": "symptom",
+    "entry_key": "unusual_exhaust_odor",
+    "content": "Unusual exhaust odor such as sulfur or rotten egg smell often indicates a failing catalytic converter. Rich conditions or fuel additives can also cause strong exhaust odors. Inspect catalytic converter efficiency and fuel trim data.",
+    "source": "automotive-diagnostics-v1"
+  },
+  {
+    "category": "symptom",
+    "entry_key": "surging",
+    "content": "Surging is a rhythmic rise and fall in engine speed under steady load. Causes include weak fuel pump, clogged fuel filter, failing MAF sensor, or vacuum leaks. Inspect fuel delivery and intake system.",
+    "source": "automotive-diagnostics-v1"
+  },
+  {
+    "category": "symptom",
+    "entry_key": "intermittent_misfire",
+    "content": "Intermittent misfire comes and goes, often under load or at specific RPM. Causes include failing ignition coils, fouled spark plugs, loose wiring, or low fuel pressure. Monitor misfire counts per cylinder to isolate the affected cylinder.",
+    "source": "automotive-diagnostics-v1"
+  },
+  {
+    "category": "symptom",
+    "entry_key": "cold_start_problems",
+    "content": "Cold-start problems include hard starting, rough idle, or stalling when the engine is cold. Causes include weak spark plugs, failing ECT sensor, low fuel pressure, or a failing thermostat. Inspect cold-start enrichment system and sensor readings.",
+    "source": "automotive-diagnostics-v1"
+  },
+  {
+    "category": "symptom",
+    "entry_key": "hot_start_problems",
+    "content": "Hot-start problems include hard starting or no-start when the engine is hot. Causes include failing fuel pump, vapor lock, failing crankshaft position sensor, or ignition coil breakdown under heat soak. Inspect fuel pressure and sensor operation when hot.",
+    "source": "automotive-diagnostics-v1"
+  },
+  {
+    "category": "symptom",
+    "entry_key": "fluctuating_rpm",
+    "content": "Fluctuating RPM at idle or steady cruise can be caused by vacuum leaks, dirty throttle body, failing IAC valve, or inconsistent fuel delivery. Inspect vacuum system, throttle body, and idle control components.",
+    "source": "automotive-diagnostics-v1"
+  }
+]
+

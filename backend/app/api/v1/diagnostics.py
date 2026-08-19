@@ -4,21 +4,32 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
 from app.crud import (
+    create_check_outcome,
     create_diagnostic_result,
     create_diagnostic_session,
+    get_check_outcome,
+    get_diagnostic_result,
     get_diagnostic_session,
+    list_check_outcomes,
     list_diagnostic_sessions,
+    update_check_outcome,
+    update_hypothesis_outcome,
 )
 from app.db.database import get_db
 from app.schemas import (
     DiagnosticAnalyzeRequest,
     DiagnosticAnalyzeResponse,
+    DiagnosticCheckOutcomeCreate,
+    DiagnosticCheckOutcomeRead,
+    DiagnosticCheckOutcomeUpdate,
     DiagnosticResultCreate,
     DiagnosticResultRead,
     DiagnosticSessionCreate,
     DiagnosticSessionRead,
+    HypothesisOutcomeUpdate,
 )
 from app.services.diagnostic import DiagnosticService, DiagnosticServiceError, get_diagnostic_service
+from app.services.diagnostic_analytics import get_diagnostic_analytics_service
 from app.services.embeddings import EmbeddingService, get_embedding_service
 from app.services.llm import LLMService, get_llm_service
 
@@ -32,9 +43,37 @@ def analyze_diagnostic(
     embedding_service: EmbeddingService = Depends(get_embedding_service),
     llm_service: LLMService = Depends(get_llm_service),
 ) -> DiagnosticAnalyzeResponse:
+    if request.session_id is not None:
+        raise HTTPException(
+            status_code=422,
+            detail="session_id is not allowed on /analyze. Use /sessions/{session_id}/analyze for follow-up analysis.",
+        )
     diagnostic_service = get_diagnostic_service(embedding_service, llm_service)
     try:
         return diagnostic_service.analyze(db, request)
+    except DiagnosticServiceError as exc:
+        raise HTTPException(status_code=503, detail=str(exc)) from exc
+
+
+@router.post("/sessions/{session_id}/analyze", response_model=DiagnosticAnalyzeResponse, status_code=201)
+def analyze_in_session(
+    session_id: uuid.UUID,
+    request: DiagnosticAnalyzeRequest,
+    db: Session = Depends(get_db),
+    embedding_service: EmbeddingService = Depends(get_embedding_service),
+    llm_service: LLMService = Depends(get_llm_service),
+) -> DiagnosticAnalyzeResponse:
+    if request.session_id is not None and request.session_id != session_id:
+        raise HTTPException(
+            status_code=422,
+            detail="request.session_id must match the URL session_id.",
+        )
+    session = get_diagnostic_session(db, session_id)
+    if session is None:
+        raise HTTPException(status_code=404, detail="Diagnostic session not found")
+    diagnostic_service = get_diagnostic_service(embedding_service, llm_service)
+    try:
+        return diagnostic_service.analyze(db, request, session=session)
     except DiagnosticServiceError as exc:
         raise HTTPException(status_code=503, detail=str(exc)) from exc
 
@@ -65,3 +104,55 @@ def create_result(
     if session is None:
         raise HTTPException(status_code=404, detail="Diagnostic session not found")
     return create_diagnostic_result(db, session_id, result_in)
+
+
+@router.patch("/results/{result_id}/outcome", response_model=DiagnosticResultRead)
+def update_result_outcome(
+    result_id: uuid.UUID,
+    outcome_in: HypothesisOutcomeUpdate,
+    db: Session = Depends(get_db),
+) -> DiagnosticResultRead:
+    result = update_hypothesis_outcome(db, result_id, outcome_in)
+    if result is None:
+        raise HTTPException(status_code=404, detail="Diagnostic result not found")
+    return result
+
+
+@router.post("/results/{result_id}/checks", response_model=DiagnosticCheckOutcomeRead, status_code=201)
+def create_result_check_outcome(
+    result_id: uuid.UUID,
+    check_in: DiagnosticCheckOutcomeCreate,
+    db: Session = Depends(get_db),
+) -> DiagnosticCheckOutcomeRead:
+    result = get_diagnostic_result(db, result_id)
+    if result is None:
+        raise HTTPException(status_code=404, detail="Diagnostic result not found")
+    return create_check_outcome(db, result_id, check_in)
+
+
+@router.patch("/checks/{outcome_id}", response_model=DiagnosticCheckOutcomeRead)
+def update_check_outcome_endpoint(
+    outcome_id: uuid.UUID,
+    check_update: DiagnosticCheckOutcomeUpdate,
+    db: Session = Depends(get_db),
+) -> DiagnosticCheckOutcomeRead:
+    outcome = update_check_outcome(db, outcome_id, check_update)
+    if outcome is None:
+        raise HTTPException(status_code=404, detail="Diagnostic check outcome not found")
+    return outcome
+
+
+@router.get("/results/{result_id}/checks", response_model=list[DiagnosticCheckOutcomeRead])
+def list_result_checks(
+    result_id: uuid.UUID, db: Session = Depends(get_db)
+) -> list[DiagnosticCheckOutcomeRead]:
+    result = get_diagnostic_result(db, result_id)
+    if result is None:
+        raise HTTPException(status_code=404, detail="Diagnostic result not found")
+    return list_check_outcomes(db, result_id)
+
+
+@router.get("/analytics/outcomes")
+def get_outcome_analytics(db: Session = Depends(get_db)) -> dict:
+    service = get_diagnostic_analytics_service(db)
+    return service.get_outcome_analytics().model_dump()

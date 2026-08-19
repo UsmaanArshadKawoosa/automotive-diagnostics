@@ -1,0 +1,32 @@
+[
+  {
+    "category": "dtc",
+    "entry_key": "P0110",
+    "content": "P0110 - Intake Air Temperature Circuit Malfunction. The IAT sensor circuit has an intermittent fault. Causes include damaged wiring, poor connector contact, or a failing sensor. Inspect wiring and connector.",
+    "source": "OBD-II DTC reference"
+  },
+  {
+    "category": "dtc",
+    "entry_key": "P0112",
+    "content": "P0112 - Intake Air Temperature Circuit Low Input. The IAT sensor reports a temperature higher than the maximum limit (typically above 130C). Causes include a shorted signal wire or a failed sensor. Inspect wiring and replace sensor if necessary.",
+    "source": "OBD-II DTC reference"
+  },
+  {
+    "category": "dtc",
+    "entry_key": "P0113",
+    "content": "P0113 - Intake Air Temperature Circuit High Input. The IAT sensor reports a temperature lower than the minimum limit (typically below -40C). Causes include an open signal wire or a failed sensor. Inspect wiring and connector.",
+    "source": "OBD-II DTC reference"
+  },
+  {
+    "category": "dtc",
+    "entry_key": "P0116",
+    "content": "P0116 - Engine Coolant Temperature Circuit Range/Performance Problem. The ECT sensor signal is out of expected range or shows slow response. Causes include a failing sensor, low coolant, or poor connector contact. Inspect sensor and wiring.",
+    "source": "OBD-II DTC reference"
+  },
+  {
+    "category": "dtc",
+    "entry_key": "P0117",
+    "content": "P0117 - Engine Coolant Temperature Circuit Low Input. The ECT sensor reports a temperature higher than the maximum limit. Causes include a shorted signal wire or a failed sensor. Inspect wiring and replace sensor if necessary.",
+    "source": "OBD-II DTC reference"
+  }
+]

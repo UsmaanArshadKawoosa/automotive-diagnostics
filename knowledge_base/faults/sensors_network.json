@@ -1,0 +1,86 @@
+[
+  {
+    "category": "fault",
+    "entry_key": "map_sensor_fault",
+    "content": "A failing MAP sensor reports incorrect manifold pressure, causing incorrect fuel injection, rough idle, hesitation, and poor acceleration. Causes include contaminated sensor element, damaged wiring, or a failing sensor. Inspect wiring and compare readings against known good values.",
+    "source": "automotive-diagnostics-v1"
+  },
+  {
+    "category": "fault",
+    "entry_key": "oxygen_sensor_failure",
+    "content": "A failing oxygen sensor sends incorrect voltage signals, causing the ECM to miscalculate fuel delivery. This leads to poor fuel economy, rough idle, hesitation, and failed emissions. Causes include contaminated sensor element, aged ceramic, or wiring faults. Inspect sensor data and wiring.",
+    "source": "automotive-diagnostics-v1"
+  },
+  {
+    "category": "fault",
+    "entry_key": "intake_leak",
+    "content": "An intake manifold leak introduces unmetered air, causing a lean condition, rough idle, hesitation, and P0171/P0174 codes. Common leak points are intake manifold gaskets, throttle body gasket, and vacuum hoses. Inspect with smoke test or propane enrichment.",
+    "source": "automotive-diagnostics-v1"
+  },
+  {
+    "category": "fault",
+    "entry_key": "exhaust_leak",
+    "content": "An exhaust leak upstream of the O2 sensor introduces fresh air, causing false lean readings, poor fuel economy, and emission test failures. Inspect exhaust manifold, downpipe, and catalytic converter welds for cracks or loose flanges.",
+    "source": "automotive-diagnostics-v1"
+  },
+  {
+    "category": "fault",
+    "entry_key": "egr_valve_malfunction",
+    "content": "A stuck-open EGR valve causes rough idle, stalling, and hesitation at low load. A stuck-closed EGR valve causes pinging, high combustion temperatures, and P0401/P0402 codes. Inspect EGR valve movement and passages for carbon buildup.",
+    "source": "automotive-diagnostics-v1"
+  },
+  {
+    "category": "fault",
+    "entry_key": "evap_leak",
+    "content": "An EVAP leak allows fuel vapors to escape, causing emission test failures and P0440-P0457 codes. Common causes include loose fuel cap, cracked hoses, failed purge/vent valve, or leaking canister. Perform a smoke test to locate the leak.",
+    "source": "automotive-diagnostics-v1"
+  },
+  {
+    "category": "fault",
+    "entry_key": "crankshaft_position_sensor_failure",
+    "content": "A failing crankshaft position sensor causes no-start, stalling, or misfire codes. The ECM loses reference for injection and ignition timing. Causes include damaged wiring, excessive air gap, or a failing sensor. Inspect sensor resistance and air gap.",
+    "source": "automotive-diagnostics-v1"
+  },
+  {
+    "category": "fault",
+    "entry_key": "camshaft_position_sensor_failure",
+    "content": "A failing camshaft position sensor causes rough running, no-start, or poor timing control. The ECM loses camshaft reference for sequential fuel injection and variable valve timing. Inspect sensor resistance, wiring, and reluctor ring.",
+    "source": "automotive-diagnostics-v1"
+  },
+  {
+    "category": "fault",
+    "entry_key": "throttle_body_malfunction",
+    "content": "A dirty or failing throttle body causes rough idle, hesitation, and high idle. Carbon buildup on the throttle plate and bore restricts airflow and disrupts idle control. Clean the throttle body and inspect the throttle position sensor.",
+    "source": "automotive-diagnostics-v1"
+  },
+  {
+    "category": "fault",
+    "entry_key": "coolant_temperature_sensor_failure",
+    "content": "A failing engine coolant temperature sensor sends incorrect temperature data to the ECM, causing incorrect fuel mixture, poor idle, and emission issues. A shorted low-temperature signal causes rich running; a shorted high-temperature signal causes lean running. Inspect sensor resistance vs temperature.",
+    "source": "automotive-diagnostics-v1"
+  },
+  {
+    "category": "fault",
+    "entry_key": "knock_sensor_failure",
+    "content": "A failing knock sensor prevents the ECM from detecting detonation, causing the engine to run advanced timing under load. This can cause engine knocking, pinging, and potential engine damage. Inspect sensor resistance and wiring.",
+    "source": "automotive-diagnostics-v1"
+  },
+  {
+    "category": "fault",
+    "entry_key": "pcv_system_failure",
+    "content": "A failed PCV valve or clogged PCV hose causes pressure buildup in the crankcase, leading to oil leaks, rough idle, and vacuum leaks. Inspect PCV valve operation and hoses for blockage. A rattling PCV valve indicates proper operation.",
+    "source": "automotive-diagnostics-v1"
+  },
+  {
+    "category": "fault",
+    "entry_key": "fuel_pump_failure",
+    "content": "A weak or failed fuel pump causes low fuel pressure, hard starting, stalling, and loss of power under load. Causes include worn pump, clogged filter, or failing pump driver module. Measure fuel pressure at the rail and inspect pump operation.",
+    "source": "automotive-diagnostics-v1"
+  },
+  {
+    "category": "fault",
+    "entry_key": "fuel_pressure_regulator_failure",
+    "content": "A failing fuel pressure regulator causes incorrect rail pressure, leading to rich or lean conditions, hard starting, and poor performance. A leaking diaphragm causes excessive fuel pressure and rich running. Inspect fuel pressure against spec.",
+    "source": "automotive-diagnostics-v1"
+  }
+]

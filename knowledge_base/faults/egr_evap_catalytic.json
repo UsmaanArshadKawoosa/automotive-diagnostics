@@ -1,0 +1,38 @@
+[
+  {
+    "category": "fault",
+    "entry_key": "catalytic_converter_degradation",
+    "content": "Catalytic converter degradation reduces emissions efficiency and causes P0420/P0430. Causes include internal substrate breakdown, oil contamination, overheating, or physical damage. Inspect converter for rattling, discoloration, or exhaust restrictions.",
+    "source": "automotive-diagnostics-v1"
+  },
+  {
+    "category": "fault",
+    "entry_key": "evap_system_leak",
+    "content": "An EVAP system leak allows fuel vapors to escape, causing emission test failures and P0440-P0457 codes. Common causes include loose fuel cap, cracked hoses, failed purge/vent valve, or leaking canister. Perform a smoke test to locate the leak.",
+    "source": "automotive-diagnostics-v1"
+  },
+  {
+    "category": "fault",
+    "entry_key": "egr_valve_stuck_open",
+    "content": "An EGR valve stuck open causes rough idle, stalling, and hesitation at low load. The ECM cannot maintain idle speed with unintended exhaust gas flow. Inspect EGR valve movement and clean carbon deposits from the valve and passages.",
+    "source": "automotive-diagnostics-v1"
+  },
+  {
+    "category": "fault",
+    "entry_key": "egr_valve_stuck_closed",
+    "content": "An EGR valve stuck closed causes high combustion temperatures, engine ping, and P0401 codes. The ECM cannot reduce NOx emissions effectively. Inspect EGR valve movement and clean carbon deposits from the valve and passages.",
+    "source": "automotive-diagnostics-v1"
+  },
+  {
+    "category": "fault",
+    "entry_key": "oxygen_sensor_contamination",
+    "content": "Oxygen sensor contamination from silicone, lead, or oil causes slow response and inaccurate fuel trim readings. A contaminated sensor causes the ECM to miscalculate fuel delivery, leading to poor fuel economy and emissions. Inspect sensor data and replace if contaminated.",
+    "source": "automotive-diagnostics-v1"
+  },
+  {
+    "category": "fault",
+    "entry_key": "catalytic_converter_physical_damage",
+    "content": "Physical damage to the catalytic converter includes cracked housing, melted substrate, or rattling internals. Causes include impact damage, overheating from misfire, or oil/antifreeze contamination. Inspect converter for rattling, cracks, or discoloration.",
+    "source": "automotive-diagnostics-v1"
+  }
+]

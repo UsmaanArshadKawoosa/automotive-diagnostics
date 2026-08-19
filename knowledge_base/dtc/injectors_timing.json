@@ -1,0 +1,50 @@
+[
+  {
+    "category": "dtc",
+    "entry_key": "P0201",
+    "content": "P0201 - Injector Circuit Malfunction (Cylinder 1). The fuel injector circuit for cylinder 1 has a fault. Causes include a failed injector, damaged wiring, or a bad injector driver in the ECM. Inspect injector resistance and wiring.",
+    "source": "OBD-II DTC reference"
+  },
+  {
+    "category": "dtc",
+    "entry_key": "P0202",
+    "content": "P0202 - Injector Circuit Malfunction (Cylinder 2). The fuel injector circuit for cylinder 2 has a fault. Causes include a failed injector, damaged wiring, or a bad injector driver in the ECM. Inspect injector resistance and wiring.",
+    "source": "OBD-II DTC reference"
+  },
+  {
+    "category": "dtc",
+    "entry_key": "P0203",
+    "content": "P0203 - Injector Circuit Malfunction (Cylinder 3). The fuel injector circuit for cylinder 3 has a fault. Causes include a failed injector, damaged wiring, or a bad injector driver in the ECM. Inspect injector resistance and wiring.",
+    "source": "OBD-II DTC reference"
+  },
+  {
+    "category": "dtc",
+    "entry_key": "P0204",
+    "content": "P0204 - Injector Circuit Malfunction (Cylinder 4). The fuel injector circuit for cylinder 4 has a fault. Causes include a failed injector, damaged wiring, or a bad injector driver in the ECM. Inspect injector resistance and wiring.",
+    "source": "OBD-II DTC reference"
+  },
+  {
+    "category": "dtc",
+    "entry_key": "P0210",
+    "content": "P0210 - Injector Circuit Malfunction (Cylinder 10). The fuel injector circuit for cylinder 10 has a fault. Causes include a failed injector, damaged wiring, or a bad injector driver in the ECM. Inspect injector resistance and wiring.",
+    "source": "OBD-II DTC reference"
+  },
+  {
+    "category": "dtc",
+    "entry_key": "P0211",
+    "content": "P0211 - Injector Circuit Malfunction (Cylinder 11). The fuel injector circuit for cylinder 11 has a fault. Causes include a failed injector, damaged wiring, or a bad injector driver in the ECM. Inspect injector resistance and wiring.",
+    "source": "OBD-II DTC reference"
+  },
+  {
+    "category": "dtc",
+    "entry_key": "P0212",
+    "content": "P0212 - Injector Circuit Malfunction (Cylinder 12). The fuel injector circuit for cylinder 12 has a fault. Causes include a failed injector, damaged wiring, or a bad injector driver in the ECM. Inspect injector resistance and wiring.",
+    "source": "OBD-II DTC reference"
+  },
+  {
+    "category": "dtc",
+    "entry_key": "P0219",
+    "content": "P0219 - Engine Over Speed Condition. The engine RPM exceeded the calibrated maximum limit. Causes include sudden load release, failing transmission, or a malfunctioning speed control system. Inspect for mechanical or drivetrain causes.",
+    "source": "OBD-II DTC reference"
+  }
+]

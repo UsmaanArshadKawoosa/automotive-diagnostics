@@ -1,0 +1,32 @@
+[
+  {
+    "category": "repair",
+    "entry_key": "egr_valve_cleaning",
+    "content": "Clean the EGR valve and passages with carburetor cleaner and a brush. Inspect the valve for carbon buildup and sticking. Verify valve movement after cleaning. Clear DTCs and confirm EGR flow is within specification.",
+    "source": "automotive-diagnostics-v1"
+  },
+  {
+    "category": "repair",
+    "entry_key": "egr_valve_replacement",
+    "content": "Replace the EGR valve with the correct OEM or equivalent part. Inspect mounting surface and gasket. Verify valve operation with a scan tool after replacement. Clear DTCs and confirm EGR flow is within specification.",
+    "source": "automotive-diagnostics-v1"
+  },
+  {
+    "category": "repair",
+    "entry_key": "evap_system_leak_repair",
+    "content": "Locate EVAP leaks with a smoke test. Replace cracked hoses, failed purge/vent valves, or leaking canisters. Inspect fuel cap seal and replace if damaged. Clear DTCs and confirm no leaks remain with a smoke test.",
+    "source": "automotive-diagnostics-v1"
+  },
+  {
+    "category": "repair",
+    "entry_key": "evap_purge_valve_replacement",
+    "content": "Replace the EVAP purge valve with the correct OEM or equivalent part. Inspect vacuum hoses for blockage. Verify valve operation with a scan tool or by listening for clicking when commanded.",
+    "source": "automotive-diagnostics-v1"
+  },
+  {
+    "category": "repair",
+    "entry_key": "evap_vent_valve_replacement",
+    "content": "Replace the EVAP vent valve with the correct OEM or equivalent part. Inspect vent hoses for blockage. Verify valve operation with a scan tool or by listening for clicking when commanded.",
+    "source": "automotive-diagnostics-v1"
+  }
+]

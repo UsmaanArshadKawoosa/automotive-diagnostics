@@ -1,0 +1,50 @@
+[
+  {
+    "category": "dtc",
+    "entry_key": "P0320",
+    "content": "P0320 - Knock Sensor Circuit Malfunction. The knock sensor circuit has an open, short, or poor connection. Causes include damaged wiring, failed sensor, or a bad ECM driver. Inspect wiring and sensor resistance.",
+    "source": "OBD-II DTC reference"
+  },
+  {
+    "category": "dtc",
+    "entry_key": "P0325",
+    "content": "P0325 - Knock Sensor Circuit Malfunction (Bank 1). The knock sensor for bank 1 has an open, short, or poor connection. Causes include damaged wiring, failed sensor, or a bad ECM driver. Inspect wiring and sensor resistance.",
+    "source": "OBD-II DTC reference"
+  },
+  {
+    "category": "dtc",
+    "entry_key": "P0327",
+    "content": "P0327 - Knock Sensor Circuit Low Input (Bank 1). The knock sensor voltage is below the expected range. Causes include a shorted signal wire, failed sensor, or open circuit. Inspect wiring and sensor.",
+    "source": "OBD-II DTC reference"
+  },
+  {
+    "category": "dtc",
+    "entry_key": "P0328",
+    "content": "P0328 - Knock Sensor Circuit High Input (Bank 1). The knock sensor voltage is above the expected range. Causes include an open signal wire or a failed sensor. Inspect wiring and ground circuit.",
+    "source": "OBD-II DTC reference"
+  },
+  {
+    "category": "dtc",
+    "entry_key": "P0335",
+    "content": "P0335 - Crankshaft Position Sensor A Circuit Malfunction. The CKP sensor has no signal or an intermittent signal. Causes include a failed sensor, damaged wiring, damaged reluctor ring, or excessive air gap. Inspect sensor, wiring, and reluctor ring.",
+    "source": "OBD-II DTC reference"
+  },
+  {
+    "category": "dtc",
+    "entry_key": "P0336",
+    "content": "P0336 - Crankshaft Position Sensor A Circuit Range/Performance Problem. The CKP sensor signal is out of expected range or inconsistent. Causes include a failing sensor, damaged reluctor ring, or excessive air gap. Inspect sensor and reluctor ring condition.",
+    "source": "OBD-II DTC reference"
+  },
+  {
+    "category": "dtc",
+    "entry_key": "P0337",
+    "content": "P0337 - Crankshaft Position Sensor A Circuit Low Input. The CKP sensor voltage is below the expected range. Causes include a shorted signal wire or a failed sensor. Inspect wiring and sensor.",
+    "source": "OBD-II DTC reference"
+  },
+  {
+    "category": "dtc",
+    "entry_key": "P0338",
+    "content": "P0338 - Crankshaft Position Sensor A Circuit High Input. The CKP sensor voltage is above the expected range. Causes include an open signal wire or a failed sensor. Inspect wiring and ground connections.",
+    "source": "OBD-II DTC reference"
+  }
+]

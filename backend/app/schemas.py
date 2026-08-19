@@ -1,7 +1,10 @@
+import re
 import uuid
 from datetime import datetime
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, field_validator
+
+_DTC_PATTERN = re.compile(r"^[PCBU][0-9]{4}$")
 
 
 class DiagnosticResultBase(BaseModel):
@@ -9,6 +12,18 @@ class DiagnosticResultBase(BaseModel):
     confidence_score: float = Field(ge=0.0, le=1.0)
     repair_suggestion: str | None = None
     severity: str | None = None
+    hypothesis_status: str = Field(default="proposed", pattern=r"^(proposed|investigating|confirmed|rejected)$")
+    observed_result: str | None = None
+    recommended_checks: list[str] = Field(default_factory=list)
+    supporting_evidence: list[str] = Field(default_factory=list)
+    knowledge_references: list[uuid.UUID] = Field(default_factory=list)
+
+    @field_validator(
+        "recommended_checks", "supporting_evidence", "knowledge_references", mode="before"
+    )
+    @classmethod
+    def _empty_if_none(cls, value: object) -> object:
+        return [] if value is None else value
 
 
 class DiagnosticResultCreate(DiagnosticResultBase):
@@ -21,6 +36,33 @@ class DiagnosticResultRead(DiagnosticResultBase):
     id: uuid.UUID
     session_id: uuid.UUID
     created_at: datetime
+    check_outcomes: list["DiagnosticCheckOutcomeRead"] = []
+
+
+class DiagnosticCheckOutcomeBase(BaseModel):
+    check_description: str = Field(min_length=1)
+    status: str = Field(default="recommended", pattern=r"^(recommended|performed|passed|failed)$")
+    observed_result: str | None = None
+    technician_note: str | None = None
+
+
+class DiagnosticCheckOutcomeCreate(DiagnosticCheckOutcomeBase):
+    pass
+
+
+class DiagnosticCheckOutcomeUpdate(BaseModel):
+    status: str | None = Field(default=None, pattern=r"^(recommended|performed|passed|failed)$")
+    observed_result: str | None = None
+    technician_note: str | None = None
+
+
+class DiagnosticCheckOutcomeRead(DiagnosticCheckOutcomeBase):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: uuid.UUID
+    result_id: uuid.UUID
+    created_at: datetime
+    updated_at: datetime
 
 
 class DiagnosticSessionBase(BaseModel):
@@ -30,6 +72,19 @@ class DiagnosticSessionBase(BaseModel):
     year: int | None = Field(default=None, ge=1900, le=2100)
     symptom_text: str
     dtc_codes: str | None = None
+
+    @field_validator("vin")
+    @classmethod
+    def _validate_vin(cls, value: str | None) -> str | None:
+        if value is None:
+            return value
+        value = value.upper()
+        if len(value) != 17:
+            raise ValueError("VIN must be exactly 17 characters")
+        for char in ("I", "O", "Q"):
+            if char in value:
+                raise ValueError(f"VIN cannot contain '{char}'")
+        return value
 
 
 class DiagnosticSessionCreate(DiagnosticSessionBase):
@@ -65,6 +120,16 @@ class KnowledgeEntryRead(KnowledgeEntryBase):
     updated_at: datetime
 
 
+class KnowledgeBulkIngestRequest(BaseModel):
+    entries: list[KnowledgeEntryCreate] = Field(min_length=1, max_length=100)
+
+
+class KnowledgeBulkIngestResponse(BaseModel):
+    created: int
+    skipped: int
+    errors: list[str]
+
+
 class KnowledgeSearchRequest(BaseModel):
     query: str = Field(min_length=1, max_length=2000)
     category: str | None = Field(default=None, max_length=50)
@@ -92,6 +157,43 @@ class DiagnosticAnalyzeRequest(BaseModel):
     year: int | None = Field(default=None, ge=1900, le=2100)
     dtc_codes: list[str] | None = Field(default=None)
     symptom_text: str = Field(min_length=1, max_length=4000)
+    session_id: uuid.UUID | None = Field(default=None)
+
+    @field_validator("vin")
+    @classmethod
+    def _validate_vin(cls, value: str | None) -> str | None:
+        if value is None:
+            return value
+        value = value.upper()
+        if len(value) != 17:
+            raise ValueError("VIN must be exactly 17 characters")
+        for char in ("I", "O", "Q"):
+            if char in value:
+                raise ValueError(f"VIN cannot contain '{char}'")
+        return value
+
+    @field_validator("dtc_codes")
+    @classmethod
+    def _validate_dtc_codes(cls, value: list[str] | None) -> list[str] | None:
+        if value is None:
+            return value
+        if len(value) == 0:
+            raise ValueError("At least one DTC code is required when provided")
+        normalized: list[str] = []
+        seen: set[str] = set()
+        for code in value:
+            if not isinstance(code, str):
+                raise ValueError("DTC codes must be strings")
+            code = code.strip().upper()
+            if not code:
+                raise ValueError("DTC code must not be empty")
+            if code in seen:
+                continue
+            if not _DTC_PATTERN.match(code):
+                raise ValueError(f"Invalid DTC code: {code}")
+            seen.add(code)
+            normalized.append(code)
+        return normalized
 
     def dtc_codes_text(self) -> str | None:
         if not self.dtc_codes:
@@ -106,6 +208,7 @@ class DiagnosticHypothesis(BaseModel):
     supporting_evidence: list[str]
     recommended_checks: list[str]
     repair_suggestion: str | None = None
+    knowledge_references: list[uuid.UUID] = Field(default_factory=list)
 
 
 class DiagnosticAnalyzeResponse(BaseModel):
@@ -114,3 +217,8 @@ class DiagnosticAnalyzeResponse(BaseModel):
     query: str
     evidence: list[KnowledgeSearchResult]
     hypotheses: list[DiagnosticHypothesis]
+
+
+class HypothesisOutcomeUpdate(BaseModel):
+    hypothesis_status: str = Field(pattern=r"^(proposed|investigating|confirmed|rejected)$")
+    observed_result: str | None = None

@@ -190,6 +190,36 @@ curl -X POST http://localhost:8000/api/v1/diagnostics/analyze \
 
 Knowledge documents can be loaded into the vector store via the seed scripts or API. The diagnostic pipeline retrieves the top-k most similar chunks using cosine distance and includes them as evidence in the LLM prompt.
 
+#### Seed knowledge from files
+
+Place JSON arrays or JSON Lines (`.jsonl`) files under `knowledge_base/` and run:
+
+```bash
+cd backend
+PYTHONPATH=. .venv/Scripts/python scripts/seed_knowledge.py
+```
+
+Use `--reset` to truncate existing entries before reseeding, or `--path <dir>` to load from a different directory.
+
+#### Bulk upload via API
+
+```bash
+curl -X POST http://localhost:8000/api/v1/knowledge/bulk \
+  -H "Content-Type: application/json" \
+  -d '{
+    "entries": [
+      {
+        "category": "symptom",
+        "entry_key": "rough_idle",
+        "content": "Rough idle can be caused by vacuum leaks...",
+        "source": "service-manual"
+      }
+    ]
+  }'
+```
+
+Duplicate `(category, entry_key)` pairs are skipped by default.
+
 ## Testing
 
 ```bash

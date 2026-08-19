@@ -1,0 +1,44 @@
+[
+  {
+    "category": "component",
+    "entry_key": "egr_valve",
+    "content": "The EGR valve recirculates a controlled amount of exhaust gas into the intake manifold to reduce combustion temperature and NOx emissions. A stuck or carboned EGR valve causes rough idle, stalling, hesitation, and P0400-P0409 codes. Inspect valve movement and passages.",
+    "source": "automotive-diagnostics-v1"
+  },
+  {
+    "category": "component",
+    "entry_key": "evap_canister",
+    "content": "The EVAP canister stores fuel vapors from the tank and releases them to the engine when conditions allow. A saturated or cracked canister causes fuel vapor leaks and P0440 codes. Inspect canister for cracks and replace if contaminated.",
+    "source": "automotive-diagnostics-v1"
+  },
+  {
+    "category": "component",
+    "entry_key": "evap_purge_valve",
+    "content": "The EVAP purge valve controls the flow of fuel vapors from the canister to the intake. A failed purge valve causes incorrect purge flow and P0441/P0443 codes. Inspect valve operation with a scan tool or by listening for clicking.",
+    "source": "automotive-diagnostics-v1"
+  },
+  {
+    "category": "component",
+    "entry_key": "evap_vent_valve",
+    "content": "The EVAP vent valve allows air to enter the EVAP system during diagnostic tests and purging. A failed vent valve causes pressure faults and P0446/P0447 codes. Inspect valve operation and vent hose for blockage.",
+    "source": "automotive-diagnostics-v1"
+  },
+  {
+    "category": "component",
+    "entry_key": "pcv_valve",
+    "content": "The PCV valve routes crankcase vapors into the intake manifold to be burned during combustion. A failed PCV valve causes pressure buildup, oil leaks, and vacuum leaks. Inspect by shaking for rattle and checking for proper airflow.",
+    "source": "automotive-diagnostics-v1"
+  },
+  {
+    "category": "component",
+    "entry_key": "pcv_hose",
+    "content": "PCV hoses connect the PCV valve to the intake manifold and crankcase. Cracked or disconnected hoses cause vacuum leaks, rough idle, and oil leaks. Inspect hoses for cracks, brittleness, and proper routing.",
+    "source": "automotive-diagnostics-v1"
+  },
+  {
+    "category": "component",
+    "entry_key": "catalytic_converter",
+    "content": "The catalytic converter reduces harmful emissions by converting CO, HC, and NOx into CO2, H2O, and N2. A failing converter causes poor emissions, loss of power, overheating, and P0420/P0430 codes. Inspect for rattling, discoloration, or backpressure.",
+    "source": "automotive-diagnostics-v1"
+  }
+]

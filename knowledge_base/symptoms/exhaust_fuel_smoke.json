@@ -1,0 +1,26 @@
+[
+  {
+    "category": "symptom",
+    "entry_key": "excessive_smoke_black",
+    "content": "Black exhaust smoke indicates a rich fuel condition. Causes include leaking fuel injectors, failing MAF sensor, clogged air filter, low compression, or a failing ECT sensor. Inspect fuel trim, injectors, and air intake.",
+    "source": "automotive-diagnostics-v1"
+  },
+  {
+    "category": "symptom",
+    "entry_key": "excessive_smoke_white",
+    "content": "White exhaust smoke (especially sweet smell) indicates coolant burning in the combustion chamber. Causes include a blown head gasket, cracked cylinder head, or cracked engine block. Inspect cooling system and perform block test.",
+    "source": "automotive-diagnostics-v1"
+  },
+  {
+    "category": "symptom",
+    "entry_key": "excessive_smoke_blue",
+    "content": "Blue exhaust smoke indicates oil burning in the combustion chamber. Causes include worn piston rings, worn valve guides, or leaking valve seals. Inspect PCV system and perform wet/dry compression test.",
+    "source": "automotive-diagnostics-v1"
+  },
+  {
+    "category": "symptom",
+    "entry_key": "sulfur_exhaust_odor",
+    "content": "A sulfur or rotten egg exhaust odor often indicates a failing catalytic converter or contaminated fuel. Inspect catalytic converter efficiency and fuel quality. Check for rich conditions or oil contamination in the exhaust.",
+    "source": "automotive-diagnostics-v1"
+  }
+]

@@ -1,0 +1,62 @@
+[
+  {
+    "category": "dtc",
+    "entry_key": "P0130",
+    "content": "P0130 - O2 Sensor Circuit Malfunction (Bank 1 Sensor 1). The upstream O2 sensor circuit has an intermittent fault. Causes include damaged wiring, poor connector contact, or a failing sensor. Inspect wiring and sensor heater circuit.",
+    "source": "OBD-II DTC reference"
+  },
+  {
+    "category": "dtc",
+    "entry_key": "P0131",
+    "content": "P0131 - O2 Sensor Circuit Low Voltage (Bank 1 Sensor 1). The upstream O2 sensor voltage is below the expected range. Causes include an open or shorted signal wire, a failed sensor, or an extremely lean exhaust. Inspect wiring and sensor.",
+    "source": "OBD-II DTC reference"
+  },
+  {
+    "category": "dtc",
+    "entry_key": "P0132",
+    "content": "P0132 - O2 Sensor Circuit High Voltage (Bank 1 Sensor 1). The upstream O2 sensor voltage is stuck high. Causes include an open ground, rich condition, or a failed sensor. Inspect for fuel delivery issues and sensor wiring.",
+    "source": "OBD-II DTC reference"
+  },
+  {
+    "category": "dtc",
+    "entry_key": "P0133",
+    "content": "P0133 - O2 Sensor Circuit Slow Response (Bank 1 Sensor 1). The upstream O2 sensor responds slower than expected. Causes include a contaminated sensor, aged ceramic element, or a failing sensor. Monitor sensor activity on a scan tool.",
+    "source": "OBD-II DTC reference"
+  },
+  {
+    "category": "dtc",
+    "entry_key": "P0134",
+    "content": "P0134 - O2 Sensor Circuit No Activity Detected (Bank 1 Sensor 1). The upstream O2 sensor shows no switching activity. Causes include an open heater circuit, failed sensor, or open signal wire. Inspect wiring and sensor heater operation.",
+    "source": "OBD-II DTC reference"
+  },
+  {
+    "category": "dtc",
+    "entry_key": "P0135",
+    "content": "P0135 - O2 Sensor Heater Circuit Malfunction (Bank 1 Sensor 1). The O2 sensor heater circuit is open or shorted. Causes include a failed heater element, damaged wiring, or a blown fuse. Inspect heater circuit and replace sensor if heater is open.",
+    "source": "OBD-II DTC reference"
+  },
+  {
+    "category": "dtc",
+    "entry_key": "P0140",
+    "content": "P0140 - O2 Sensor Circuit No Activity Detected (Bank 1 Sensor 2). The downstream O2 sensor shows no switching activity. Causes include an open heater circuit, failed sensor, or open signal wire. Inspect wiring and sensor heater operation.",
+    "source": "OBD-II DTC reference"
+  },
+  {
+    "category": "dtc",
+    "entry_key": "P0141",
+    "content": "P0141 - O2 Sensor Heater Circuit Malfunction (Bank 1 Sensor 2). The downstream O2 sensor heater circuit is open or shorted. Causes include a failed heater element, damaged wiring, or a blown fuse. Inspect heater circuit and replace sensor if heater is open.",
+    "source": "OBD-II DTC reference"
+  },
+  {
+    "category": "dtc",
+    "entry_key": "P0142",
+    "content": "P0142 - O2 Sensor Circuit Malfunction (Bank 1 Sensor 2). The downstream O2 sensor circuit has an intermittent fault. Causes include damaged wiring, poor connector contact, or a failing sensor. Inspect wiring and sensor.",
+    "source": "OBD-II DTC reference"
+  },
+  {
+    "category": "dtc",
+    "entry_key": "P0143",
+    "content": "P0143 - O2 Sensor Circuit Low Voltage (Bank 1 Sensor 2). The downstream O2 sensor voltage is below the expected range. Causes include an open or shorted signal wire or a failed sensor. Inspect wiring and sensor.",
+    "source": "OBD-II DTC reference"
+  }
+]

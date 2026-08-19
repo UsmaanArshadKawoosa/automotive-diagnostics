@@ -1,0 +1,20 @@
+[
+  {
+    "category": "repair",
+    "entry_key": "catalytic_converter_replacement",
+    "content": "Replace the catalytic converter with a correct-fit OEM or certified aftermarket part. Inspect for underlying causes such as misfire, oil contamination, or rich running before replacement. Confirm O2 sensor activity and fuel trim are normal after replacement.",
+    "source": "automotive-diagnostics-v1"
+  },
+  {
+    "category": "repair",
+    "entry_key": "exhaust_manifold_gasket_replacement",
+    "content": "Replace the exhaust manifold gasket with the correct OEM or equivalent part. Inspect manifold for cracks and warpage. Torque fasteners to specification in the correct sequence. Inspect for leaks after repair.",
+    "source": "automotive-diagnostics-v1"
+  },
+  {
+    "category": "repair",
+    "entry_key": "muffler_resonator_replacement",
+    "content": "Replace the muffler or resonator with a correct-fit part. Inspect hangers and heat shields. Verify exhaust clearance from body panels and fuel lines after installation.",
+    "source": "automotive-diagnostics-v1"
+  }
+]

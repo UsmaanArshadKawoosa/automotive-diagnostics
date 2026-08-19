@@ -1,0 +1,26 @@
+[
+  {
+    "category": "dtc",
+    "entry_key": "P0170",
+    "content": "P0170 - Fuel Trim Malfunction (Bank 1). The ECM detects an intermittent fault in fuel trim calculations. Causes include intermittent vacuum leaks, failing O2 sensor, or fuel delivery inconsistency. Check freeze-frame data and fuel trim numbers.",
+    "source": "OBD-II DTC reference"
+  },
+  {
+    "category": "dtc",
+    "entry_key": "P0172",
+    "content": "P0172 - System Too Rich (Bank 1). The air-fuel mixture on bank 1 is richer than the ECM can compensate for. Common causes include leaking fuel injectors, failing MAF sensor, low intake manifold vacuum, or excessive fuel pressure. Inspect injectors, MAF, and fuel pressure.",
+    "source": "OBD-II DTC reference"
+  },
+  {
+    "category": "dtc",
+    "entry_key": "P0173",
+    "content": "P0173 - Fuel Trim Malfunction (Bank 2). The ECM detects an intermittent fault in fuel trim calculations for bank 2. Causes include intermittent vacuum leaks, failing O2 sensor, or fuel delivery inconsistency on the second bank. Check freeze-frame data and fuel trim numbers.",
+    "source": "OBD-II DTC reference"
+  },
+  {
+    "category": "dtc",
+    "entry_key": "P0175",
+    "content": "P0175 - System Too Rich (Bank 2). The air-fuel mixture on bank 2 is richer than the ECM can compensate for. Common causes include leaking fuel injectors, failing MAF sensor, or excessive fuel pressure on the second bank. Inspect injectors, MAF, and fuel pressure.",
+    "source": "OBD-II DTC reference"
+  }
+]
