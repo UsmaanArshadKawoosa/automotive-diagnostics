@@ -17,6 +17,10 @@ from app.schemas import (
     DiagnosticSessionCreate,
     KnowledgeSearchResult,
 )
+from app.services.component_taxonomy import (
+    map_evidence_to_component,
+    map_fault_description,
+)
 from app.services.embeddings import EmbeddingService
 from app.services.llm import LLMProviderError, LLMService
 
@@ -352,12 +356,17 @@ Return a single JSON object with a "hypotheses" array. Each item must match this
                 year=request.year,
                 symptom_text=request.symptom_text,
                 dtc_codes=request.dtc_codes_text(),
+                vehicle_type=request.vehicle_type,
             )
             session = create_diagnostic_session(db, session_in)
 
         hypotheses: list[DiagnosticHypothesis] = []
         for hypothesis in parsed_hypotheses:
             validated_evidence, knowledge_refs = self._validate_evidence(hypothesis, evidence)
+
+            component = map_fault_description(hypothesis.fault_description)
+            if component is None:
+                component = map_evidence_to_component(evidence)
 
             validated_hypothesis = DiagnosticHypothesis(
                 fault_description=hypothesis.fault_description,
@@ -367,6 +376,9 @@ Return a single JSON object with a "hypotheses" array. Each item must match this
                 recommended_checks=hypothesis.recommended_checks,
                 repair_suggestion=hypothesis.repair_suggestion,
                 knowledge_references=knowledge_refs,
+                component_id=component.component_id if component else None,
+                system_category=component.system_category if component else None,
+                vehicle_region=component.vehicle_region if component else None,
             )
             hypotheses.append(validated_hypothesis)
 
@@ -388,6 +400,7 @@ Return a single JSON object with a "hypotheses" array. Each item must match this
                 "make": request.make,
                 "model": request.model,
                 "year": request.year,
+                "vehicle_type": request.vehicle_type,
             },
             query=query,
             evidence=evidence,

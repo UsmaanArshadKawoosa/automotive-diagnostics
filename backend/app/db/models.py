@@ -40,6 +40,7 @@ class DiagnosticSession(Base):
     year: Mapped[int | None] = mapped_column(Integer, nullable=True)
     symptom_text: Mapped[str] = mapped_column(Text, nullable=False)
     dtc_codes: Mapped[str | None] = mapped_column(Text, nullable=True)
+    vehicle_type: Mapped[str | None] = mapped_column(String(20), nullable=True)
     results: Mapped[list["DiagnosticResult"]] = relationship(back_populates="session", cascade="all, delete-orphan")
 
 class DiagnosticResult(Base):

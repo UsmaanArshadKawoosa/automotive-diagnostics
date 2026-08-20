@@ -84,6 +84,19 @@ class TestDiagnosticAnalyzeRequest:
         assert request.dtc_codes is None
         assert request.vin is None
 
+    def test_valid_vehicle_type_accepted(self):
+        for vt in ("hatchback", "sedan", "suv", "pickup", "van"):
+            request = DiagnosticAnalyzeRequest(symptom_text="misfire", vehicle_type=vt)
+            assert request.vehicle_type == vt
+
+    def test_invalid_vehicle_type_rejected(self):
+        with pytest.raises(ValueError, match="vehicle_type"):
+            DiagnosticAnalyzeRequest(symptom_text="misfire", vehicle_type="coupe")
+
+    def test_vehicle_type_omitted_ok(self):
+        request = DiagnosticAnalyzeRequest(symptom_text="misfire")
+        assert request.vehicle_type is None
+
 
 class TestDiagnosticService:
     def test_analyze_creates_session_and_results(self, db, clean_diagnostic_tables):
@@ -1228,3 +1241,36 @@ class TestHypothesisOutcomeTracking:
         assert len(data["hypotheses"]) >= 1
         assert data["hypotheses"][0]["fault_description"] == "Faulty spark plugs"
         assert data["hypotheses"][0].get("knowledge_references") is not None
+
+    def test_analyze_response_includes_component_metadata(self, client: TestClient, clean_diagnostic_tables):
+        payload = {
+            "symptom_text": "Faulty ignition coil causing misfire",
+        }
+        response = client.post("/api/v1/diagnostics/analyze", json=payload)
+        assert response.status_code == 201
+        data = response.json()
+        assert "hypotheses" in data
+        assert len(data["hypotheses"]) >= 1
+        hypothesis = data["hypotheses"][0]
+        assert "component_id" in hypothesis
+        assert "system_category" in hypothesis
+        assert "vehicle_region" in hypothesis
+
+    def test_analyze_response_propagates_vehicle_type(self, client: TestClient, clean_diagnostic_tables):
+        payload = {
+            "symptom_text": "Faulty ignition coil causing misfire",
+            "vehicle_type": "suv",
+        }
+        response = client.post("/api/v1/diagnostics/analyze", json=payload)
+        assert response.status_code == 201
+        data = response.json()
+        assert data["vehicle"]["vehicle_type"] == "suv"
+
+    def test_analyze_response_vehicle_type_omitted(self, client: TestClient, clean_diagnostic_tables):
+        payload = {
+            "symptom_text": "Faulty ignition coil causing misfire",
+        }
+        response = client.post("/api/v1/diagnostics/analyze", json=payload)
+        assert response.status_code == 201
+        data = response.json()
+        assert data["vehicle"].get("vehicle_type") is None

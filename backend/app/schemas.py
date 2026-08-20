@@ -72,6 +72,7 @@ class DiagnosticSessionBase(BaseModel):
     year: int | None = Field(default=None, ge=1900, le=2100)
     symptom_text: str
     dtc_codes: str | None = None
+    vehicle_type: str | None = Field(default=None, pattern=r"^(hatchback|sedan|suv|pickup|van)$")
 
     @field_validator("vin")
     @classmethod
@@ -155,6 +156,7 @@ class DiagnosticAnalyzeRequest(BaseModel):
     make: str | None = Field(default=None, max_length=100)
     model: str | None = Field(default=None, max_length=100)
     year: int | None = Field(default=None, ge=1900, le=2100)
+    vehicle_type: str | None = Field(default=None, pattern=r"^(hatchback|sedan|suv|pickup|van)$")
     dtc_codes: list[str] | None = Field(default=None)
     symptom_text: str = Field(min_length=1, max_length=4000)
     session_id: uuid.UUID | None = Field(default=None)
@@ -209,6 +211,20 @@ class DiagnosticHypothesis(BaseModel):
     recommended_checks: list[str]
     repair_suggestion: str | None = None
     knowledge_references: list[uuid.UUID] = Field(default_factory=list)
+    component_id: str | None = None
+    system_category: str | None = None
+    vehicle_region: str | None = None
+
+
+class RepairSafetyTier(BaseModel):
+    tier: str = Field(pattern=r"^(diy_inspection|diy_repair|mechanic_recommended|immediate_professional)$")
+    label: str
+    description: str
+
+
+# TODO: Integrate RepairSafetyTier into DiagnosticHypothesis once the rules engine is implemented.
+# The tier should be derived from severity, component type, and repair complexity,
+# NOT generated freely by the LLM.
 
 
 class DiagnosticAnalyzeResponse(BaseModel):
