@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Input, Textarea, Button, Select } from '../components/Form';
 import { DtcInput } from '../components/DtcInput';
@@ -27,6 +27,8 @@ export function DiagnosePage() {
   const [results, setResults] = useState<DiagnosticResult[]>([]);
   const [loadingSession, setLoadingSession] = useState(false);
   const [selectedComponent, setSelectedComponent] = useState<{ component_id: string; system_category?: string; vehicle_region?: string } | null>(null);
+  const [selectedHypothesisId, setSelectedHypothesisId] = useState<string | null>(null);
+  const hypothesisCardsRef = useRef<Map<string, HTMLDivElement>>(new Map());
 
   useEffect(() => {
     if (apiState.data) {
@@ -116,6 +118,32 @@ export function DiagnosePage() {
   const currentVehicleType = (apiState.data?.vehicle?.vehicle_type as VehicleType) || vehicleType || 'sedan';
   const analysisHypotheses: DiagnosticHypothesis[] = apiState.data?.hypotheses || [];
   const hasComponentHighlights = analysisHypotheses.some((h) => h.component_id);
+
+  const handle3DComponentSelect = useCallback((component: { component_id: string; system_category?: string; vehicle_region?: string } | null) => {
+    setSelectedComponent(component);
+    if (component) {
+      // Find all hypotheses with matching component_id and select the highest-confidence one
+      const matchingHypotheses = analysisHypotheses.filter((h) => h.component_id === component.component_id);
+      if (matchingHypotheses.length > 0) {
+        const highestConfidence = matchingHypotheses.reduce((max, h) => 
+          h.confidence_score > max.confidence_score ? h : max
+        );
+        const hypothesisIndex = analysisHypotheses.findIndex((h) => h.component_id === component.component_id && h.confidence_score === highestConfidence.confidence_score);
+        const hypothesisId = `hypothesis-${hypothesisIndex}`;
+        setSelectedHypothesisId(hypothesisId);
+        
+        // Scroll the selected hypothesis into view
+        requestAnimationFrame(() => {
+          const card = hypothesisCardsRef.current.get(hypothesisId);
+          if (card) {
+            card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          }
+        });
+      }
+    } else {
+      setSelectedHypothesisId(null);
+    }
+  }, [analysisHypotheses]);
 
   const displayResults = analysisHypotheses.length > 0
     ? analysisHypotheses.map((h, idx) => ({
@@ -261,9 +289,13 @@ export function DiagnosePage() {
                   component_id: h.component_id!,
                   system_category: h.system_category,
                   vehicle_region: h.vehicle_region,
+                  safety_tier: h.safety_tier,
+                  safety_tier_label: h.safety_tier_label,
+                  safety_tier_description: h.safety_tier_description,
+                  safety_tier_reasoning: h.safety_tier_reasoning,
                 }))}
               selectedComponent={selectedComponent}
-              onComponentSelect={setSelectedComponent}
+              onComponentSelect={handle3DComponentSelect}
             />
           )}
 
@@ -299,26 +331,39 @@ export function DiagnosePage() {
                 Hypotheses ({displayResults.length})
               </h3>
               <div className="space-y-4">
-                {displayResults.map((result) => (
-                  <HypothesisCard
-                    key={result.id}
-                    hypothesis={{
-                      fault_description: result.fault_description,
-                      confidence_score: result.confidence_score,
-                      severity: result.severity || 'low',
-                      supporting_evidence: result.supporting_evidence,
-                      recommended_checks: result.recommended_checks,
-                      repair_suggestion: result.repair_suggestion,
-                      component_id: result.component_id,
-                      system_category: result.system_category,
-                      vehicle_region: result.vehicle_region,
-                    }}
-                    resultId={result.id}
-                    currentStatus={result.hypothesis_status}
-                    onUpdateStatus={handleOutcomeUpdate}
-                    updating={false}
-                  />
-                ))}
+{displayResults.map((result) => (
+                    <HypothesisCard
+                      key={result.id}
+                      ref={(el) => {
+                        if (el) {
+                          hypothesisCardsRef.current.set(result.id, el);
+                        } else {
+                          hypothesisCardsRef.current.delete(result.id);
+                        }
+                      }}
+                      hypothesis={{
+                        fault_description: result.fault_description,
+                        confidence_score: result.confidence_score,
+                        severity: result.severity || 'low',
+                        supporting_evidence: result.supporting_evidence,
+                        recommended_checks: result.recommended_checks,
+                        repair_suggestion: result.repair_suggestion,
+                        component_id: result.component_id,
+                        system_category: result.system_category,
+                        vehicle_region: result.vehicle_region,
+                        safety_tier: result.safety_tier,
+                        safety_tier_label: result.safety_tier_label,
+                        safety_tier_description: result.safety_tier_description,
+                        safety_tier_reasoning: result.safety_tier_reasoning,
+                      }}
+                      resultId={result.id}
+                      currentStatus={result.hypothesis_status}
+                      onUpdateStatus={handleOutcomeUpdate}
+                      updating={false}
+                      isSelected={selectedHypothesisId === result.id}
+                      onSelect={() => setSelectedHypothesisId(result.id)}
+                    />
+                  ))}
               </div>
             </div>
           )}

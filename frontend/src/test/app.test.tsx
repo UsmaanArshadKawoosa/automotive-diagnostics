@@ -267,8 +267,15 @@ describe('vehicle type configuration', () => {
     expect(VEHICLE_TYPES).toEqual(['hatchback', 'sedan', 'suv', 'pickup', 'van']);
     (['hatchback', 'sedan', 'suv', 'pickup', 'van'] as VehicleType[]).forEach((vt) => {
       expect(VEHICLE_TYPE_CONFIG[vt]).toBeDefined();
-      expect(VEHICLE_TYPE_CONFIG[vt].modelAsset).toBeNull();
+      expect(VEHICLE_TYPE_CONFIG[vt].modelAsset).toBeDefined();
+      expect(VEHICLE_TYPE_CONFIG[vt].modelAsset).toBeTruthy();
     });
+    expect(VEHICLE_TYPE_CONFIG.hatchback.modelAsset).toBe('/models/hatchback.glb');
+    expect(VEHICLE_TYPE_CONFIG.sedan.modelAsset).toBe('/models/sedan_detailed.glb');
+    expect(VEHICLE_TYPE_CONFIG.sedan.fallbackModelAsset).toBe('/models/sedan.glb');
+    expect(VEHICLE_TYPE_CONFIG.suv.modelAsset).toBe('/models/suv.glb');
+    expect(VEHICLE_TYPE_CONFIG.pickup.modelAsset).toBe('/models/pickup.glb');
+    expect(VEHICLE_TYPE_CONFIG.van.modelAsset).toBe('/models/van.glb');
   });
 
   it('returns config for a known vehicle type', () => {

@@ -23,6 +23,7 @@ from app.services.component_taxonomy import (
 )
 from app.services.embeddings import EmbeddingService
 from app.services.llm import LLMProviderError, LLMService
+from app.services.repair_safety import RepairSafetyTier, determine_repair_safety_tier, SafetyTierDecision
 
 
 class DiagnosticServiceError(Exception):
@@ -368,6 +369,13 @@ Return a single JSON object with a "hypotheses" array. Each item must match this
             if component is None:
                 component = map_evidence_to_component(evidence)
 
+            safety_decision = determine_repair_safety_tier(
+                component_id=component.component_id if component else None,
+                system_category=component.system_category if component else None,
+                severity=hypothesis.severity,
+                repair_suggestion=hypothesis.repair_suggestion,
+            )
+
             validated_hypothesis = DiagnosticHypothesis(
                 fault_description=hypothesis.fault_description,
                 confidence_score=hypothesis.confidence_score,
@@ -379,6 +387,10 @@ Return a single JSON object with a "hypotheses" array. Each item must match this
                 component_id=component.component_id if component else None,
                 system_category=component.system_category if component else None,
                 vehicle_region=component.vehicle_region if component else None,
+                safety_tier=safety_decision.tier.value,
+                safety_tier_label=safety_decision.label,
+                safety_tier_description=safety_decision.description,
+                safety_tier_reasoning=safety_decision.reasoning,
             )
             hypotheses.append(validated_hypothesis)
 

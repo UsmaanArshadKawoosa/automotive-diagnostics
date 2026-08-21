@@ -214,6 +214,10 @@ class DiagnosticHypothesis(BaseModel):
     component_id: str | None = None
     system_category: str | None = None
     vehicle_region: str | None = None
+    safety_tier: str | None = None
+    safety_tier_label: str | None = None
+    safety_tier_description: str | None = None
+    safety_tier_reasoning: list[str] = Field(default_factory=list)
 
 
 class RepairSafetyTier(BaseModel):

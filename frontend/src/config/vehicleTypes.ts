@@ -5,6 +5,7 @@ export interface VehicleTypeConfig {
   label: string;
   description: string;
   modelAsset: string | null;
+  fallbackModelAsset: string | null;
 }
 
 export const VEHICLE_TYPE_CONFIG: Record<VehicleType, VehicleTypeConfig> = {
@@ -12,31 +13,36 @@ export const VEHICLE_TYPE_CONFIG: Record<VehicleType, VehicleTypeConfig> = {
     type: 'hatchback',
     label: 'Hatchback',
     description: 'Compact hatchback with front-engine layout',
-    modelAsset: null,
+    modelAsset: '/models/hatchback.glb',
+    fallbackModelAsset: null,
   },
   sedan: {
     type: 'sedan',
     label: 'Sedan',
     description: 'Standard sedan with front-engine layout',
-    modelAsset: null,
+    modelAsset: '/models/sedan_detailed.glb',
+    fallbackModelAsset: '/models/sedan.glb',
   },
   suv: {
     type: 'suv',
     label: 'SUV',
     description: 'Sport utility vehicle with higher ground clearance',
-    modelAsset: null,
+    modelAsset: '/models/suv.glb',
+    fallbackModelAsset: null,
   },
   pickup: {
     type: 'pickup',
     label: 'Pickup',
     description: 'Light truck with open cargo bed',
-    modelAsset: null,
+    modelAsset: '/models/pickup.glb',
+    fallbackModelAsset: null,
   },
   van: {
     type: 'van',
     label: 'Van',
-    description: ' enclosed box-style body',
-    modelAsset: null,
+    description: 'Enclosed box-style body',
+    modelAsset: '/models/van.glb',
+    fallbackModelAsset: null,
   },
 };
 

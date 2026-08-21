@@ -26,6 +26,10 @@ export interface DiagnosticHypothesis {
   component_id?: string;
   system_category?: string;
   vehicle_region?: string;
+  safety_tier?: RepairSafetyTier;
+  safety_tier_label?: string;
+  safety_tier_description?: string;
+  safety_tier_reasoning?: string[];
 }
 
 export interface DiagnosticAnalyzeResponse {
@@ -64,6 +68,10 @@ export interface DiagnosticResult {
   component_id?: string;
   system_category?: string;
   vehicle_region?: string;
+  safety_tier?: RepairSafetyTier;
+  safety_tier_label?: string;
+  safety_tier_description?: string;
+  safety_tier_reasoning?: string[];
 }
 
 export interface DiagnosticSession {
