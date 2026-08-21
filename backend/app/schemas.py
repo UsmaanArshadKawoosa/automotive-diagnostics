@@ -160,6 +160,7 @@ class DiagnosticAnalyzeRequest(BaseModel):
     dtc_codes: list[str] | None = Field(default=None)
     symptom_text: str = Field(min_length=1, max_length=4000)
     session_id: uuid.UUID | None = Field(default=None)
+    follow_up_answer: str | None = Field(default=None, max_length=4000)
 
     @field_validator("vin")
     @classmethod
@@ -237,6 +238,9 @@ class DiagnosticAnalyzeResponse(BaseModel):
     query: str
     evidence: list[KnowledgeSearchResult]
     hypotheses: list[DiagnosticHypothesis]
+    status: str = Field(pattern=r"^(complete|needs_more_information)$")
+    follow_up_question: str | None = None
+    follow_up_reason: str | None = None
 
 
 class HypothesisOutcomeUpdate(BaseModel):

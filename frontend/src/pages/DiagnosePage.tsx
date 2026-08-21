@@ -28,6 +28,10 @@ export function DiagnosePage() {
   const [loadingSession, setLoadingSession] = useState(false);
   const [selectedComponent, setSelectedComponent] = useState<{ component_id: string; system_category?: string; vehicle_region?: string } | null>(null);
   const [selectedHypothesisId, setSelectedHypothesisId] = useState<string | null>(null);
+  const [followUpQuestion, setFollowUpQuestion] = useState<string | null>(null);
+  const [followUpReason, setFollowUpReason] = useState<string | null>(null);
+  const [followUpAnswer, setFollowUpAnswer] = useState('');
+  const [awaitingFollowUp, setAwaitingFollowUp] = useState(false);
   const hypothesisCardsRef = useRef<Map<string, HTMLDivElement>>(new Map());
 
   useEffect(() => {
@@ -35,6 +39,18 @@ export function DiagnosePage() {
       const sid = apiState.data.session_id;
       setSessionId(sid);
       loadSessionResults(sid);
+
+      // Handle follow-up question flow
+      if (apiState.data.status === 'needs_more_information') {
+        setFollowUpQuestion(apiState.data.follow_up_question || '');
+        setFollowUpReason(apiState.data.follow_up_reason || '');
+        setAwaitingFollowUp(true);
+        setFollowUpAnswer('');
+      } else {
+        setFollowUpQuestion(null);
+        setFollowUpReason(null);
+        setAwaitingFollowUp(false);
+      }
     }
   }, [apiState.data]);
 
@@ -69,8 +85,8 @@ export function DiagnosePage() {
   }, [symptomText, vin, year, dtcCodes]);
 
   const handleSubmit = useCallback(
-    async (e: React.FormEvent) => {
-      e.preventDefault();
+    async (e?: React.FormEvent) => {
+      e?.preventDefault();
       const validationError = validate();
       if (validationError) {
         setLocalError(validationError);
@@ -85,10 +101,12 @@ export function DiagnosePage() {
         vehicle_type: vehicleType || undefined,
         dtc_codes: dtcCodes.length > 0 ? dtcCodes : undefined,
         symptom_text: symptomText.trim(),
+        session_id: awaitingFollowUp ? sessionId || undefined : undefined,
+        follow_up_answer: awaitingFollowUp ? followUpAnswer.trim() : undefined,
       };
       await analyze(payload);
     },
-    [validate, vin, make, model, year, vehicleType, dtcCodes, symptomText, analyze]
+    [validate, vin, make, model, year, vehicleType, dtcCodes, symptomText, analyze, awaitingFollowUp, sessionId, followUpAnswer]
   );
 
   const handleOutcomeUpdate = useCallback(
@@ -229,6 +247,41 @@ export function DiagnosePage() {
           </div>
         </div>
 
+{apiState.error && (
+          <ErrorMessage message={apiState.error} />
+        )}
+
+        {awaitingFollowUp && followUpQuestion && (
+          <div className="mt-6 rounded-lg border border-amber-200 bg-amber-50 p-5 shadow-sm">
+            <h3 className="text-base font-semibold text-amber-900 mb-3">
+              Additional Information Needed
+            </h3>
+            <p className="text-sm text-amber-800 mb-2">{followUpQuestion}</p>
+            {followUpReason && (
+              <p className="text-xs text-amber-700 mb-4">Why: {followUpReason}</p>
+            )}
+            <div className="flex flex-col sm:flex-row gap-3">
+              <Textarea
+                id="followUpAnswer"
+                value={followUpAnswer}
+                onChange={(value) => setFollowUpAnswer(value)}
+                placeholder="Your answer..."
+                label="Your Answer"
+                required
+                maxLength={4000}
+              />
+              <Button
+                type="button"
+                onClick={handleSubmit}
+                disabled={apiState.loading || !followUpAnswer.trim()}
+                className="min-w-[160px]"
+              >
+                {apiState.loading ? 'Submitting...' : 'Submit Answer'}
+              </Button>
+            </div>
+          </div>
+        )}
+
         {localError && (
           <Alert type="error" title="Validation Error">
             {localError}
@@ -243,7 +296,7 @@ export function DiagnosePage() {
           <Button type="submit" disabled={apiState.loading} className="min-w-[160px]">
             {apiState.loading ? 'Analyzing...' : 'Run Diagnosis'}
           </Button>
-          {sessionId && !apiState.loading && (
+          {sessionId && !apiState.loading && !awaitingFollowUp && (
             <Button type="button" variant="secondary" onClick={handleContinueSession}>
               Continue in Session
             </Button>

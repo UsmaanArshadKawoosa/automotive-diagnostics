@@ -157,7 +157,7 @@ Notes:
 
 """
 
-        return f"""You are an expert automotive diagnostic assistant.
+return f"""You are an expert automotive diagnostic assistant.
 
 Analyze the following case and produce structured diagnostic reasoning.
 
@@ -178,24 +178,24 @@ Instructions:
 - The follow-up question should be specific and actionable for a vehicle owner.
 
 Return a single JSON object with this schema:
-{{
+{
   "status": "complete" | "needs_more_information",
   "follow_up_question": "string or null",
   "follow_up_reason": "string or null",
   "hypotheses": [
-    {{
+    {
       "fault_description": "string",
       "confidence_score": 0.0,
       "severity": "low|medium|high|critical",
       "supporting_evidence": ["string"],
       "recommended_checks": ["string"],
       "repair_suggestion": "string or null"
-    }}
+    }
   ]
-}}
+}
 """
 
-    @staticmethod
+        @staticmethod
     def _coerce_string_list(value: Any) -> list[str]:
         if not isinstance(value, list):
             return []
@@ -206,6 +206,57 @@ Return a single JSON object with this schema:
                 if stripped:
                     coerced.append(stripped)
         return coerced
+
+    def _parse_llm_response(self, raw: str) -> dict:
+        """Parse LLM response and return structured data with status, follow_up_question, and hypotheses."""
+        try:
+            data = json.loads(raw)
+        except json.JSONDecodeError as exc:
+            raise DiagnosticServiceError(f"LLM returned invalid JSON: {exc}") from exc
+
+        if not isinstance(data, dict) or "hypotheses" not in data:
+            raise DiagnosticServiceError("LLM response missing 'hypotheses' key")
+
+        if "status" not in data:
+            raise DiagnosticServiceError("LLM response missing 'status' key")
+
+        status = data["status"]
+        if status not in ("complete", "needs_more_information"):
+            raise DiagnosticServiceError(f"Invalid status value: {status}")
+
+        follow_up_question = data.get("follow_up_question")
+        follow_up_reason = data.get("follow_up_reason")
+
+        raw_hypotheses = data["hypotheses"]
+        if not isinstance(raw_hypotheses, list):
+            raise DiagnosticServiceError("LLM 'hypotheses' must be an array")
+
+        hypotheses: list[DiagnosticHypothesis] = []
+        for idx, item in enumerate(raw_hypotheses):
+            if not isinstance(item, dict):
+                continue
+            sanitized = dict(item)
+            # Knowledge references are derived from retrieved evidence, never from the LLM.
+            sanitized.pop("knowledge_references", None)
+            sanitized["supporting_evidence"] = self._coerce_string_list(
+                sanitized.get("supporting_evidence")
+            )
+            sanitized["recommended_checks"] = self._coerce_string_list(
+                sanitized.get("recommended_checks")
+            )
+            try:
+                hypotheses.append(DiagnosticHypothesis(**sanitized))
+            except ValidationError as exc:
+                raise DiagnosticServiceError(
+                    f"Invalid hypothesis at index {idx}: {exc}"
+                ) from exc
+
+        return {
+            "status": status,
+            "follow_up_question": follow_up_question,
+            "follow_up_reason": follow_up_reason,
+            "hypotheses": hypotheses,
+        }
 
     def _validate_evidence(
         self,
@@ -263,59 +314,6 @@ Return a single JSON object with this schema:
 
         return validated_strings, validated_ids
 
-    def _parse_hypotheses(self, raw: str) -> list[DiagnosticHypothesis]:
-        """Backward compatibility alias for _parse_llm_response."""
-        parsed = self._parse_llm_response(raw)
-        return parsed["hypotheses"]
-
-    def _parse_llm_response(self, raw: str) -> dict:
-        """Parse LLM response and return structured data with status, follow_up_question, and hypotheses."""
-        try:
-            data = json.loads(raw)
-        except json.JSONDecodeError as exc:
-            raise DiagnosticServiceError(f"LLM returned invalid JSON: {exc}") from exc
-
-        if not isinstance(data, dict) or "hypotheses" not in data:
-            raise DiagnosticServiceError("LLM response missing 'hypotheses' key")
-
-        # Support both old format (without status) and new format (with status)
-        status = data.get("status", "complete")
-        if status not in ("complete", "needs_more_information"):
-            raise DiagnosticServiceError(f"Invalid status value: {status}")
-
-        follow_up_question = data.get("follow_up_question")
-        follow_up_reason = data.get("follow_up_reason")
-
-        raw_hypotheses = data["hypotheses"]
-        if not isinstance(raw_hypotheses, list):
-            raise DiagnosticServiceError("LLM 'hypotheses' must be an array")
-
-        hypotheses: list[DiagnosticHypothesis] = []
-        for idx, item in enumerate(raw_hypotheses):
-            if not isinstance(item, dict):
-                continue
-            sanitized = dict(item)
-            sanitized.pop("knowledge_references", None)
-            sanitized["supporting_evidence"] = self._coerce_string_list(
-                sanitized.get("supporting_evidence")
-            )
-            sanitized["recommended_checks"] = self._coerce_string_list(
-                sanitized.get("recommended_checks")
-            )
-            try:
-                hypotheses.append(DiagnosticHypothesis(**sanitized))
-            except ValidationError as exc:
-                raise DiagnosticServiceError(
-                    f"Invalid hypothesis at index {idx}: {exc}"
-                ) from exc
-
-        return {
-            "status": status,
-            "follow_up_question": follow_up_question,
-            "follow_up_reason": follow_up_reason,
-            "hypotheses": hypotheses,
-        }
-
     def analyze(
         self, db: Session, request: DiagnosticAnalyzeRequest, session: models.DiagnosticSession | None = None
     ) -> DiagnosticAnalyzeResponse:
@@ -342,7 +340,7 @@ Return a single JSON object with this schema:
             for entry, score in rows
         ]
 
-        prompt = self._build_prompt(request, evidence, session_context=session_context)
+prompt = self._build_prompt(request, evidence, session_context=session_context)
         response_schema = {
             "type": "object",
             "properties": {
@@ -453,9 +451,6 @@ Return a single JSON object with this schema:
             query=query,
             evidence=evidence,
             hypotheses=hypotheses,
-            status=status,
-            follow_up_question=follow_up_question,
-            follow_up_reason=follow_up_reason,
         )
 
 

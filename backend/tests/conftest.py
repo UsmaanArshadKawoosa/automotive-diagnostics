@@ -42,7 +42,12 @@ class FakeLLMProvider(LLMProvider):
             recommended_checks=["Inspect spark plugs"],
             repair_suggestion="Replace spark plugs if worn",
         )
-        return json.dumps({"hypotheses": [hypothesis.model_dump()]})
+        return json.dumps({
+            "status": "complete",
+            "follow_up_question": None,
+            "follow_up_reason": None,
+            "hypotheses": [hypothesis.model_dump()]
+        })
 
     def complete(self, prompt: str, response_schema: dict[str, Any] | None = None) -> str:
         return self._response

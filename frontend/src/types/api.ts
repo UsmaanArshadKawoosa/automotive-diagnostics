@@ -38,6 +38,9 @@ export interface DiagnosticAnalyzeResponse {
   query: string;
   evidence: KnowledgeSearchResult[];
   hypotheses: DiagnosticHypothesis[];
+  status: 'complete' | 'needs_more_information';
+  follow_up_question?: string;
+  follow_up_reason?: string;
 }
 
 export interface DiagnosticCheckOutcome {
@@ -96,6 +99,7 @@ export interface DiagnosticAnalyzeRequest {
   dtc_codes?: string[];
   symptom_text: string;
   session_id?: string;
+  follow_up_answer?: string;
 }
 
 export interface HypothesisOutcomeUpdate {
