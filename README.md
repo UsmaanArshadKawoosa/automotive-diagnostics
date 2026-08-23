@@ -13,18 +13,18 @@ The engine accepts vehicle symptoms and optional diagnostic trouble codes (DTCs)
 │  FastAPI API    │────▶│ Diagnostic Service│────▶│ Embedding Service│
 │  /api/v1/...    │     │ (RAG reasoning)  │     │ (sentence-     │
 └─────────────────┘     └──────────────────┘     │  transformers  │
-                            │                    │  or OpenAI)    │
-                            ▼                    └─────────────────┘
-                     ┌──────────────────┐
-                     │  LLM Service     │
-                     │  Ollama / OpenAI │
-                     └──────────────────┘
-                            │
-                            ▼
-                     ┌──────────────────┐
-                     │ PostgreSQL +     │
-                     │ pgvector         │
-                     └──────────────────┘
+                             │                    │  or OpenAI)    │
+                             ▼                    └─────────────────┘
+                      ┌──────────────────┐
+                      │  LLM Service     │
+                      │  Ollama / OpenAI │
+                      └──────────────────┘
+                             │
+                             ▼
+                      ┌──────────────────┐
+                      │ PostgreSQL +     │
+                      │ pgvector         │
+                      └──────────────────┘
 ```
 
 ## Tech Stack
@@ -37,6 +37,14 @@ The engine accepts vehicle symptoms and optional diagnostic trouble codes (DTCs)
 - **Ollama** - Default local LLM (default model: `llama3.1:latest`)
 - **OpenAI** - Optional cloud LLM / embedding provider
 - **pytest** - Testing
+- **React + TypeScript + Vite** - Frontend framework
+
+## Prerequisites
+
+- Python 3.8+
+- Node.js 16+ and npm
+- PostgreSQL 12+ with pgvector extension
+- Ollama (for local LLM, optional if using OpenAI)
 
 ## Project Structure
 
@@ -53,6 +61,12 @@ automotive-diagnostic-ai/
 │   ├── alembic/              # Alembic migrations
 │   ├── .env                  # Local environment variables
 │   └── requirements.txt
+├── frontend/
+│   ├── src/                  # Frontend source code
+│   ├── public/               # Static assets
+│   ├── .env                  # Frontend environment variables
+│   ├── package.json          # npm dependencies
+│   └── vite.config.ts        # Vite configuration
 ├── .env.example
 └── README.md
 ```
@@ -92,6 +106,12 @@ Copy `.env.example` to `backend/.env` and adjust for your environment.
 | `LLM_MAX_TOKENS` | `2048` | Max response tokens |
 | `OPENAI_API_KEY` | | Required when using OpenAI |
 
+### Frontend
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `VITE_API_BASE_URL` | `http://localhost:8000` | Backend API URL |
+
 ## Setup
 
 ### 1. Install Python dependencies
@@ -103,24 +123,43 @@ source .venv/bin/activate  # Windows: .venv\Scripts\activate
 pip install -r requirements.txt
 ```
 
-### 2. Start PostgreSQL with pgvector
+### 2. Install Node.js dependencies
+
+```bash
+cd frontend
+npm install
+```
+
+### 3. Start PostgreSQL with pgvector
 
 Ensure PostgreSQL is running and the `vector` extension is available in the target database.
 
-### 3. Run migrations
+To install pgvector extension:
+```bash
+# For Ubuntu/Debian
+sudo apt-get install postgresql-postgis-12  # Version may vary
+
+# For macOS with Homebrew
+brew install postgis
+
+# Then enable the extension in your database:
+psql -U postgres -d automotive_diagnostic -c "CREATE EXTENSION IF NOT EXISTS vector;"
+```
+
+### 4. Run migrations
 
 ```bash
 cd backend
 alembic upgrade head
 ```
 
-### 4. Start Ollama (default LLM)
+### 5. Start Ollama (default LLM)
 
 ```bash
 ollama run llama3.1:latest
 ```
 
-### 5. Start the backend
+### 6. Start the backend
 
 ```bash
 cd backend
@@ -128,6 +167,15 @@ uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 ```
 
 The API will be available at `http://localhost:8000`.
+
+### 7. Start the frontend
+
+```bash
+cd frontend
+npm run dev
+```
+
+The frontend will be available at `http://localhost:5173`.
 
 ## API Usage
 
@@ -186,11 +234,11 @@ curl -X POST http://localhost:8000/api/v1/diagnostics/analyze \
 }
 ```
 
-### Knowledge management
+## Knowledge management
 
 Knowledge documents can be loaded into the vector store via the seed scripts or API. The diagnostic pipeline retrieves the top-k most similar chunks using cosine distance and includes them as evidence in the LLM prompt.
 
-#### Seed knowledge from files
+### Seed knowledge from files
 
 Place JSON arrays or JSON Lines (`.jsonl`) files under `knowledge_base/` and run:
 
@@ -201,7 +249,7 @@ PYTHONPATH=. .venv/Scripts/python scripts/seed_knowledge.py
 
 Use `--reset` to truncate existing entries before reseeding, or `--path <dir>` to load from a different directory.
 
-#### Bulk upload via API
+### Bulk upload via API
 
 ```bash
 curl -X POST http://localhost:8000/api/v1/knowledge/bulk \
@@ -222,6 +270,8 @@ Duplicate `(category, entry_key)` pairs are skipped by default.
 
 ## Testing
 
+### Backend tests
+
 ```bash
 cd backend
 pytest -q
@@ -231,6 +281,41 @@ The test suite uses:
 - `FakeEmbeddingService` to avoid loading the transformer model
 - `FakeLLMService` to avoid network calls
 - A separate test database engine to prevent connection pool contention
+
+### Frontend tests
+
+```bash
+cd frontend
+npm test -- --run
+```
+
+### TypeScript checking
+
+```bash
+cd frontend
+npx tsc --noEmit
+```
+
+### Frontend build
+
+```bash
+cd frontend
+npm run build
+```
+
+## Evaluation harness
+
+To run the full diagnostic evaluation suite:
+
+```bash
+cd backend
+python -m evaluation
+```
+
+This runs the system against 25 benchmark cases using a deterministic mock LLM provider for consistent results.
+
+The evaluation report is available at:
+`backend/evaluation/EVALUATION_REPORT.md`
 
 ## Provider Switching
 
