@@ -122,10 +122,10 @@ class EvaluationReporter:
 
             for metric in case.metrics:
                 status_symbol = {
-                    EvaluationResult.PASS: "✓",
-                    EvaluationResult.FAIL: "✗",
-                    EvaluationResult.UNAVAILABLE: "~",
-                }.get(metric.result, "?")
+                    EvaluationResult.PASS: "[PASS]",
+                    EvaluationResult.FAIL: "[FAIL]",
+                    EvaluationResult.UNAVAILABLE: "[~]",
+                }.get(metric.result, "[?]")
                 output.write(f"  {status_symbol} {metric.name}: {metric.result.value}")
                 if metric.expected is not None:
                     output.write(f" (expected: {metric.expected}, actual: {metric.actual})")

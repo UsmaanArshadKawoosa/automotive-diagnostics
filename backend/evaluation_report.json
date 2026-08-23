@@ -1,0 +1,1827 @@
+{
+  "timestamp": "2026-08-23T21:20:16.139049Z",
+  "summary": {
+    "total_cases": 25,
+    "passed_cases": 24,
+    "failed_cases": 1,
+    "top1_component_accuracy": 1.0,
+    "top3_component_accuracy": 1.0,
+    "system_category_accuracy": 1.0,
+    "safety_tier_accuracy": 1.0,
+    "follow_up_accuracy": 1.0,
+    "evidence_validity_rate": 1.0,
+    "dtc_match_accuracy": 0.9444,
+    "avg_score_per_case": 0.9943
+  },
+  "metric_pass_rates": {
+    "top1_component": 1.0,
+    "top3_component": 1.0,
+    "system_category": 1.0,
+    "safety_tier": 1.0,
+    "dtc_match": 0.9444,
+    "evidence_validity": 1.0,
+    "follow_up_decision": 1.0
+  },
+  "cases": [
+    {
+      "case_id": "B001",
+      "description": "P0300 random misfire - should map to spark_plug via DTC",
+      "predictions": {
+        "component": "spark_plug",
+        "system_category": "ignition",
+        "safety_tier": "immediate_professional",
+        "status": "complete",
+        "top_components": [
+          "spark_plug"
+        ]
+      },
+      "metrics": [
+        {
+          "name": "top1_component",
+          "result": "pass",
+          "expected": "spark_plug",
+          "actual": "spark_plug",
+          "score": 1.0,
+          "details": "Top hypothesis component: spark_plug"
+        },
+        {
+          "name": "top3_component",
+          "result": "pass",
+          "expected": "spark_plug",
+          "actual": "spark_plug",
+          "score": 1.0,
+          "details": "Top 3 components: spark_plug"
+        },
+        {
+          "name": "system_category",
+          "result": "pass",
+          "expected": "ignition",
+          "actual": "ignition",
+          "score": 1.0,
+          "details": "Predicted system category: ignition"
+        },
+        {
+          "name": "safety_tier",
+          "result": "pass",
+          "expected": "immediate_professional",
+          "actual": "immediate_professional",
+          "score": 1.0,
+          "details": "Predicted safety tier: immediate_professional"
+        },
+        {
+          "name": "dtc_match",
+          "result": "pass",
+          "expected": "P0300",
+          "actual": "P0300",
+          "score": 1.0,
+          "details": "DTC evidence found: P0300; DTC referenced in hypothesis: True"
+        },
+        {
+          "name": "evidence_validity",
+          "result": "pass",
+          "expected": "all valid",
+          "actual": "1/1 valid",
+          "score": 1.0,
+          "details": "Evidence validity rate: 1.00"
+        },
+        {
+          "name": "follow_up_decision",
+          "result": "pass",
+          "expected": "complete",
+          "actual": "complete",
+          "score": 1.0,
+          "details": "Expected follow-up: False, got: False; Question: N/A"
+        }
+      ],
+      "error": null
+    },
+    {
+      "case_id": "B002",
+      "description": "P0171 system too lean - should map to maf_sensor via DTC",
+      "predictions": {
+        "component": "maf_sensor",
+        "system_category": "sensors",
+        "safety_tier": "mechanic_recommended",
+        "status": "complete",
+        "top_components": [
+          "maf_sensor"
+        ]
+      },
+      "metrics": [
+        {
+          "name": "top1_component",
+          "result": "pass",
+          "expected": "maf_sensor",
+          "actual": "maf_sensor",
+          "score": 1.0,
+          "details": "Top hypothesis component: maf_sensor"
+        },
+        {
+          "name": "top3_component",
+          "result": "pass",
+          "expected": "maf_sensor",
+          "actual": "maf_sensor",
+          "score": 1.0,
+          "details": "Top 3 components: maf_sensor"
+        },
+        {
+          "name": "system_category",
+          "result": "pass",
+          "expected": "sensors",
+          "actual": "sensors",
+          "score": 1.0,
+          "details": "Predicted system category: sensors"
+        },
+        {
+          "name": "safety_tier",
+          "result": "pass",
+          "expected": "mechanic_recommended",
+          "actual": "mechanic_recommended",
+          "score": 1.0,
+          "details": "Predicted safety tier: mechanic_recommended"
+        },
+        {
+          "name": "dtc_match",
+          "result": "pass",
+          "expected": "P0171",
+          "actual": "P0171",
+          "score": 1.0,
+          "details": "DTC evidence found: P0171; DTC referenced in hypothesis: True"
+        },
+        {
+          "name": "evidence_validity",
+          "result": "pass",
+          "expected": "all valid",
+          "actual": "1/1 valid",
+          "score": 1.0,
+          "details": "Evidence validity rate: 1.00"
+        },
+        {
+          "name": "follow_up_decision",
+          "result": "pass",
+          "expected": "complete",
+          "actual": "complete",
+          "score": 1.0,
+          "details": "Expected follow-up: False, got: False; Question: N/A"
+        }
+      ],
+      "error": null
+    },
+    {
+      "case_id": "B003",
+      "description": "P0420 catalytic converter efficiency - should map to catalytic_converter",
+      "predictions": {
+        "component": "catalytic_converter",
+        "system_category": "exhaust",
+        "safety_tier": "immediate_professional",
+        "status": "complete",
+        "top_components": [
+          "catalytic_converter"
+        ]
+      },
+      "metrics": [
+        {
+          "name": "top1_component",
+          "result": "pass",
+          "expected": "catalytic_converter",
+          "actual": "catalytic_converter",
+          "score": 1.0,
+          "details": "Top hypothesis component: catalytic_converter"
+        },
+        {
+          "name": "top3_component",
+          "result": "pass",
+          "expected": "catalytic_converter",
+          "actual": "catalytic_converter",
+          "score": 1.0,
+          "details": "Top 3 components: catalytic_converter"
+        },
+        {
+          "name": "system_category",
+          "result": "pass",
+          "expected": "exhaust",
+          "actual": "exhaust",
+          "score": 1.0,
+          "details": "Predicted system category: exhaust"
+        },
+        {
+          "name": "safety_tier",
+          "result": "pass",
+          "expected": "immediate_professional",
+          "actual": "immediate_professional",
+          "score": 1.0,
+          "details": "Predicted safety tier: immediate_professional"
+        },
+        {
+          "name": "dtc_match",
+          "result": "pass",
+          "expected": "P0420",
+          "actual": "P0420",
+          "score": 1.0,
+          "details": "DTC evidence found: P0420; DTC referenced in hypothesis: True"
+        },
+        {
+          "name": "evidence_validity",
+          "result": "pass",
+          "expected": "all valid",
+          "actual": "1/1 valid",
+          "score": 1.0,
+          "details": "Evidence validity rate: 1.00"
+        },
+        {
+          "name": "follow_up_decision",
+          "result": "pass",
+          "expected": "complete",
+          "actual": "complete",
+          "score": 1.0,
+          "details": "Expected follow-up: False, got: False; Question: N/A"
+        }
+      ],
+      "error": null
+    },
+    {
+      "case_id": "B004",
+      "description": "P0505 idle air control - should map to iac_valve",
+      "predictions": {
+        "component": "iac_valve",
+        "system_category": "intake",
+        "safety_tier": "mechanic_recommended",
+        "status": "complete",
+        "top_components": [
+          "iac_valve"
+        ]
+      },
+      "metrics": [
+        {
+          "name": "top1_component",
+          "result": "pass",
+          "expected": "iac_valve",
+          "actual": "iac_valve",
+          "score": 1.0,
+          "details": "Top hypothesis component: iac_valve"
+        },
+        {
+          "name": "top3_component",
+          "result": "pass",
+          "expected": "iac_valve",
+          "actual": "iac_valve",
+          "score": 1.0,
+          "details": "Top 3 components: iac_valve"
+        },
+        {
+          "name": "system_category",
+          "result": "pass",
+          "expected": "intake",
+          "actual": "intake",
+          "score": 1.0,
+          "details": "Predicted system category: intake"
+        },
+        {
+          "name": "safety_tier",
+          "result": "pass",
+          "expected": "mechanic_recommended",
+          "actual": "mechanic_recommended",
+          "score": 1.0,
+          "details": "Predicted safety tier: mechanic_recommended"
+        },
+        {
+          "name": "dtc_match",
+          "result": "pass",
+          "expected": "P0505",
+          "actual": "P0505",
+          "score": 1.0,
+          "details": "DTC evidence found: P0505; DTC referenced in hypothesis: True"
+        },
+        {
+          "name": "evidence_validity",
+          "result": "pass",
+          "expected": "all valid",
+          "actual": "1/1 valid",
+          "score": 1.0,
+          "details": "Evidence validity rate: 1.00"
+        },
+        {
+          "name": "follow_up_decision",
+          "result": "pass",
+          "expected": "complete",
+          "actual": "complete",
+          "score": 1.0,
+          "details": "Expected follow-up: False, got: False; Question: N/A"
+        }
+      ],
+      "error": null
+    },
+    {
+      "case_id": "B005",
+      "description": "P0335 crankshaft position sensor - should map to crankshaft_position_sensor",
+      "predictions": {
+        "component": "crankshaft_position_sensor",
+        "system_category": "sensors",
+        "safety_tier": "mechanic_recommended",
+        "status": "complete",
+        "top_components": [
+          "crankshaft_position_sensor"
+        ]
+      },
+      "metrics": [
+        {
+          "name": "top1_component",
+          "result": "pass",
+          "expected": "crankshaft_position_sensor",
+          "actual": "crankshaft_position_sensor",
+          "score": 1.0,
+          "details": "Top hypothesis component: crankshaft_position_sensor"
+        },
+        {
+          "name": "top3_component",
+          "result": "pass",
+          "expected": "crankshaft_position_sensor",
+          "actual": "crankshaft_position_sensor",
+          "score": 1.0,
+          "details": "Top 3 components: crankshaft_position_sensor"
+        },
+        {
+          "name": "system_category",
+          "result": "pass",
+          "expected": "sensors",
+          "actual": "sensors",
+          "score": 1.0,
+          "details": "Predicted system category: sensors"
+        },
+        {
+          "name": "safety_tier",
+          "result": "pass",
+          "expected": "mechanic_recommended",
+          "actual": "mechanic_recommended",
+          "score": 1.0,
+          "details": "Predicted safety tier: mechanic_recommended"
+        },
+        {
+          "name": "dtc_match",
+          "result": "pass",
+          "expected": "P0335",
+          "actual": "P0335",
+          "score": 1.0,
+          "details": "DTC evidence found: P0335; DTC referenced in hypothesis: True"
+        },
+        {
+          "name": "evidence_validity",
+          "result": "pass",
+          "expected": "all valid",
+          "actual": "1/1 valid",
+          "score": 1.0,
+          "details": "Evidence validity rate: 1.00"
+        },
+        {
+          "name": "follow_up_decision",
+          "result": "pass",
+          "expected": "complete",
+          "actual": "complete",
+          "score": 1.0,
+          "details": "Expected follow-up: False, got: False; Question: N/A"
+        }
+      ],
+      "error": null
+    },
+    {
+      "case_id": "B006",
+      "description": "Rough idle symptom - should retrieve rough_idle knowledge",
+      "predictions": {
+        "component": "vacuum_hose",
+        "system_category": "vacuum",
+        "safety_tier": "diy_repair",
+        "status": "needs_more_information",
+        "top_components": [
+          "vacuum_hose"
+        ]
+      },
+      "metrics": [
+        {
+          "name": "top1_component",
+          "result": "pass",
+          "expected": "vacuum_hose",
+          "actual": "vacuum_hose",
+          "score": 1.0,
+          "details": "Top hypothesis component: vacuum_hose"
+        },
+        {
+          "name": "top3_component",
+          "result": "pass",
+          "expected": "vacuum_hose",
+          "actual": "vacuum_hose",
+          "score": 1.0,
+          "details": "Top 3 components: vacuum_hose"
+        },
+        {
+          "name": "system_category",
+          "result": "pass",
+          "expected": "vacuum",
+          "actual": "vacuum",
+          "score": 1.0,
+          "details": "Predicted system category: vacuum"
+        },
+        {
+          "name": "safety_tier",
+          "result": "pass",
+          "expected": "diy_repair",
+          "actual": "diy_repair",
+          "score": 1.0,
+          "details": "Predicted safety tier: diy_repair"
+        },
+        {
+          "name": "dtc_match",
+          "result": "unavailable",
+          "expected": "N/A",
+          "actual": "N/A",
+          "score": 0.0,
+          "details": "No DTC codes in benchmark case"
+        },
+        {
+          "name": "evidence_validity",
+          "result": "pass",
+          "expected": "all valid",
+          "actual": "1/1 valid",
+          "score": 1.0,
+          "details": "Evidence validity rate: 1.00"
+        },
+        {
+          "name": "follow_up_decision",
+          "result": "pass",
+          "expected": "follow_up",
+          "actual": "follow_up",
+          "score": 1.0,
+          "details": "Expected follow-up: True, got: True; Question: Does the rough idle change under specific conditions like load, temperature, or RPM range?"
+        }
+      ],
+      "error": null
+    },
+    {
+      "case_id": "B007",
+      "description": "Engine misfire symptom - should retrieve engine_misfire knowledge",
+      "predictions": {
+        "component": "spark_plug",
+        "system_category": "ignition",
+        "safety_tier": "immediate_professional",
+        "status": "needs_more_information",
+        "top_components": [
+          "spark_plug"
+        ]
+      },
+      "metrics": [
+        {
+          "name": "top1_component",
+          "result": "pass",
+          "expected": "spark_plug",
+          "actual": "spark_plug",
+          "score": 1.0,
+          "details": "Top hypothesis component: spark_plug"
+        },
+        {
+          "name": "top3_component",
+          "result": "pass",
+          "expected": "spark_plug",
+          "actual": "spark_plug",
+          "score": 1.0,
+          "details": "Top 3 components: spark_plug"
+        },
+        {
+          "name": "system_category",
+          "result": "pass",
+          "expected": "ignition",
+          "actual": "ignition",
+          "score": 1.0,
+          "details": "Predicted system category: ignition"
+        },
+        {
+          "name": "safety_tier",
+          "result": "pass",
+          "expected": "immediate_professional",
+          "actual": "immediate_professional",
+          "score": 1.0,
+          "details": "Predicted safety tier: immediate_professional"
+        },
+        {
+          "name": "dtc_match",
+          "result": "unavailable",
+          "expected": "N/A",
+          "actual": "N/A",
+          "score": 0.0,
+          "details": "No DTC codes in benchmark case"
+        },
+        {
+          "name": "evidence_validity",
+          "result": "pass",
+          "expected": "all valid",
+          "actual": "1/1 valid",
+          "score": 1.0,
+          "details": "Evidence validity rate: 1.00"
+        },
+        {
+          "name": "follow_up_decision",
+          "result": "pass",
+          "expected": "follow_up",
+          "actual": "follow_up",
+          "score": 1.0,
+          "details": "Expected follow-up: True, got: True; Question: Does the misfire occur only under load/acceleration, or also at idle?"
+        }
+      ],
+      "error": null
+    },
+    {
+      "case_id": "B008",
+      "description": "Soft brake pedal - no brake symptom in knowledge base",
+      "predictions": {
+        "component": "throttle_body",
+        "system_category": "intake",
+        "safety_tier": "immediate_professional",
+        "status": "needs_more_information",
+        "top_components": [
+          "throttle_body"
+        ]
+      },
+      "metrics": [
+        {
+          "name": "top1_component",
+          "result": "pass",
+          "expected": "throttle_body",
+          "actual": "throttle_body",
+          "score": 1.0,
+          "details": "Top hypothesis component: throttle_body"
+        },
+        {
+          "name": "top3_component",
+          "result": "pass",
+          "expected": "throttle_body",
+          "actual": "throttle_body",
+          "score": 1.0,
+          "details": "Top 3 components: throttle_body"
+        },
+        {
+          "name": "system_category",
+          "result": "pass",
+          "expected": "intake",
+          "actual": "intake",
+          "score": 1.0,
+          "details": "Predicted system category: intake"
+        },
+        {
+          "name": "safety_tier",
+          "result": "pass",
+          "expected": "immediate_professional",
+          "actual": "immediate_professional",
+          "score": 1.0,
+          "details": "Predicted safety tier: immediate_professional"
+        },
+        {
+          "name": "dtc_match",
+          "result": "unavailable",
+          "expected": "N/A",
+          "actual": "N/A",
+          "score": 0.0,
+          "details": "No DTC codes in benchmark case"
+        },
+        {
+          "name": "evidence_validity",
+          "result": "pass",
+          "expected": "all valid",
+          "actual": "0/0 valid",
+          "score": 1.0,
+          "details": "Evidence validity rate: 1.00"
+        },
+        {
+          "name": "follow_up_decision",
+          "result": "pass",
+          "expected": "follow_up",
+          "actual": "follow_up",
+          "score": 1.0,
+          "details": "Expected follow-up: True, got: True; Question: Can you describe the brake symptoms in more detail? Any fluid leaks or warning lights?"
+        }
+      ],
+      "error": null
+    },
+    {
+      "case_id": "B009",
+      "description": "Engine overheating - should retrieve cooling system knowledge",
+      "predictions": {
+        "component": "thermostat",
+        "system_category": "cooling",
+        "safety_tier": "immediate_professional",
+        "status": "needs_more_information",
+        "top_components": [
+          "thermostat"
+        ]
+      },
+      "metrics": [
+        {
+          "name": "top1_component",
+          "result": "pass",
+          "expected": "thermostat",
+          "actual": "thermostat",
+          "score": 1.0,
+          "details": "Top hypothesis component: thermostat"
+        },
+        {
+          "name": "top3_component",
+          "result": "pass",
+          "expected": "thermostat",
+          "actual": "thermostat",
+          "score": 1.0,
+          "details": "Top 3 components: thermostat"
+        },
+        {
+          "name": "system_category",
+          "result": "pass",
+          "expected": "cooling",
+          "actual": "cooling",
+          "score": 1.0,
+          "details": "Predicted system category: cooling"
+        },
+        {
+          "name": "safety_tier",
+          "result": "pass",
+          "expected": "immediate_professional",
+          "actual": "immediate_professional",
+          "score": 1.0,
+          "details": "Predicted safety tier: immediate_professional"
+        },
+        {
+          "name": "dtc_match",
+          "result": "unavailable",
+          "expected": "N/A",
+          "actual": "N/A",
+          "score": 0.0,
+          "details": "No DTC codes in benchmark case"
+        },
+        {
+          "name": "evidence_validity",
+          "result": "pass",
+          "expected": "all valid",
+          "actual": "1/1 valid",
+          "score": 1.0,
+          "details": "Evidence validity rate: 1.00"
+        },
+        {
+          "name": "follow_up_decision",
+          "result": "pass",
+          "expected": "follow_up",
+          "actual": "follow_up",
+          "score": 1.0,
+          "details": "Expected follow-up: True, got: True; Question: Is there any coolant leak visible? Does the overheating occur at idle or under load?"
+        }
+      ],
+      "error": null
+    },
+    {
+      "case_id": "B010",
+      "description": "P0300 + rough idle - combined signals should reinforce spark_plug",
+      "predictions": {
+        "component": "spark_plug",
+        "system_category": "ignition",
+        "safety_tier": "immediate_professional",
+        "status": "complete",
+        "top_components": [
+          "spark_plug"
+        ]
+      },
+      "metrics": [
+        {
+          "name": "top1_component",
+          "result": "pass",
+          "expected": "spark_plug",
+          "actual": "spark_plug",
+          "score": 1.0,
+          "details": "Top hypothesis component: spark_plug"
+        },
+        {
+          "name": "top3_component",
+          "result": "pass",
+          "expected": "spark_plug",
+          "actual": "spark_plug",
+          "score": 1.0,
+          "details": "Top 3 components: spark_plug"
+        },
+        {
+          "name": "system_category",
+          "result": "pass",
+          "expected": "ignition",
+          "actual": "ignition",
+          "score": 1.0,
+          "details": "Predicted system category: ignition"
+        },
+        {
+          "name": "safety_tier",
+          "result": "pass",
+          "expected": "immediate_professional",
+          "actual": "immediate_professional",
+          "score": 1.0,
+          "details": "Predicted safety tier: immediate_professional"
+        },
+        {
+          "name": "dtc_match",
+          "result": "pass",
+          "expected": "P0300",
+          "actual": "P0300",
+          "score": 1.0,
+          "details": "DTC evidence found: P0300; DTC referenced in hypothesis: True"
+        },
+        {
+          "name": "evidence_validity",
+          "result": "pass",
+          "expected": "all valid",
+          "actual": "1/1 valid",
+          "score": 1.0,
+          "details": "Evidence validity rate: 1.00"
+        },
+        {
+          "name": "follow_up_decision",
+          "result": "pass",
+          "expected": "complete",
+          "actual": "complete",
+          "score": 1.0,
+          "details": "Expected follow-up: False, got: False; Question: N/A"
+        }
+      ],
+      "error": null
+    },
+    {
+      "case_id": "B011",
+      "description": "P0171 + rough idle - lean condition with idle symptoms",
+      "predictions": {
+        "component": "maf_sensor",
+        "system_category": "sensors",
+        "safety_tier": "mechanic_recommended",
+        "status": "complete",
+        "top_components": [
+          "maf_sensor"
+        ]
+      },
+      "metrics": [
+        {
+          "name": "top1_component",
+          "result": "pass",
+          "expected": "maf_sensor",
+          "actual": "maf_sensor",
+          "score": 1.0,
+          "details": "Top hypothesis component: maf_sensor"
+        },
+        {
+          "name": "top3_component",
+          "result": "pass",
+          "expected": "maf_sensor",
+          "actual": "maf_sensor",
+          "score": 1.0,
+          "details": "Top 3 components: maf_sensor"
+        },
+        {
+          "name": "system_category",
+          "result": "pass",
+          "expected": "sensors",
+          "actual": "sensors",
+          "score": 1.0,
+          "details": "Predicted system category: sensors"
+        },
+        {
+          "name": "safety_tier",
+          "result": "pass",
+          "expected": "mechanic_recommended",
+          "actual": "mechanic_recommended",
+          "score": 1.0,
+          "details": "Predicted safety tier: mechanic_recommended"
+        },
+        {
+          "name": "dtc_match",
+          "result": "pass",
+          "expected": "P0171",
+          "actual": "P0171",
+          "score": 1.0,
+          "details": "DTC evidence found: P0171; DTC referenced in hypothesis: True"
+        },
+        {
+          "name": "evidence_validity",
+          "result": "pass",
+          "expected": "all valid",
+          "actual": "1/1 valid",
+          "score": 1.0,
+          "details": "Evidence validity rate: 1.00"
+        },
+        {
+          "name": "follow_up_decision",
+          "result": "pass",
+          "expected": "complete",
+          "actual": "complete",
+          "score": 1.0,
+          "details": "Expected follow-up: False, got: False; Question: N/A"
+        }
+      ],
+      "error": null
+    },
+    {
+      "case_id": "B012",
+      "description": "P0442 EVAP small leak - emissions system",
+      "predictions": {
+        "component": "evap_purge_valve",
+        "system_category": "emissions",
+        "safety_tier": "mechanic_recommended",
+        "status": "complete",
+        "top_components": [
+          "evap_purge_valve"
+        ]
+      },
+      "metrics": [
+        {
+          "name": "top1_component",
+          "result": "pass",
+          "expected": "evap_purge_valve",
+          "actual": "evap_purge_valve",
+          "score": 1.0,
+          "details": "Top hypothesis component: evap_purge_valve"
+        },
+        {
+          "name": "top3_component",
+          "result": "pass",
+          "expected": "evap_purge_valve",
+          "actual": "evap_purge_valve",
+          "score": 1.0,
+          "details": "Top 3 components: evap_purge_valve"
+        },
+        {
+          "name": "system_category",
+          "result": "pass",
+          "expected": "emissions",
+          "actual": "emissions",
+          "score": 1.0,
+          "details": "Predicted system category: emissions"
+        },
+        {
+          "name": "safety_tier",
+          "result": "pass",
+          "expected": "mechanic_recommended",
+          "actual": "mechanic_recommended",
+          "score": 1.0,
+          "details": "Predicted safety tier: mechanic_recommended"
+        },
+        {
+          "name": "dtc_match",
+          "result": "pass",
+          "expected": "P0442",
+          "actual": "P0442",
+          "score": 1.0,
+          "details": "DTC evidence found: P0442; DTC referenced in hypothesis: True"
+        },
+        {
+          "name": "evidence_validity",
+          "result": "pass",
+          "expected": "all valid",
+          "actual": "1/1 valid",
+          "score": 1.0,
+          "details": "Evidence validity rate: 1.00"
+        },
+        {
+          "name": "follow_up_decision",
+          "result": "pass",
+          "expected": "complete",
+          "actual": "complete",
+          "score": 1.0,
+          "details": "Expected follow-up: False, got: False; Question: N/A"
+        }
+      ],
+      "error": null
+    },
+    {
+      "case_id": "B013",
+      "description": "Rough idle without DTC - multiple plausible causes",
+      "predictions": {
+        "component": "vacuum_hose",
+        "system_category": "vacuum",
+        "safety_tier": "diy_repair",
+        "status": "needs_more_information",
+        "top_components": [
+          "vacuum_hose"
+        ]
+      },
+      "metrics": [
+        {
+          "name": "top1_component",
+          "result": "pass",
+          "expected": "vacuum_hose",
+          "actual": "vacuum_hose",
+          "score": 1.0,
+          "details": "Top hypothesis component: vacuum_hose"
+        },
+        {
+          "name": "top3_component",
+          "result": "pass",
+          "expected": "vacuum_hose",
+          "actual": "vacuum_hose",
+          "score": 1.0,
+          "details": "Top 3 components: vacuum_hose"
+        },
+        {
+          "name": "system_category",
+          "result": "pass",
+          "expected": "vacuum",
+          "actual": "vacuum",
+          "score": 1.0,
+          "details": "Predicted system category: vacuum"
+        },
+        {
+          "name": "safety_tier",
+          "result": "pass",
+          "expected": "diy_repair",
+          "actual": "diy_repair",
+          "score": 1.0,
+          "details": "Predicted safety tier: diy_repair"
+        },
+        {
+          "name": "dtc_match",
+          "result": "unavailable",
+          "expected": "N/A",
+          "actual": "N/A",
+          "score": 0.0,
+          "details": "No DTC codes in benchmark case"
+        },
+        {
+          "name": "evidence_validity",
+          "result": "pass",
+          "expected": "all valid",
+          "actual": "1/1 valid",
+          "score": 1.0,
+          "details": "Evidence validity rate: 1.00"
+        },
+        {
+          "name": "follow_up_decision",
+          "result": "pass",
+          "expected": "follow_up",
+          "actual": "follow_up",
+          "score": 1.0,
+          "details": "Expected follow-up: True, got: True; Question: Does the rough idle change under specific conditions like load, temperature, or RPM range?"
+        }
+      ],
+      "error": null
+    },
+    {
+      "case_id": "B014",
+      "description": "Hard start + no DTC - multiple ignition/fuel causes",
+      "predictions": {
+        "component": "fuel_pump",
+        "system_category": "fuel",
+        "safety_tier": "mechanic_recommended",
+        "status": "needs_more_information",
+        "top_components": [
+          "fuel_pump"
+        ]
+      },
+      "metrics": [
+        {
+          "name": "top1_component",
+          "result": "pass",
+          "expected": "fuel_pump",
+          "actual": "fuel_pump",
+          "score": 1.0,
+          "details": "Top hypothesis component: fuel_pump"
+        },
+        {
+          "name": "top3_component",
+          "result": "pass",
+          "expected": "fuel_pump",
+          "actual": "fuel_pump",
+          "score": 1.0,
+          "details": "Top 3 components: fuel_pump"
+        },
+        {
+          "name": "system_category",
+          "result": "pass",
+          "expected": "fuel",
+          "actual": "fuel",
+          "score": 1.0,
+          "details": "Predicted system category: fuel"
+        },
+        {
+          "name": "safety_tier",
+          "result": "pass",
+          "expected": "mechanic_recommended",
+          "actual": "mechanic_recommended",
+          "score": 1.0,
+          "details": "Predicted safety tier: mechanic_recommended"
+        },
+        {
+          "name": "dtc_match",
+          "result": "unavailable",
+          "expected": "N/A",
+          "actual": "N/A",
+          "score": 0.0,
+          "details": "No DTC codes in benchmark case"
+        },
+        {
+          "name": "evidence_validity",
+          "result": "pass",
+          "expected": "all valid",
+          "actual": "7/7 valid",
+          "score": 1.0,
+          "details": "Evidence validity rate: 1.00"
+        },
+        {
+          "name": "follow_up_decision",
+          "result": "pass",
+          "expected": "follow_up",
+          "actual": "follow_up",
+          "score": 1.0,
+          "details": "Expected follow-up: True, got: True; Question: Does the hard start occur only when cold, or also when warm? Any check engine light?"
+        }
+      ],
+      "error": null
+    },
+    {
+      "case_id": "B015",
+      "description": "Symptoms suggest ignition but DTC suggests fuel - conflicting",
+      "predictions": {
+        "component": "maf_sensor",
+        "system_category": "sensors",
+        "safety_tier": "mechanic_recommended",
+        "status": "needs_more_information",
+        "top_components": [
+          "maf_sensor"
+        ]
+      },
+      "metrics": [
+        {
+          "name": "top1_component",
+          "result": "pass",
+          "expected": "maf_sensor",
+          "actual": "maf_sensor",
+          "score": 1.0,
+          "details": "Top hypothesis component: maf_sensor"
+        },
+        {
+          "name": "top3_component",
+          "result": "pass",
+          "expected": "maf_sensor",
+          "actual": "maf_sensor",
+          "score": 1.0,
+          "details": "Top 3 components: maf_sensor"
+        },
+        {
+          "name": "system_category",
+          "result": "pass",
+          "expected": "sensors",
+          "actual": "sensors",
+          "score": 1.0,
+          "details": "Predicted system category: sensors"
+        },
+        {
+          "name": "safety_tier",
+          "result": "pass",
+          "expected": "mechanic_recommended",
+          "actual": "mechanic_recommended",
+          "score": 1.0,
+          "details": "Predicted safety tier: mechanic_recommended"
+        },
+        {
+          "name": "dtc_match",
+          "result": "pass",
+          "expected": "P0171",
+          "actual": "P0171",
+          "score": 1.0,
+          "details": "DTC evidence found: P0171; DTC referenced in hypothesis: True"
+        },
+        {
+          "name": "evidence_validity",
+          "result": "pass",
+          "expected": "all valid",
+          "actual": "1/1 valid",
+          "score": 1.0,
+          "details": "Evidence validity rate: 1.00"
+        },
+        {
+          "name": "follow_up_decision",
+          "result": "pass",
+          "expected": "follow_up",
+          "actual": "follow_up",
+          "score": 1.0,
+          "details": "Expected follow-up: True, got: True; Question: Does the misfire occur only under load/acceleration, or also at idle?"
+        }
+      ],
+      "error": null
+    },
+    {
+      "case_id": "B016",
+      "description": "Vague symptom - should request more info",
+      "predictions": {
+        "component": "fuel_pump",
+        "system_category": "fuel",
+        "safety_tier": "mechanic_recommended",
+        "status": "needs_more_information",
+        "top_components": [
+          "fuel_pump"
+        ]
+      },
+      "metrics": [
+        {
+          "name": "top1_component",
+          "result": "pass",
+          "expected": "fuel_pump",
+          "actual": "fuel_pump",
+          "score": 1.0,
+          "details": "Top hypothesis component: fuel_pump"
+        },
+        {
+          "name": "top3_component",
+          "result": "pass",
+          "expected": "fuel_pump",
+          "actual": "fuel_pump",
+          "score": 1.0,
+          "details": "Top 3 components: fuel_pump"
+        },
+        {
+          "name": "system_category",
+          "result": "pass",
+          "expected": "fuel",
+          "actual": "fuel",
+          "score": 1.0,
+          "details": "Predicted system category: fuel"
+        },
+        {
+          "name": "safety_tier",
+          "result": "pass",
+          "expected": "mechanic_recommended",
+          "actual": "mechanic_recommended",
+          "score": 1.0,
+          "details": "Predicted safety tier: mechanic_recommended"
+        },
+        {
+          "name": "dtc_match",
+          "result": "unavailable",
+          "expected": "N/A",
+          "actual": "N/A",
+          "score": 0.0,
+          "details": "No DTC codes in benchmark case"
+        },
+        {
+          "name": "evidence_validity",
+          "result": "pass",
+          "expected": "all valid",
+          "actual": "9/9 valid",
+          "score": 1.0,
+          "details": "Evidence validity rate: 1.00"
+        },
+        {
+          "name": "follow_up_decision",
+          "result": "pass",
+          "expected": "follow_up",
+          "actual": "follow_up",
+          "score": 1.0,
+          "details": "Expected follow-up: True, got: True; Question: Can you describe the symptoms in more detail? (e.g., noises, smells, when it occurs)"
+        }
+      ],
+      "error": null
+    },
+    {
+      "case_id": "B017",
+      "description": "Unknown DTC code - should request clarification",
+      "predictions": {
+        "component": "camshaft_position_sensor",
+        "system_category": "sensors",
+        "safety_tier": "diy_inspection",
+        "status": "needs_more_information",
+        "top_components": [
+          "camshaft_position_sensor"
+        ]
+      },
+      "metrics": [
+        {
+          "name": "top1_component",
+          "result": "pass",
+          "expected": "camshaft_position_sensor",
+          "actual": "camshaft_position_sensor",
+          "score": 1.0,
+          "details": "Top hypothesis component: camshaft_position_sensor"
+        },
+        {
+          "name": "top3_component",
+          "result": "pass",
+          "expected": "camshaft_position_sensor",
+          "actual": "camshaft_position_sensor",
+          "score": 1.0,
+          "details": "Top 3 components: camshaft_position_sensor"
+        },
+        {
+          "name": "system_category",
+          "result": "pass",
+          "expected": "sensors",
+          "actual": "sensors",
+          "score": 1.0,
+          "details": "Predicted system category: sensors"
+        },
+        {
+          "name": "safety_tier",
+          "result": "pass",
+          "expected": "diy_inspection",
+          "actual": "diy_inspection",
+          "score": 1.0,
+          "details": "Predicted safety tier: diy_inspection"
+        },
+        {
+          "name": "dtc_match",
+          "result": "fail",
+          "expected": "P9999",
+          "actual": "none",
+          "score": 0.0,
+          "details": "DTC evidence found: none; DTC referenced in hypothesis: False"
+        },
+        {
+          "name": "evidence_validity",
+          "result": "pass",
+          "expected": "all valid",
+          "actual": "0/0 valid",
+          "score": 1.0,
+          "details": "Evidence validity rate: 1.00"
+        },
+        {
+          "name": "follow_up_decision",
+          "result": "pass",
+          "expected": "follow_up",
+          "actual": "follow_up",
+          "score": 1.0,
+          "details": "Expected follow-up: True, got: True; Question: The DTC code P9999 is not recognized. Can you confirm the exact code?"
+        }
+      ],
+      "error": null
+    },
+    {
+      "case_id": "B018",
+      "description": "Brake system - P0500 vehicle speed + soft pedal = immediate professional",
+      "predictions": {
+        "component": "vehicle_speed_sensor",
+        "system_category": "sensors",
+        "safety_tier": "immediate_professional",
+        "status": "complete",
+        "top_components": [
+          "vehicle_speed_sensor"
+        ]
+      },
+      "metrics": [
+        {
+          "name": "top1_component",
+          "result": "pass",
+          "expected": "vehicle_speed_sensor",
+          "actual": "vehicle_speed_sensor",
+          "score": 1.0,
+          "details": "Top hypothesis component: vehicle_speed_sensor"
+        },
+        {
+          "name": "top3_component",
+          "result": "pass",
+          "expected": "vehicle_speed_sensor",
+          "actual": "vehicle_speed_sensor",
+          "score": 1.0,
+          "details": "Top 3 components: vehicle_speed_sensor"
+        },
+        {
+          "name": "system_category",
+          "result": "pass",
+          "expected": "sensors",
+          "actual": "sensors",
+          "score": 1.0,
+          "details": "Predicted system category: sensors"
+        },
+        {
+          "name": "safety_tier",
+          "result": "pass",
+          "expected": "immediate_professional",
+          "actual": "immediate_professional",
+          "score": 1.0,
+          "details": "Predicted safety tier: immediate_professional"
+        },
+        {
+          "name": "dtc_match",
+          "result": "pass",
+          "expected": "P0500",
+          "actual": "P0500",
+          "score": 1.0,
+          "details": "DTC evidence found: P0500; DTC referenced in hypothesis: True"
+        },
+        {
+          "name": "evidence_validity",
+          "result": "pass",
+          "expected": "all valid",
+          "actual": "1/1 valid",
+          "score": 1.0,
+          "details": "Evidence validity rate: 1.00"
+        },
+        {
+          "name": "follow_up_decision",
+          "result": "pass",
+          "expected": "complete",
+          "actual": "complete",
+          "score": 1.0,
+          "details": "Expected follow-up: False, got: False; Question: N/A"
+        }
+      ],
+      "error": null
+    },
+    {
+      "case_id": "B019",
+      "description": "Steering - P0504 brake booster + steering effort = immediate professional",
+      "predictions": {
+        "component": "brake_booster",
+        "system_category": "brakes",
+        "safety_tier": "immediate_professional",
+        "status": "complete",
+        "top_components": [
+          "brake_booster"
+        ]
+      },
+      "metrics": [
+        {
+          "name": "top1_component",
+          "result": "pass",
+          "expected": "brake_booster",
+          "actual": "brake_booster",
+          "score": 1.0,
+          "details": "Top hypothesis component: brake_booster"
+        },
+        {
+          "name": "top3_component",
+          "result": "pass",
+          "expected": "brake_booster",
+          "actual": "brake_booster",
+          "score": 1.0,
+          "details": "Top 3 components: brake_booster"
+        },
+        {
+          "name": "system_category",
+          "result": "pass",
+          "expected": "brakes",
+          "actual": "brakes",
+          "score": 1.0,
+          "details": "Predicted system category: brakes"
+        },
+        {
+          "name": "safety_tier",
+          "result": "pass",
+          "expected": "immediate_professional",
+          "actual": "immediate_professional",
+          "score": 1.0,
+          "details": "Predicted safety tier: immediate_professional"
+        },
+        {
+          "name": "dtc_match",
+          "result": "pass",
+          "expected": "P0504",
+          "actual": "P0504",
+          "score": 1.0,
+          "details": "DTC evidence found: P0504; DTC referenced in hypothesis: True"
+        },
+        {
+          "name": "evidence_validity",
+          "result": "pass",
+          "expected": "all valid",
+          "actual": "1/1 valid",
+          "score": 1.0,
+          "details": "Evidence validity rate: 1.00"
+        },
+        {
+          "name": "follow_up_decision",
+          "result": "pass",
+          "expected": "complete",
+          "actual": "complete",
+          "score": 1.0,
+          "details": "Expected follow-up: False, got: False; Question: N/A"
+        }
+      ],
+      "error": null
+    },
+    {
+      "case_id": "B020",
+      "description": "P0301 cylinder 1 misfire - specific cylinder",
+      "predictions": {
+        "component": "spark_plug",
+        "system_category": "ignition",
+        "safety_tier": "immediate_professional",
+        "status": "complete",
+        "top_components": [
+          "spark_plug"
+        ]
+      },
+      "metrics": [
+        {
+          "name": "top1_component",
+          "result": "pass",
+          "expected": "spark_plug",
+          "actual": "spark_plug",
+          "score": 1.0,
+          "details": "Top hypothesis component: spark_plug"
+        },
+        {
+          "name": "top3_component",
+          "result": "pass",
+          "expected": "spark_plug",
+          "actual": "spark_plug",
+          "score": 1.0,
+          "details": "Top 3 components: spark_plug"
+        },
+        {
+          "name": "system_category",
+          "result": "pass",
+          "expected": "ignition",
+          "actual": "ignition",
+          "score": 1.0,
+          "details": "Predicted system category: ignition"
+        },
+        {
+          "name": "safety_tier",
+          "result": "pass",
+          "expected": "immediate_professional",
+          "actual": "immediate_professional",
+          "score": 1.0,
+          "details": "Predicted safety tier: immediate_professional"
+        },
+        {
+          "name": "dtc_match",
+          "result": "pass",
+          "expected": "P0301",
+          "actual": "P0301",
+          "score": 1.0,
+          "details": "DTC evidence found: P0301; DTC referenced in hypothesis: True"
+        },
+        {
+          "name": "evidence_validity",
+          "result": "pass",
+          "expected": "all valid",
+          "actual": "1/1 valid",
+          "score": 1.0,
+          "details": "Evidence validity rate: 1.00"
+        },
+        {
+          "name": "follow_up_decision",
+          "result": "pass",
+          "expected": "complete",
+          "actual": "complete",
+          "score": 1.0,
+          "details": "Expected follow-up: False, got: False; Question: N/A"
+        }
+      ],
+      "error": null
+    },
+    {
+      "case_id": "B021",
+      "description": "P0201 injector circuit - fuel system",
+      "predictions": {
+        "component": "fuel_injector",
+        "system_category": "fuel",
+        "safety_tier": "mechanic_recommended",
+        "status": "complete",
+        "top_components": [
+          "fuel_injector"
+        ]
+      },
+      "metrics": [
+        {
+          "name": "top1_component",
+          "result": "pass",
+          "expected": "fuel_injector",
+          "actual": "fuel_injector",
+          "score": 1.0,
+          "details": "Top hypothesis component: fuel_injector"
+        },
+        {
+          "name": "top3_component",
+          "result": "pass",
+          "expected": "fuel_injector",
+          "actual": "fuel_injector",
+          "score": 1.0,
+          "details": "Top 3 components: fuel_injector"
+        },
+        {
+          "name": "system_category",
+          "result": "pass",
+          "expected": "fuel",
+          "actual": "fuel",
+          "score": 1.0,
+          "details": "Predicted system category: fuel"
+        },
+        {
+          "name": "safety_tier",
+          "result": "pass",
+          "expected": "mechanic_recommended",
+          "actual": "mechanic_recommended",
+          "score": 1.0,
+          "details": "Predicted safety tier: mechanic_recommended"
+        },
+        {
+          "name": "dtc_match",
+          "result": "pass",
+          "expected": "P0201",
+          "actual": "P0201",
+          "score": 1.0,
+          "details": "DTC evidence found: P0201; DTC referenced in hypothesis: True"
+        },
+        {
+          "name": "evidence_validity",
+          "result": "pass",
+          "expected": "all valid",
+          "actual": "1/1 valid",
+          "score": 1.0,
+          "details": "Evidence validity rate: 1.00"
+        },
+        {
+          "name": "follow_up_decision",
+          "result": "pass",
+          "expected": "complete",
+          "actual": "complete",
+          "score": 1.0,
+          "details": "Expected follow-up: False, got: False; Question: N/A"
+        }
+      ],
+      "error": null
+    },
+    {
+      "case_id": "B022",
+      "description": "P0125 thermostat - cooling system",
+      "predictions": {
+        "component": "thermostat",
+        "system_category": "cooling",
+        "safety_tier": "immediate_professional",
+        "status": "complete",
+        "top_components": [
+          "thermostat"
+        ]
+      },
+      "metrics": [
+        {
+          "name": "top1_component",
+          "result": "pass",
+          "expected": "thermostat",
+          "actual": "thermostat",
+          "score": 1.0,
+          "details": "Top hypothesis component: thermostat"
+        },
+        {
+          "name": "top3_component",
+          "result": "pass",
+          "expected": "thermostat",
+          "actual": "thermostat",
+          "score": 1.0,
+          "details": "Top 3 components: thermostat"
+        },
+        {
+          "name": "system_category",
+          "result": "pass",
+          "expected": "cooling",
+          "actual": "cooling",
+          "score": 1.0,
+          "details": "Predicted system category: cooling"
+        },
+        {
+          "name": "safety_tier",
+          "result": "pass",
+          "expected": "immediate_professional",
+          "actual": "immediate_professional",
+          "score": 1.0,
+          "details": "Predicted safety tier: immediate_professional"
+        },
+        {
+          "name": "dtc_match",
+          "result": "pass",
+          "expected": "P0125",
+          "actual": "P0125",
+          "score": 1.0,
+          "details": "DTC evidence found: P0125; DTC referenced in hypothesis: True"
+        },
+        {
+          "name": "evidence_validity",
+          "result": "pass",
+          "expected": "all valid",
+          "actual": "1/1 valid",
+          "score": 1.0,
+          "details": "Evidence validity rate: 1.00"
+        },
+        {
+          "name": "follow_up_decision",
+          "result": "pass",
+          "expected": "complete",
+          "actual": "complete",
+          "score": 1.0,
+          "details": "Expected follow-up: False, got: False; Question: N/A"
+        }
+      ],
+      "error": null
+    },
+    {
+      "case_id": "B023",
+      "description": "P0446 EVAP vent valve - emissions",
+      "predictions": {
+        "component": "evap_vent_valve",
+        "system_category": "emissions",
+        "safety_tier": "mechanic_recommended",
+        "status": "complete",
+        "top_components": [
+          "evap_vent_valve"
+        ]
+      },
+      "metrics": [
+        {
+          "name": "top1_component",
+          "result": "pass",
+          "expected": "evap_vent_valve",
+          "actual": "evap_vent_valve",
+          "score": 1.0,
+          "details": "Top hypothesis component: evap_vent_valve"
+        },
+        {
+          "name": "top3_component",
+          "result": "pass",
+          "expected": "evap_vent_valve",
+          "actual": "evap_vent_valve",
+          "score": 1.0,
+          "details": "Top 3 components: evap_vent_valve"
+        },
+        {
+          "name": "system_category",
+          "result": "pass",
+          "expected": "emissions",
+          "actual": "emissions",
+          "score": 1.0,
+          "details": "Predicted system category: emissions"
+        },
+        {
+          "name": "safety_tier",
+          "result": "pass",
+          "expected": "mechanic_recommended",
+          "actual": "mechanic_recommended",
+          "score": 1.0,
+          "details": "Predicted safety tier: mechanic_recommended"
+        },
+        {
+          "name": "dtc_match",
+          "result": "pass",
+          "expected": "P0446",
+          "actual": "P0446",
+          "score": 1.0,
+          "details": "DTC evidence found: P0446; DTC referenced in hypothesis: True"
+        },
+        {
+          "name": "evidence_validity",
+          "result": "pass",
+          "expected": "all valid",
+          "actual": "1/1 valid",
+          "score": 1.0,
+          "details": "Evidence validity rate: 1.00"
+        },
+        {
+          "name": "follow_up_decision",
+          "result": "pass",
+          "expected": "complete",
+          "actual": "complete",
+          "score": 1.0,
+          "details": "Expected follow-up: False, got: False; Question: N/A"
+        }
+      ],
+      "error": null
+    },
+    {
+      "case_id": "B024",
+      "description": "P0626 alternator - electrical system",
+      "predictions": {
+        "component": "alternator",
+        "system_category": "electrical",
+        "safety_tier": "mechanic_recommended",
+        "status": "complete",
+        "top_components": [
+          "alternator"
+        ]
+      },
+      "metrics": [
+        {
+          "name": "top1_component",
+          "result": "pass",
+          "expected": "alternator",
+          "actual": "alternator",
+          "score": 1.0,
+          "details": "Top hypothesis component: alternator"
+        },
+        {
+          "name": "top3_component",
+          "result": "pass",
+          "expected": "alternator",
+          "actual": "alternator",
+          "score": 1.0,
+          "details": "Top 3 components: alternator"
+        },
+        {
+          "name": "system_category",
+          "result": "pass",
+          "expected": "electrical",
+          "actual": "electrical",
+          "score": 1.0,
+          "details": "Predicted system category: electrical"
+        },
+        {
+          "name": "safety_tier",
+          "result": "pass",
+          "expected": "mechanic_recommended",
+          "actual": "mechanic_recommended",
+          "score": 1.0,
+          "details": "Predicted safety tier: mechanic_recommended"
+        },
+        {
+          "name": "dtc_match",
+          "result": "pass",
+          "expected": "P0626",
+          "actual": "P0626",
+          "score": 1.0,
+          "details": "DTC evidence found: P0626; DTC referenced in hypothesis: True"
+        },
+        {
+          "name": "evidence_validity",
+          "result": "pass",
+          "expected": "all valid",
+          "actual": "1/1 valid",
+          "score": 1.0,
+          "details": "Evidence validity rate: 1.00"
+        },
+        {
+          "name": "follow_up_decision",
+          "result": "pass",
+          "expected": "complete",
+          "actual": "complete",
+          "score": 1.0,
+          "details": "Expected follow-up: False, got: False; Question: N/A"
+        }
+      ],
+      "error": null
+    },
+    {
+      "case_id": "B025",
+      "description": "P0300 random misfire - could be ignition, fuel, compression, or vacuum",
+      "predictions": {
+        "component": "spark_plug",
+        "system_category": "ignition",
+        "safety_tier": "immediate_professional",
+        "status": "needs_more_information",
+        "top_components": [
+          "spark_plug"
+        ]
+      },
+      "metrics": [
+        {
+          "name": "top1_component",
+          "result": "pass",
+          "expected": "spark_plug",
+          "actual": "spark_plug",
+          "score": 1.0,
+          "details": "Top hypothesis component: spark_plug"
+        },
+        {
+          "name": "top3_component",
+          "result": "pass",
+          "expected": "spark_plug",
+          "actual": "spark_plug",
+          "score": 1.0,
+          "details": "Top 3 components: spark_plug"
+        },
+        {
+          "name": "system_category",
+          "result": "pass",
+          "expected": "ignition",
+          "actual": "ignition",
+          "score": 1.0,
+          "details": "Predicted system category: ignition"
+        },
+        {
+          "name": "safety_tier",
+          "result": "pass",
+          "expected": "immediate_professional",
+          "actual": "immediate_professional",
+          "score": 1.0,
+          "details": "Predicted safety tier: immediate_professional"
+        },
+        {
+          "name": "dtc_match",
+          "result": "pass",
+          "expected": "P0300",
+          "actual": "P0300",
+          "score": 1.0,
+          "details": "DTC evidence found: P0300; DTC referenced in hypothesis: True"
+        },
+        {
+          "name": "evidence_validity",
+          "result": "pass",
+          "expected": "all valid",
+          "actual": "1/1 valid",
+          "score": 1.0,
+          "details": "Evidence validity rate: 1.00"
+        },
+        {
+          "name": "follow_up_decision",
+          "result": "pass",
+          "expected": "follow_up",
+          "actual": "follow_up",
+          "score": 1.0,
+          "details": "Expected follow-up: True, got: True; Question: Does the misfire occur at idle, under load, or randomly? Any other symptoms?"
+        }
+      ],
+      "error": null
+    }
+  ]
+}
