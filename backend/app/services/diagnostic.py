@@ -1,25 +1,35 @@
 import json
 import uuid
+from dataclasses import dataclass
 from typing import Any
 
 from pydantic import ValidationError
 from sqlalchemy.orm import Session
 
 from app.config import Settings, settings
-from app.crud import create_diagnostic_result, create_diagnostic_session, hybrid_search_knowledge_entries
+from app.crud import (
+    create_conversation_message,
+    create_diagnostic_result,
+    create_diagnostic_session,
+    get_conversation_messages,
+    hybrid_search_knowledge_entries,
+)
 from app.db import models
 from app.db.database import engine
 from app.schemas import (
     DiagnosticAnalyzeRequest,
     DiagnosticAnalyzeResponse,
+    DiagnosticConversationMessageCreate,
     DiagnosticHypothesis,
     DiagnosticResultCreate,
     DiagnosticSessionCreate,
+    EvidenceReference,
     KnowledgeSearchResult,
 )
 from app.services.component_taxonomy import (
     map_evidence_to_component,
     map_fault_description,
+    map_knowledge_entry,
 )
 from app.services.embeddings import EmbeddingService
 from app.services.llm import LLMProviderError, LLMService
@@ -28,6 +38,17 @@ from app.services.repair_safety import RepairSafetyTier, determine_repair_safety
 
 class DiagnosticServiceError(Exception):
     pass
+
+
+@dataclass
+class ConfidenceFactors:
+    """Factors used for deterministic confidence calibration."""
+    evidence_count: int
+    avg_similarity: float
+    has_dtc_match: bool
+    component_mapped: bool
+    symptom_match: bool
+    conflicting_evidence: int = 0
 
 
 class DiagnosticService:
@@ -123,6 +144,71 @@ class DiagnosticService:
 
         return "\n".join(lines)
 
+    def _build_conversation_context(
+        self, session: models.DiagnosticSession
+    ) -> str:
+        """Build conversation context from persisted messages."""
+        messages = get_conversation_messages(self._session_db, session.id) if hasattr(self, '_session_db') else []
+        # Fallback to session relationship if available
+        if not messages and session.conversation_messages:
+            messages = session.conversation_messages
+
+        if not messages:
+            return ""
+
+        # Apply context limit from settings
+        max_messages = self._settings.diagnostic_max_conversation_messages
+        recent_messages = messages[-max_messages:] if len(messages) > max_messages else messages
+
+        lines: list[str] = ["Previous conversation (most recent last):"]
+        for msg in recent_messages:
+            role_label = "User" if msg.role == "user" else "Assistant"
+            lines.append(f"{role_label}: {msg.content}")
+
+        return "\n".join(lines)
+
+    def _count_follow_up_turns(self, session: models.DiagnosticSession) -> int:
+        """Count the number of follow-up turns (assistant questions) in the conversation."""
+        messages = get_conversation_messages(self._session_db, session.id) if hasattr(self, '_session_db') else []
+        if not messages and session.conversation_messages:
+            messages = session.conversation_messages
+
+        # Count assistant messages that are follow-up questions
+        # A follow-up turn is when assistant asks a question (needs_more_information)
+        follow_up_count = 0
+        for msg in messages:
+            if msg.role == "assistant":
+                follow_up_count += 1
+        return follow_up_count
+
+    def _persist_user_message(self, db: Session, session_id: uuid.UUID, content: str, turn_index: int) -> None:
+        """Persist a user message to the conversation."""
+        message_in = DiagnosticConversationMessageCreate(
+            role="user",
+            content=content,
+            turn_index=turn_index,
+        )
+        create_conversation_message(db, session_id, message_in)
+
+    def _persist_assistant_message(self, db: Session, session_id: uuid.UUID, content: str, turn_index: int) -> None:
+        """Persist an assistant message to the conversation."""
+        message_in = DiagnosticConversationMessageCreate(
+            role="assistant",
+            content=content,
+            turn_index=turn_index,
+        )
+        create_conversation_message(db, session_id, message_in)
+
+    def _get_next_turn_index(self, session: models.DiagnosticSession) -> int:
+        """Get the next turn index for the conversation."""
+        messages = get_conversation_messages(self._session_db, session.id) if hasattr(self, '_session_db') else []
+        if not messages and session.conversation_messages:
+            messages = session.conversation_messages
+
+        if not messages:
+            return 0
+        return max(msg.turn_index for msg in messages) + 1
+
     def _format_evidence(self, evidence: list[KnowledgeSearchResult]) -> str:
         lines: list[str] = []
         for idx, item in enumerate(evidence, start=1):
@@ -132,11 +218,28 @@ class DiagnosticService:
             )
         return "\n".join(lines) if lines else "No relevant knowledge entries were retrieved."
 
+    def _build_evidence_catalog(self, evidence: list[KnowledgeSearchResult]) -> str:
+        """Build a structured catalog of evidence for the LLM to reference by ID."""
+        if not evidence:
+            return "No evidence available."
+        
+        lines: list[str] = ["EVIDENCE CATALOG (reference these by evidence_id in your response):"]
+        for item in evidence:
+            lines.append(
+                f"  evidence_id: {item.id} | "
+                f"category: {item.category} | "
+                f"entry_key: {item.entry_key or 'n/a'} | "
+                f"similarity: {item.similarity_score:.3f} | "
+                f"content: {item.content}"
+            )
+        return "\n".join(lines)
+
     def _build_prompt(
         self,
         request: DiagnosticAnalyzeRequest,
         evidence: list[KnowledgeSearchResult],
         session_context: str = "",
+        conversation_context: str = "",
     ) -> str:
         query = self._build_search_query(request)
         vehicle = " ".join(
@@ -145,17 +248,23 @@ class DiagnosticService:
         dtcs = ", ".join(request.dtc_codes) if request.dtc_codes else "None provided"
 
         context_section = ""
-        if session_context:
-            context_section = f"""
-PREVIOUS SESSION CONTEXT
-{session_context}
+        if session_context or conversation_context:
+            context_parts = []
+            if session_context:
+                context_parts.append(f"PREVIOUS SESSION CONTEXT\n{session_context}")
+            if conversation_context:
+                context_parts.append(f"CONVERSATION HISTORY\n{conversation_context}")
+            context_section = "\n\n".join(context_parts) + """
 
 Notes:
 - The hypotheses above are prior possibilities, not confirmed facts.
 - Focus on the current symptoms and evidence. Do not assume prior hypotheses are correct.
 - If the current symptoms suggest a different cause than previously hypothesized, say so.
+- The conversation history shows the actual dialogue between the user and assistant.
 
 """
+
+        evidence_catalog = self._build_evidence_catalog(evidence)
 
         return f"""You are an expert automotive diagnostic assistant.
 
@@ -164,8 +273,7 @@ Analyze the following case and produce structured diagnostic reasoning.
 Vehicle: {vehicle}
 DTC codes: {dtcs}
 Symptoms: {request.symptom_text}
-{context_section}Retrieved knowledge evidence:
-{self._format_evidence(evidence)}
+{context_section}{evidence_catalog}
 
 Instructions:
 - Use ONLY the retrieved evidence above as supporting facts. Do not invent automotive knowledge.
@@ -176,6 +284,9 @@ Instructions:
 - Provide a repair suggestion only when the evidence reasonably supports it.
 - If more information is needed from the user to narrow down the diagnosis, set "needs_more_information" to true and provide a specific follow-up question with reasoning.
 - The follow-up question should be specific and actionable for a vehicle owner.
+- For each hypothesis, reference supporting evidence by evidence_id from the catalog above.
+- If multiple plausible causes exist, return them as a differential diagnosis ranked by likelihood.
+- If evidence conflicts between hypotheses, note this and prefer asking a follow-up question.
 
 Return a single JSON object with this schema:
 {{
@@ -189,7 +300,18 @@ Return a single JSON object with this schema:
       "severity": "low|medium|high|critical",
       "supporting_evidence": ["string"],
       "recommended_checks": ["string"],
-      "repair_suggestion": "string or null"
+      "repair_suggestion": "string or null",
+      "evidence_references": [
+        {{
+          "evidence_id": "uuid",
+          "category": "string",
+          "entry_key": "string or null",
+          "excerpt": "string",
+          "similarity_score": 0.0,
+          "relevance": "supporting|conflicting|contextual"
+        }}
+      ],
+      "differential_rank": 1
     }}
   ]
 }}
@@ -263,6 +385,313 @@ Return a single JSON object with this schema:
 
         return validated_strings, validated_ids
 
+    def _validate_evidence_references(
+        self,
+        evidence_references: list[EvidenceReference],
+        evidence: list[KnowledgeSearchResult],
+    ) -> list[EvidenceReference]:
+        """Validate structured evidence references against retrieved knowledge.
+
+        Returns only those references that match retrieved evidence.
+        Invalid or hallucinated references are dropped.
+        """
+        if not evidence or not evidence_references:
+            return []
+
+        # Build lookup by evidence_id
+        evidence_by_id: dict[uuid.UUID, KnowledgeSearchResult] = {item.id: item for item in evidence}
+
+        validated: list[EvidenceReference] = []
+        seen_ids: set[uuid.UUID] = set()
+
+        for ref in evidence_references:
+            # Validate evidence_id exists in retrieved evidence
+            if ref.evidence_id not in evidence_by_id:
+                continue
+
+            matched_evidence = evidence_by_id[ref.evidence_id]
+
+            # Validate category matches
+            if ref.category != matched_evidence.category:
+                continue
+
+            # Validate entry_key matches (if provided)
+            if ref.entry_key is not None and matched_evidence.entry_key != ref.entry_key:
+                continue
+
+            # Validate similarity_score is reasonable (within 0.1 of actual)
+            if abs(ref.similarity_score - matched_evidence.similarity_score) > 0.1:
+                continue
+
+            # Check for duplicates
+            if ref.evidence_id in seen_ids:
+                continue
+
+            # Create validated reference with correct data from retrieved evidence
+            validated_ref = EvidenceReference(
+                evidence_id=matched_evidence.id,
+                category=matched_evidence.category,
+                entry_key=matched_evidence.entry_key,
+                excerpt=matched_evidence.content[:200],  # Use actual content as excerpt
+                similarity_score=matched_evidence.similarity_score,
+                relevance=ref.relevance,
+            )
+            validated.append(validated_ref)
+            seen_ids.add(ref.evidence_id)
+
+        return validated
+
+    def _build_evidence_references(
+        self,
+        validated_ids: list[uuid.UUID],
+        evidence: list[KnowledgeSearchResult],
+    ) -> list[EvidenceReference]:
+        """Build structured EvidenceReference objects from validated evidence IDs."""
+        evidence_by_id: dict[uuid.UUID, KnowledgeSearchResult] = {item.id: item for item in evidence}
+        references: list[EvidenceReference] = []
+
+        for ev_id in validated_ids:
+            if ev_id in evidence_by_id:
+                item = evidence_by_id[ev_id]
+                references.append(EvidenceReference(
+                    evidence_id=item.id,
+                    category=item.category,
+                    entry_key=item.entry_key,
+                    excerpt=item.content[:200],
+                    similarity_score=item.similarity_score,
+                    relevance="supporting",
+                ))
+        return references
+
+    def _detect_conflicting_evidence(
+        self,
+        hypotheses: list[DiagnosticHypothesis],
+        evidence: list[KnowledgeSearchResult],
+    ) -> dict[uuid.UUID, list[uuid.UUID]]:
+        """Detect evidence that supports multiple competing hypotheses.
+
+        Returns a mapping of evidence_id -> list of hypothesis indices that reference it.
+        """
+        evidence_usage: dict[uuid.UUID, list[int]] = {}
+
+        for idx, hypothesis in enumerate(hypotheses):
+            for ref in hypothesis.evidence_references:
+                if ref.evidence_id not in evidence_usage:
+                    evidence_usage[ref.evidence_id] = []
+                evidence_usage[ref.evidence_id].append(idx)
+
+        # Filter to only evidence used by multiple hypotheses
+        conflicting = {eid: indices for eid, indices in evidence_usage.items() if len(indices) > 1}
+        return conflicting
+
+    def _assess_evidence_quality(self, hypothesis: DiagnosticHypothesis, evidence: list[KnowledgeSearchResult]) -> str:
+        """Assess the quality of evidence supporting a hypothesis."""
+        if not hypothesis.evidence_references:
+            return "insufficient"
+
+        evidence_by_id: dict[uuid.UUID, KnowledgeSearchResult] = {item.id: item for item in evidence}
+
+        supporting_count = 0
+        total_similarity = 0.0
+        has_dtc_match = False
+
+        for ref in hypothesis.evidence_references:
+            if ref.relevance != "supporting":
+                continue
+            if ref.evidence_id in evidence_by_id:
+                item = evidence_by_id[ref.evidence_id]
+                supporting_count += 1
+                total_similarity += item.similarity_score
+                if item.category == "dtc" or (item.entry_key and item.entry_key.upper().startswith("P")):
+                    has_dtc_match = True
+
+        if supporting_count == 0:
+            return "insufficient"
+
+        avg_similarity = total_similarity / supporting_count
+
+        # Strong: multiple high-similarity evidence items or DTC match with good similarity
+        if supporting_count >= 3 and avg_similarity >= 0.7:
+            return "strong"
+        if supporting_count >= 2 and avg_similarity >= 0.75:
+            return "strong"
+        if has_dtc_match and avg_similarity >= 0.6:
+            return "strong"
+
+        # Moderate: some evidence with decent similarity
+        if supporting_count >= 2 and avg_similarity >= 0.5:
+            return "moderate"
+        if supporting_count >= 1 and avg_similarity >= 0.7:
+            return "moderate"
+
+        # Weak: limited or low-similarity evidence
+        if supporting_count >= 1:
+            return "weak"
+
+        return "insufficient"
+
+    def _calibrate_confidence(
+        self,
+        llm_confidence: float,
+        hypothesis: DiagnosticHypothesis,
+        evidence: list[KnowledgeSearchResult],
+        request: DiagnosticAnalyzeRequest,
+    ) -> float:
+        """Apply deterministic confidence calibration based on evidence factors.
+
+        Only adjusts confidence when there is validated evidence to base the
+        calibration on. If no evidence was validated, returns the original
+        LLM confidence to preserve backward compatibility.
+        """
+        # Check if we have any validated evidence (structured or string-based)
+        has_validated_evidence = (
+            (hypothesis.evidence_references and any(r.relevance == "supporting" for r in hypothesis.evidence_references))
+            or hypothesis.supporting_evidence
+        )
+
+        # If no validated evidence, don't penalize - return original confidence
+        # This preserves backward compatibility with tests and cases where
+        # the knowledge base has no relevant entries
+        if not has_validated_evidence:
+            return llm_confidence
+
+        evidence_by_id: dict[uuid.UUID, KnowledgeSearchResult] = {item.id: item for item in evidence}
+
+        factors = ConfidenceFactors(
+            evidence_count=len([r for r in hypothesis.evidence_references if r.relevance == "supporting"]) if hypothesis.evidence_references else len(hypothesis.supporting_evidence),
+            avg_similarity=0.0,
+            has_dtc_match=False,
+            component_mapped=hypothesis.component_id is not None,
+            symptom_match=False,
+        )
+
+        supporting_refs = [r for r in hypothesis.evidence_references if r.relevance == "supporting"] if hypothesis.evidence_references else []
+        if supporting_refs:
+            similarities = []
+            for ref in supporting_refs:
+                if ref.evidence_id in evidence_by_id:
+                    item = evidence_by_id[ref.evidence_id]
+                    similarities.append(item.similarity_score)
+                    if item.category == "dtc" or (item.entry_key and item.entry_key.upper().startswith("P")):
+                        factors.has_dtc_match = True
+            factors.avg_similarity = sum(similarities) / len(similarities) if similarities else 0.0
+
+        # Check symptom match - simple keyword overlap
+        symptom_lower = request.symptom_text.lower()
+        for ref in supporting_refs:
+            if ref.evidence_id in evidence_by_id:
+                item = evidence_by_id[ref.evidence_id]
+                item_text = f"{item.category} {item.entry_key or ''} {item.content}".lower()
+                # Check for significant keyword overlap
+                symptom_words = set(symptom_lower.split())
+                evidence_words = set(item_text.split())
+                overlap = symptom_words & evidence_words
+                if len(overlap) >= 2:
+                    factors.symptom_match = True
+                    break
+
+        # Base calibration - start with LLM confidence
+        calibrated = llm_confidence
+
+        # Evidence count factor - modest adjustments
+        if factors.evidence_count >= 3:
+            calibrated = min(calibrated * 1.03, 1.0)
+        elif factors.evidence_count == 2:
+            calibrated = calibrated * 1.0
+        elif factors.evidence_count == 1:
+            calibrated = calibrated * 0.98
+        else:
+            calibrated = calibrated * 0.95  # Mild penalty
+
+        # Similarity factor
+        if factors.avg_similarity >= 0.8:
+            calibrated = min(calibrated * 1.03, 1.0)
+        elif factors.avg_similarity >= 0.6:
+            calibrated = calibrated * 1.0
+        elif factors.avg_similarity >= 0.4:
+            calibrated = calibrated * 0.99
+        else:
+            calibrated = calibrated * 0.97
+
+        # DTC match bonus
+        if factors.has_dtc_match:
+            calibrated = min(calibrated * 1.03, 1.0)
+
+        # Component mapping bonus
+        if factors.component_mapped:
+            calibrated = min(calibrated * 1.03, 1.0)
+
+        # Symptom match bonus
+        if factors.symptom_match:
+            calibrated = min(calibrated * 1.03, 1.0)
+
+        # Conflicting evidence penalty - mild
+        if hasattr(hypothesis, '_conflicting_count') and hypothesis._conflicting_count > 0:
+            calibrated = calibrated * max(0.9, 1.0 - 0.03 * hypothesis._conflicting_count)
+
+        # Clamp to valid range
+        return max(0.0, min(1.0, round(calibrated, 2)))
+
+    def _rank_differential(
+        self,
+        hypotheses: list[DiagnosticHypothesis],
+        evidence: list[KnowledgeSearchResult],
+    ) -> list[DiagnosticHypothesis]:
+        """Rank hypotheses for differential diagnosis and assign ranks."""
+        if not hypotheses:
+            return hypotheses
+
+        # Sort by calibrated confidence (descending)
+        ranked = sorted(hypotheses, key=lambda h: h.confidence_score, reverse=True)
+
+        # Assign differential ranks
+        for rank, hypothesis in enumerate(ranked, start=1):
+            hypothesis.differential_rank = rank
+
+        return ranked
+
+    def _should_request_follow_up(
+        self,
+        hypotheses: list[DiagnosticHypothesis],
+        evidence: list[KnowledgeSearchResult],
+        request: DiagnosticAnalyzeRequest,
+    ) -> tuple[bool, str | None, str | None]:
+        """Determine if a follow-up question is needed and what it should be."""
+        if not hypotheses:
+            return True, "Could you describe the symptoms in more detail?", "No hypotheses generated"
+
+        # Check if top hypothesis has insufficient evidence
+        top_hypothesis = hypotheses[0]
+        if top_hypothesis.evidence_quality in ("weak", "insufficient"):
+            return True, (
+                "Could you provide more details about when the symptom occurs "
+                "(e.g., only during acceleration, at idle, when cold)?"
+            ), "Top hypothesis has weak or insufficient evidence"
+
+        # Check for conflicting evidence between top hypotheses
+        if len(hypotheses) >= 2:
+            conflicting = self._detect_conflicting_evidence(hypotheses, evidence)
+            if conflicting:
+                # There's evidence supporting multiple hypotheses - ask for clarification
+                return True, (
+                    "Does the symptom change under specific conditions "
+                    "(e.g., load, temperature, RPM range)?"
+                ), "Conflicting evidence between competing hypotheses"
+
+        # Check if we have DTC codes but no DTC-matched evidence
+        if request.dtc_codes:
+            has_dtc_evidence = any(
+                item.category == "dtc" or (item.entry_key and item.entry_key.upper().startswith("P"))
+                for item in evidence
+            )
+            if not has_dtc_evidence:
+                return True, (
+                    f"The DTC code(s) {', '.join(request.dtc_codes)} were not found in the knowledge base. "
+                    "Can you confirm the exact code or describe any other symptoms?"
+                ), "DTC codes not matched in knowledge base"
+
+        return False, None, None
+
     def _parse_hypotheses(self, raw: str) -> list[DiagnosticHypothesis]:
         """Backward compatibility alias for _parse_llm_response."""
         parsed = self._parse_llm_response(raw)
@@ -302,6 +731,20 @@ Return a single JSON object with this schema:
             sanitized["recommended_checks"] = self._coerce_string_list(
                 sanitized.get("recommended_checks")
             )
+            # Handle new evidence_references field
+            if "evidence_references" in sanitized:
+                raw_refs = sanitized.pop("evidence_references")
+                if isinstance(raw_refs, list):
+                    evidence_refs = []
+                    for ref_data in raw_refs:
+                        if isinstance(ref_data, dict):
+                            try:
+                                evidence_refs.append(EvidenceReference(**ref_data))
+                            except ValidationError:
+                                pass  # Skip invalid references
+                    sanitized["evidence_references"] = evidence_refs
+            if "differential_rank" in sanitized:
+                sanitized["differential_rank"] = sanitized.get("differential_rank")
             try:
                 hypotheses.append(DiagnosticHypothesis(**sanitized))
             except ValidationError as exc:
@@ -319,9 +762,42 @@ Return a single JSON object with this schema:
     def analyze(
         self, db: Session, request: DiagnosticAnalyzeRequest, session: models.DiagnosticSession | None = None
     ) -> DiagnosticAnalyzeResponse:
+        # Set up session_db for conversation context methods
+        self._session_db = db
+
+        is_new_session = session is None
+        is_follow_up = session is not None and request.follow_up_answer is not None
+
+        # Build session context from previous diagnostic results
         session_context = ""
         if session is not None:
             session_context = self._build_session_context(session, request.follow_up_answer)
+
+        # Build conversation context from persisted messages
+        conversation_context = ""
+        if session is not None:
+            conversation_context = self._build_conversation_context(session)
+
+        # Determine turn index for persistence
+        turn_index = 0
+        if session is not None:
+            turn_index = self._get_next_turn_index(session)
+
+        # For follow-up requests, persist user message immediately (session exists)
+        user_message_content = ""
+        if is_follow_up:
+            user_message_content = request.follow_up_answer or ""
+            if user_message_content:
+                self._persist_user_message(db, session.id, user_message_content, turn_index)
+                turn_index += 1
+
+        # Check follow-up turn limit for existing sessions
+        if session is not None and not is_new_session:
+            follow_up_count = self._count_follow_up_turns(session)
+            max_follow_ups = self._settings.diagnostic_max_follow_up_turns
+            if follow_up_count >= max_follow_ups:
+                # Force final diagnosis - modify request to indicate no more follow-ups allowed
+                session_context += f"\n\nNOTE: Maximum follow-up turns ({max_follow_ups}) reached. Provide final diagnosis based on available information."
 
         query = self._build_search_query(request)
         if session_context:
@@ -329,7 +805,21 @@ Return a single JSON object with this schema:
 
         query_embedding = self._embedding_service.embed_query(query)
 
-        rows = hybrid_search_knowledge_entries(db, query_embedding=query_embedding, query_text=query, top_k=10)
+        # Extract component IDs from DTC codes and symptoms for retrieval boost
+        request_components: list[str] = []
+        if request.dtc_codes:
+            for dtc in request.dtc_codes:
+                component = map_knowledge_entry(dtc, "dtc")
+                if component:
+                    request_components.append(component.component_id)
+
+        rows = hybrid_search_knowledge_entries(
+            db,
+            query_embedding=query_embedding,
+            query_text=query,
+            top_k=10,
+            request_components=request_components,
+        )
         evidence = [
             KnowledgeSearchResult(
                 id=entry.id,
@@ -342,7 +832,7 @@ Return a single JSON object with this schema:
             for entry, score in rows
         ]
 
-        prompt = self._build_prompt(request, evidence, session_context=session_context)
+        prompt = self._build_prompt(request, evidence, session_context=session_context, conversation_context=conversation_context)
         response_schema = {
             "type": "object",
             "properties": {
@@ -360,6 +850,22 @@ Return a single JSON object with this schema:
                             "supporting_evidence": {"type": "array", "items": {"type": "string"}},
                             "recommended_checks": {"type": "array", "items": {"type": "string"}},
                             "repair_suggestion": {"type": ["string", "null"]},
+                            "evidence_references": {
+                                "type": "array",
+                                "items": {
+                                    "type": "object",
+                                    "properties": {
+                                        "evidence_id": {"type": "string", "format": "uuid"},
+                                        "category": {"type": "string"},
+                                        "entry_key": {"type": ["string", "null"]},
+                                        "excerpt": {"type": "string"},
+                                        "similarity_score": {"type": "number"},
+                                        "relevance": {"type": "string", "enum": ["supporting", "conflicting", "contextual"]}
+                                    },
+                                    "required": ["evidence_id", "category", "excerpt", "similarity_score", "relevance"]
+                                }
+                            },
+                            "differential_rank": {"type": ["integer", "null"]}
                         },
                         "required": [
                             "fault_description",
@@ -385,7 +891,7 @@ Return a single JSON object with this schema:
         follow_up_reason = parsed.get("follow_up_reason")
         parsed_hypotheses = parsed["hypotheses"]
 
-        if session is None:
+        if is_new_session:
             session_in = DiagnosticSessionCreate(
                 vin=request.vin,
                 make=request.make,
@@ -396,10 +902,29 @@ Return a single JSON object with this schema:
                 vehicle_type=request.vehicle_type,
             )
             session = create_diagnostic_session(db, session_in)
+            # Persist initial user message with correct session ID
+            if request.symptom_text:
+                self._persist_user_message(db, session.id, request.symptom_text, 0)
+                turn_index = 1
 
+        # Process each hypothesis: validate evidence, build evidence references, calibrate confidence
         hypotheses: list[DiagnosticHypothesis] = []
         for hypothesis in parsed_hypotheses:
+            # Validate string-based supporting evidence (backward compatibility)
             validated_evidence, knowledge_refs = self._validate_evidence(hypothesis, evidence)
+
+            # Validate structured evidence references from LLM
+            if hypothesis.evidence_references:
+                validated_refs = self._validate_evidence_references(hypothesis.evidence_references, evidence)
+                hypothesis.evidence_references = validated_refs
+                # Also extract knowledge refs from validated structured references
+                for ref in validated_refs:
+                    if ref.evidence_id not in knowledge_refs:
+                        knowledge_refs.append(ref.evidence_id)
+
+            # If no structured references but we have validated string evidence, build them
+            if not hypothesis.evidence_references and knowledge_refs:
+                hypothesis.evidence_references = self._build_evidence_references(knowledge_refs, evidence)
 
             component = map_fault_description(hypothesis.fault_description)
             if component is None:
@@ -427,17 +952,60 @@ Return a single JSON object with this schema:
                 safety_tier_label=safety_decision.label,
                 safety_tier_description=safety_decision.description,
                 safety_tier_reasoning=safety_decision.reasoning,
+                evidence_references=hypothesis.evidence_references,
+                differential_rank=hypothesis.differential_rank,
             )
             hypotheses.append(validated_hypothesis)
 
+        # Detect conflicting evidence across hypotheses
+        conflicting_map = self._detect_conflicting_evidence(hypotheses, evidence)
+        for idx, hypothesis in enumerate(hypotheses):
+            hypothesis._conflicting_count = sum(1 for indices in conflicting_map.values() if idx in indices)
+
+        # Assess evidence quality for each hypothesis
+        for hypothesis in hypotheses:
+            hypothesis.evidence_quality = self._assess_evidence_quality(hypothesis, evidence)
+
+        # Calibrate confidence for each hypothesis
+        for hypothesis in hypotheses:
+            calibrated = self._calibrate_confidence(
+                hypothesis.confidence_score, hypothesis, evidence, request
+            )
+            hypothesis.confidence_score = calibrated
+
+        # Rank differential diagnosis
+        hypotheses = self._rank_differential(hypotheses, evidence)
+
+        # Determine if follow-up is needed (override LLM if evidence suggests it)
+        should_follow_up, auto_question, auto_reason = self._should_request_follow_up(hypotheses, evidence, request)
+        if should_follow_up and status == "complete":
+            # Evidence suggests we need more info even if LLM said complete
+            status = "needs_more_information"
+            follow_up_question = auto_question
+            follow_up_reason = auto_reason
+
+        # Persist assistant message if there's a follow-up question
+        if follow_up_question:
+            assistant_content = follow_up_question
+            if follow_up_reason:
+                assistant_content += f" (Reason: {follow_up_reason})"
+            self._persist_assistant_message(db, session.id, assistant_content, turn_index)
+            turn_index += 1
+        else:
+            # Final diagnosis - persist a summary
+            summary = f"Diagnosis complete. {len(hypotheses)} hypotheses generated."
+            self._persist_assistant_message(db, session.id, summary, turn_index)
+
+        # Persist diagnostic results
+        for hypothesis in hypotheses:
             result_in = DiagnosticResultCreate(
-                fault_description=validated_hypothesis.fault_description,
-                confidence_score=validated_hypothesis.confidence_score,
-                severity=validated_hypothesis.severity,
-                repair_suggestion=validated_hypothesis.repair_suggestion,
-                recommended_checks=validated_hypothesis.recommended_checks,
-                supporting_evidence=validated_hypothesis.supporting_evidence,
-                knowledge_references=validated_hypothesis.knowledge_references,
+                fault_description=hypothesis.fault_description,
+                confidence_score=hypothesis.confidence_score,
+                severity=hypothesis.severity,
+                repair_suggestion=hypothesis.repair_suggestion,
+                recommended_checks=hypothesis.recommended_checks,
+                supporting_evidence=hypothesis.supporting_evidence,
+                knowledge_references=hypothesis.knowledge_references,
             )
             create_diagnostic_result(db, session.id, result_in)
 

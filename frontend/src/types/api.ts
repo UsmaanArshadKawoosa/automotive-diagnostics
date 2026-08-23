@@ -15,6 +15,17 @@ export interface KnowledgeSearchResult {
   similarity_score: number;
 }
 
+export interface EvidenceReference {
+  evidence_id: string;
+  category: string;
+  entry_key: string | null;
+  excerpt: string;
+  similarity_score: number;
+  relevance: 'supporting' | 'conflicting' | 'contextual';
+}
+
+export type EvidenceQuality = 'strong' | 'moderate' | 'weak' | 'insufficient';
+
 export interface DiagnosticHypothesis {
   fault_description: string;
   confidence_score: number;
@@ -30,6 +41,9 @@ export interface DiagnosticHypothesis {
   safety_tier_label?: string;
   safety_tier_description?: string;
   safety_tier_reasoning?: string[];
+  evidence_references: EvidenceReference[];
+  differential_rank?: number;
+  evidence_quality?: EvidenceQuality;
 }
 
 export interface DiagnosticAnalyzeResponse {
@@ -88,6 +102,16 @@ export interface DiagnosticSession {
   symptom_text: string;
   dtc_codes: string | null;
   results: DiagnosticResult[];
+  conversation_messages: DiagnosticConversationMessage[];
+}
+
+export interface DiagnosticConversationMessage {
+  id: string;
+  session_id: string;
+  role: 'user' | 'assistant';
+  content: string;
+  turn_index: number;
+  created_at: string;
 }
 
 export interface DiagnosticAnalyzeRequest {

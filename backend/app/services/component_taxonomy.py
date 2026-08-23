@@ -301,6 +301,14 @@ _register(ComponentDefinition(
 ))
 
 _register(ComponentDefinition(
+    component_id="cruise_control",
+    display_name="Cruise Control System",
+    system_category="electrical",
+    vehicle_region="engine_bay",
+    description="Maintains vehicle speed without driver throttle input. Includes servo, switches, and control module.",
+))
+
+_register(ComponentDefinition(
     component_id="intake_manifold",
     display_name="Intake Manifold",
     system_category="intake",
@@ -424,6 +432,11 @@ FAULT_DESCRIPTION_PREFIXES: Dict[str, str] = {
     "bad alternator": "alternator",
     "vacuum leak": "vacuum_hose",
     "vacuum hose leak": "vacuum_hose",
+    "iac valve failure": "iac_valve",
+    "faulty iac valve": "iac_valve",
+    "idle air control valve failure": "iac_valve",
+    "faulty idle air control valve": "iac_valve",
+    "failed idle air control valve": "iac_valve",
     "failed torque converter": "torque_converter",
     "faulty torque converter": "torque_converter",
     "failed brake booster": "brake_booster",
@@ -546,7 +559,9 @@ KNOWLEDGE_ENTRY_KEY_TO_COMPONENT: Dict[str, str] = {
     "p0405": "egr_valve",
     "p0406": "egr_valve",
     "p0420": "catalytic_converter",
+    "p0422": "catalytic_converter",
     "p0430": "catalytic_converter",
+    "p0432": "catalytic_converter",
     "p0440": "evap_purge_valve",
     "p0441": "evap_purge_valve",
     "p0442": "evap_purge_valve",
@@ -582,7 +597,14 @@ KNOWLEDGE_ENTRY_KEY_TO_COMPONENT: Dict[str, str] = {
     "p0517": "battery",
     "p0518": "iac_valve",
     "p0519": "iac_valve",
+    "p0595": "cruise_control",
+    "p0596": "cruise_control",
+    "p0597": "cruise_control",
+    "p0598": "cruise_control",
+    "p0599": "cruise_control",
+    "p0610": "engine",
     "p0620": "alternator",
+    "p0630": "engine",
     "p0625": "alternator",
     "p0626": "alternator",
     "p0627": "fuel_pump",
@@ -690,9 +712,17 @@ def map_knowledge_entry(entry_key: str, category: str) -> Optional[ComponentDefi
 
 def map_evidence_to_component(evidence: List["KnowledgeSearchResult"]) -> Optional[ComponentDefinition]:
     from app.schemas import KnowledgeSearchResult
+    from collections import Counter
 
+    component_counts: Counter[str] = Counter()
     for item in evidence:
         component = map_knowledge_entry(item.entry_key or "", item.category)
         if component:
-            return component
-    return None
+            component_counts[component.component_id] += 1
+
+    if not component_counts:
+        return None
+
+    # Return the most frequently mapped component
+    most_common_id = component_counts.most_common(1)[0][0]
+    return get_component(most_common_id)

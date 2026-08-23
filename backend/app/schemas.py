@@ -146,6 +146,16 @@ class KnowledgeSearchResult(BaseModel):
     similarity_score: float
 
 
+class EvidenceReference(BaseModel):
+    """Structured reference to a specific piece of retrieved evidence."""
+    evidence_id: uuid.UUID
+    category: str
+    entry_key: str | None
+    excerpt: str
+    similarity_score: float
+    relevance: str = Field(default="supporting", pattern=r"^(supporting|conflicting|contextual)$")
+
+
 class KnowledgeSearchResponse(BaseModel):
     query: str
     results: list[KnowledgeSearchResult]
@@ -219,6 +229,9 @@ class DiagnosticHypothesis(BaseModel):
     safety_tier_label: str | None = None
     safety_tier_description: str | None = None
     safety_tier_reasoning: list[str] = Field(default_factory=list)
+    evidence_references: list[EvidenceReference] = Field(default_factory=list)
+    differential_rank: int | None = None
+    evidence_quality: str | None = Field(default=None, pattern=r"^(strong|moderate|weak|insufficient)$")
 
 
 class RepairSafetyTier(BaseModel):
@@ -246,3 +259,31 @@ class DiagnosticAnalyzeResponse(BaseModel):
 class HypothesisOutcomeUpdate(BaseModel):
     hypothesis_status: str = Field(pattern=r"^(proposed|investigating|confirmed|rejected)$")
     observed_result: str | None = None
+
+
+class DiagnosticConversationMessageBase(BaseModel):
+    role: str = Field(pattern=r"^(user|assistant)$")
+    content: str
+    turn_index: int
+
+
+class DiagnosticConversationMessageCreate(DiagnosticConversationMessageBase):
+    pass
+
+
+class DiagnosticConversationMessageRead(DiagnosticConversationMessageBase):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: uuid.UUID
+    session_id: uuid.UUID
+    created_at: datetime
+
+
+class DiagnosticSessionRead(DiagnosticSessionBase):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: uuid.UUID
+    created_at: datetime
+    updated_at: datetime
+    results: list[DiagnosticResultRead] = []
+    conversation_messages: list[DiagnosticConversationMessageRead] = []

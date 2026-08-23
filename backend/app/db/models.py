@@ -42,6 +42,7 @@ class DiagnosticSession(Base):
     dtc_codes: Mapped[str | None] = mapped_column(Text, nullable=True)
     vehicle_type: Mapped[str | None] = mapped_column(String(20), nullable=True)
     results: Mapped[list["DiagnosticResult"]] = relationship(back_populates="session", cascade="all, delete-orphan")
+    conversation_messages: Mapped[list["DiagnosticConversationMessage"]] = relationship(back_populates="session", cascade="all, delete-orphan", order_by="DiagnosticConversationMessage.turn_index")
 
 class DiagnosticResult(Base):
     __tablename__ = "diagnostic_results"
@@ -72,6 +73,18 @@ class DiagnosticCheckOutcome(Base):
     observed_result: Mapped[str | None] = mapped_column(Text, nullable=True)
     technician_note: Mapped[str | None] = mapped_column(Text, nullable=True)
     result: Mapped["DiagnosticResult"] = relationship(back_populates="check_outcomes")
+
+
+class DiagnosticConversationMessage(Base):
+    __tablename__ = "diagnostic_conversation_messages"
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    session_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("diagnostic_sessions.id", ondelete="CASCADE"), nullable=False, index=True)
+    role: Mapped[str] = mapped_column(String(20), nullable=False)
+    content: Mapped[str] = mapped_column(Text, nullable=False)
+    turn_index: Mapped[int] = mapped_column(Integer, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), nullable=False)
+    session: Mapped["DiagnosticSession"] = relationship(back_populates="conversation_messages")
+
 
 class KnowledgeEntry(Base):
     __tablename__ = "knowledge_entries"

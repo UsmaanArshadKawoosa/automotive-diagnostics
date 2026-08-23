@@ -8,6 +8,7 @@ from app.db import models
 from app.schemas import (
     DiagnosticCheckOutcomeCreate,
     DiagnosticCheckOutcomeUpdate,
+    DiagnosticConversationMessageCreate,
     DiagnosticResultCreate,
     DiagnosticSessionCreate,
     HypothesisOutcomeUpdate,
@@ -136,6 +137,7 @@ def hybrid_search_knowledge_entries(
     query_text: str,
     category: str | None = None,
     top_k: int = 5,
+    request_components: list[str] | None = None,
 ) -> list[tuple[models.KnowledgeEntry, float]]:
     dtc_codes = _extract_dtc_codes(query_text)
 
@@ -171,15 +173,42 @@ def hybrid_search_knowledge_entries(
         else:
             entry_scores[entry.id] = (entry, 0.0, keyword_score)
 
+    # Compute component match bonus for each entry
+    component_match_bonus: dict[uuid.UUID, float] = {}
+    if request_components:
+        from app.services.component_taxonomy import map_knowledge_entry
+        for entry_id, (entry, _, _) in entry_scores.items():
+            component = map_knowledge_entry(entry.entry_key or "", entry.category)
+            if component and component.component_id in request_components:
+                component_match_bonus[entry_id] = 0.3
+
     scored: list[tuple[models.KnowledgeEntry, float]] = []
     for entry_id, (entry, semantic_score, keyword_score) in entry_scores.items():
         dtc_bonus = 0.0
         if entry.entry_key and entry.entry_key.upper() in dtc_codes:
             dtc_bonus = 0.5
-        combined_score = semantic_score + keyword_score * 0.3 + dtc_bonus
+        comp_bonus = component_match_bonus.get(entry_id, 0.0)
+        combined_score = semantic_score + keyword_score * 0.3 + dtc_bonus + comp_bonus
         scored.append((entry, combined_score))
 
-    scored.sort(key=lambda x: x[1], reverse=True)
+    # Deterministic sort: score desc, then entry_key asc for stable ordering
+    scored.sort(key=lambda x: (-x[1], x[0].entry_key or ""))
+
+    # Content-based deduplication: remove entries with very similar content
+    # Keep the highest-scored entry for each content cluster
+    if len(scored) > 1:
+        deduped: list[tuple[models.KnowledgeEntry, float]] = []
+        for entry, score in scored:
+            # Check if this content is too similar to already selected entries
+            is_duplicate = False
+            for existing_entry, _ in deduped:
+                if entry.content == existing_entry.content:
+                    is_duplicate = True
+                    break
+            if not is_duplicate:
+                deduped.append((entry, score))
+        scored = deduped
+
     return scored[:top_k]
 
 
@@ -233,3 +262,22 @@ def update_check_outcome(
 
 def list_check_outcomes(db: Session, result_id: uuid.UUID) -> list[models.DiagnosticCheckOutcome]:
     return db.query(models.DiagnosticCheckOutcome).filter(models.DiagnosticCheckOutcome.result_id == result_id).all()
+
+
+def create_conversation_message(
+    db: Session, session_id: uuid.UUID, message_in: DiagnosticConversationMessageCreate
+) -> models.DiagnosticConversationMessage:
+    message = models.DiagnosticConversationMessage(session_id=session_id, **message_in.model_dump())
+    db.add(message)
+    db.commit()
+    db.refresh(message)
+    return message
+
+
+def get_conversation_messages(db: Session, session_id: uuid.UUID) -> list[models.DiagnosticConversationMessage]:
+    return (
+        db.query(models.DiagnosticConversationMessage)
+        .filter(models.DiagnosticConversationMessage.session_id == session_id)
+        .order_by(models.DiagnosticConversationMessage.turn_index)
+        .all()
+    )

@@ -26,6 +26,9 @@ class Settings(BaseSettings):
     llm_temperature: float = 0.2
     llm_max_tokens: int = 2048
 
+    diagnostic_max_conversation_messages: int = 20
+    diagnostic_max_follow_up_turns: int = 3
+
     cors_origins: str = "http://localhost:3000"
 
     model_config = SettingsConfigDict(

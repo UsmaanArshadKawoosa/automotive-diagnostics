@@ -7,7 +7,7 @@ import { Vehicle3DViewer } from '../components/Vehicle3DViewer';
 import { Alert, ErrorMessage } from '../components/Alert';
 import { useAnalyze } from '../hooks/useDiagnostics';
 import { VEHICLE_TYPES } from '../config/vehicleTypes';
-import type { DiagnosticAnalyzeRequest, DiagnosticHypothesis, DiagnosticResult } from '../types/api';
+import type { DiagnosticAnalyzeRequest, DiagnosticHypothesis, DiagnosticResult, DiagnosticConversationMessage } from '../types/api';
 import type { HypothesisStatus, VehicleType } from '../types/api';
 
 const DTC_REGEX = /^[PCBU][0-9]{4}$/i;
@@ -25,6 +25,7 @@ export function DiagnosePage() {
   const [localError, setLocalError] = useState<string | null>(null);
   const [sessionId, setSessionId] = useState<string | null>(null);
   const [results, setResults] = useState<DiagnosticResult[]>([]);
+  const [conversationMessages, setConversationMessages] = useState<DiagnosticConversationMessage[]>([]);
   const [loadingSession, setLoadingSession] = useState(false);
   const [selectedComponent, setSelectedComponent] = useState<{ component_id: string; system_category?: string; vehicle_region?: string } | null>(null);
   const [selectedHypothesisId, setSelectedHypothesisId] = useState<string | null>(null);
@@ -62,6 +63,7 @@ export function DiagnosePage() {
       if (!res.ok) throw new Error('Failed to load session');
       const session = await res.json();
       setResults(session.results || []);
+      setConversationMessages(session.conversation_messages || []);
     } catch {
       // silently ignore, results will be empty
     } finally {
@@ -332,6 +334,46 @@ export function DiagnosePage() {
               </p>
             )}
           </div>
+
+          {conversationMessages.length > 0 && (
+            <div className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
+              <h3 className="text-base font-semibold text-slate-900 mb-3">
+                Conversation History
+              </h3>
+              <div className="space-y-4">
+                {conversationMessages.map((msg) => (
+                  <div
+                    key={msg.id}
+                    className={`flex gap-3 ${
+                      msg.role === 'user' ? 'flex-row-reverse' : 'flex-row'
+                    }`}
+                  >
+                    <div
+                      className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-medium ${
+                        msg.role === 'user'
+                          ? 'bg-slate-600'
+                          : 'bg-brand-600'
+                      }`}
+                    >
+                      {msg.role === 'user' ? 'U' : 'A'}
+                    </div>
+                    <div
+                      className={`flex-1 min-w-0 rounded-lg p-3 ${
+                        msg.role === 'user'
+                          ? 'bg-slate-100 text-slate-900'
+                          : 'bg-brand-50 text-slate-900 border border-brand-100'
+                      }`}
+                    >
+                      <p className="text-sm">{msg.content}</p>
+                      <p className="mt-1 text-xs text-slate-400">
+                        {new Date(msg.created_at).toLocaleTimeString()}
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
 
           {hasComponentHighlights && (
             <Vehicle3DViewer
