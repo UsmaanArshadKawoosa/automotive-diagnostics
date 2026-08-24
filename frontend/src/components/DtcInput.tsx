@@ -6,9 +6,10 @@ interface DtcInputProps {
   codes: string[];
   onChange: (codes: string[]) => void;
   error?: string;
+  disabled?: boolean;
 }
 
-export function DtcInput({ codes, onChange, error }: DtcInputProps) {
+export function DtcInput({ codes, onChange, error, disabled }: DtcInputProps) {
   const [inputValue, setInputValue] = useState('');
 
   const handleAdd = useCallback(() => {
@@ -43,9 +44,11 @@ export function DtcInput({ codes, onChange, error }: DtcInputProps) {
           placeholder="e.g. P0300"
           maxLength={5}
           error={error}
+          helperText="Format: P, C, B, or U followed by 4 digits"
           className="font-mono"
+          disabled={disabled}
         />
-        <Button type="button" onClick={handleAdd} variant="secondary" className="shrink-0">
+        <Button type="button" onClick={handleAdd} variant="secondary" className="shrink-0 min-w-[44px]" disabled={disabled}>
           Add
         </Button>
       </div>
@@ -59,12 +62,13 @@ export function DtcInput({ codes, onChange, error }: DtcInputProps) {
               )}
             >
               <span className="font-mono">{code}</span>
-              <button
-                type="button"
-                onClick={() => handleRemove(code)}
-                className="ml-0.5 text-brand-400 hover:text-brand-600"
-                aria-label={`Remove ${code}`}
-              >
+               <button
+                 type="button"
+                 onClick={() => handleRemove(code)}
+                 className="ml-0.5 text-brand-400 hover:text-brand-600 min-w-[44px] min-h-[44px] flex items-center justify-center"
+                 aria-label={`Remove ${code}`}
+                 disabled={disabled}
+               >
                 <svg className="h-3.5 w-3.5" viewBox="0 0 20 20" fill="currentColor">
                   <path d="M6.28 5.22a.75.75 0 00-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 101.06 1.06L10 11.06l3.72 3.72a.75.75 0 101.06-1.06L11.06 10l3.72-3.72a.75.75 0 00-1.06-1.06L10 8.94 6.28 5.22z" />
                 </svg>

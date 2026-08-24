@@ -40,9 +40,9 @@ const ALERT_ICONS: Record<string, ReactNode> = {
 
 export function Alert({ type, title, children, className }: AlertProps) {
   return (
-    <div className={cn('rounded-lg border p-4', ALERT_STYLES[type], className)}>
+    <div className={cn('rounded-lg border p-4', ALERT_STYLES[type], className)} role="alert" aria-live="polite">
       <div className="flex gap-3">
-        <div className="flex-shrink-0">{ALERT_ICONS[type]}</div>
+        <div className="flex-shrink-0" aria-hidden="true">{ALERT_ICONS[type]}</div>
         <div>
           {title && <h3 className="text-sm font-semibold">{title}</h3>}
           <div className="text-sm">{children}</div>
@@ -54,10 +54,10 @@ export function Alert({ type, title, children, className }: AlertProps) {
 
 export function ErrorMessage({ message, onRetry }: { message: string; onRetry?: () => void }) {
   return (
-    <div className="rounded-lg border border-red-200 bg-red-50 p-4">
+    <div className="rounded-lg border border-red-200 bg-red-50 p-4" role="alert" aria-live="polite">
       <div className="flex items-center gap-3">
-        <svg className="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
-          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.28 7.22a.75.75 0 00-1.06 1.06L8.94 10l-1.72 1.72a.75.75 0 101.06 1.06L10 11.06l1.72 1.72a.75.75 0 101.06-1.06L11.06 10l1.72-1.72a.75.75 0 00-1.06-1.06L10 8.94 8.28 7.22z" clipRule="evenodd" />
+        <svg className="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.28 7.22a.75.75 0 00-1.06 1.06L8.94 10l-1.72 1.72a.75.75 0 101.06 1.06L10 11.06l1.72 1.72a.75.75 0 101.06-1.06L11.06 10l1.72-1.72a.75.75 0 00-1.06-1.06L10 8.94 8.28 5.22z" clipRule="evenodd" />
         </svg>
         <div className="flex-1">
           <p className="text-sm font-medium text-red-800">{message}</p>

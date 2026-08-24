@@ -303,6 +303,142 @@ cd frontend
 npm run build
 ```
 
+## Production Deployment
+
+### Selected $0 stack (verified 2026)
+
+| Component | Provider | Free tier limits |
+|-----------|----------|------------------|
+| Frontend | Vercel | Unlimited static hosting, HTTPS, preview deploys |
+| Backend | Render | 750 web-service hrs/mo, 512 MB RAM, spins down after 15 min idle |
+| Database | Neon | 0.5 GB storage, pgvector supported, no expiration, no credit card |
+| LLM | Groq | 30 RPM, 1,000 RPD, OpenAI-compatible API, no credit card |
+
+**Why this stack:**
+- **Vercel**: Zero-config React/Vite hosting with global CDN and free HTTPS.
+- **Render**: Simplest Git-based backend deploy; Docker not required. Cold starts (~30-60s) are the main limitation.
+- **Neon**: Serverless Postgres with pgvector on every plan. Free tier has no time limit and no credit-card requirement. 0.5 GB is sufficient for knowledge entries and diagnostic sessions.
+- **Groq**: OpenAI-compatible inference with generous free rate limits. No credit card required. Fast LPU-backed inference.
+
+### Prerequisites
+
+Accounts on:
+- [Vercel](https://vercel.com) (GitHub/GitLab/Bitbucket login)
+- [Render](https://render.com) (GitHub login)
+- [Neon](https://neon.tech) (email or GitHub login)
+- [Groq](https://console.groq.com) (email or Google login)
+
+### 1. Database (Neon)
+
+1. Create a Neon project.
+2. Create a database (default name is fine).
+3. Enable pgvector:
+   ```sql
+   CREATE EXTENSION IF NOT EXISTS vector;
+   ```
+4. Copy the **connection string** (pooled or unpooled). It looks like:
+   ```
+   postgresql://user:password@ep-xyz.region.aws.neon.tech/dbname?sslmode=require
+   ```
+
+### 2. Backend (Render)
+
+1. Push this repo to GitHub.
+2. In Render, create a new **Web Service** from your repo.
+3. **Runtime**: Docker (uses the included `Dockerfile`).
+   - If you prefer manual configuration instead of Docker:
+     - **Environment**: Python 3
+     - **Build Command**: `pip install -r requirements.txt`
+     - **Start Command**: `gunicorn app.main:app --workers 2 --worker-class uvicorn.workers.UvicornWorker --bind 0.0.0.0:$PORT`
+4. Add environment variables (see below).
+5. Deploy. Render gives you a URL like `https://your-app.onrender.com`.
+
+### 3. Frontend (Vercel)
+
+1. Import the `frontend/` directory (or the whole repo with root set to `frontend/`) into Vercel.
+2. Add environment variable `VITE_API_BASE_URL` pointing to your Render backend URL (e.g., `https://your-app.onrender.com`).
+3. Deploy. Vercel gives you a URL like `https://your-app.vercel.app`.
+
+### 4. Environment variables
+
+**Backend (`backend/.env` on Render → Environment tab):**
+
+```env
+APP_ENV=production
+DEBUG=false
+
+# Neon database connection string
+DATABASE_URL=postgresql://user:password@ep-xyz.region.aws.neon.tech/dbname?sslmode=require
+
+# CORS: add your Vercel frontend domain
+CORS_ORIGINS=https://your-app.vercel.app
+
+# Use Groq as a free LLM provider (OpenAI-compatible)
+LLM_PROVIDER=openai
+LLM_BASE_URL=https://api.groq.com/openai/v1
+LLM_MODEL=llama-3.1-8b-instant
+OPENAI_API_KEY=<your-groq-api-key>
+
+# Embeddings (local sentence-transformers works on Render free tier)
+EMBEDDING_PROVIDER=sentence-transformers
+EMBEDDING_MODEL=sentence-transformers/all-MiniLM-L6-v2
+EMBEDDING_DIMENSIONS=384
+```
+
+**Frontend (`frontend/.env` on Vercel → Settings → Environment Variables):**
+
+```env
+VITE_API_BASE_URL=https://your-app.onrender.com
+```
+
+### 5. Database migrations
+
+After the first deploy, run migrations against the Neon database:
+
+```bash
+# From your local machine with the Neon connection string:
+cd backend
+set DATABASE_URL=postgresql://user:password@ep-xyz.region.aws.neon.tech/dbname?sslmode=require
+alembic upgrade head
+```
+
+Or connect to Neon's SQL Editor and run:
+```sql
+CREATE EXTENSION IF NOT EXISTS vector;
+```
+
+### 6. Verify deployment
+
+```bash
+# Backend health
+curl https://your-app.onrender.com/health
+
+# Backend readiness (checks DB connection)
+curl https://your-app.onrender.com/ready
+
+# Frontend should load at
+# https://your-app.vercel.app
+```
+
+### Free-tier limitations to expect
+
+- **Render cold starts**: The free web service sleeps after 15 minutes of inactivity. The first request after sleep takes 30-60 seconds. Use a free uptime monitor (e.g., UptimeRobot) to ping `/health` every 10 minutes if you want to keep it warm. This does not prevent deployment, but public users will feel the cold start.
+- **Neon auto-suspend**: Neon free compute suspends after a period of inactivity. The first request after suspend may take a few seconds.
+- **Groq rate limits**: Free tier is 30 requests per minute and 1,000 requests per day per model. This is enough for a demo or low-traffic public launch. If you exceed limits, requests will return HTTP 429.
+- **Bandwidth**: Render free tier includes 100 GB/month. Vercel free tier has generous bandwidth for static sites.
+- **No persistent storage on Render**: Do not write files to the local filesystem. All data must go to the database.
+
+### Cost if you outgrow free tiers
+
+| Component | Cheapest paid upgrade | Approximate cost |
+|-----------|----------------------|------------------|
+| Render web service | Starter (always-on) | ~$7/mo |
+| Neon | Launch plan | ~$15/mo |
+| Groq | Developer tier | Pay-per-token (~$0.59-0.79/M tokens) |
+| Vercel | Pro | $20/mo |
+
+Most apps stay within free tiers indefinitely for low traffic.
+
 ## Evaluation harness
 
 To run the full diagnostic evaluation suite:

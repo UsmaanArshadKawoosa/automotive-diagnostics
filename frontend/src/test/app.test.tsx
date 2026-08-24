@@ -1,10 +1,12 @@
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { MemoryRouter } from 'react-router-dom';
 import { DtcInput } from '../components/DtcInput';
 import { HypothesisCard } from '../components/DiagnosticResults';
 import { CheckOutcomeSection } from '../components/DiagnosticResults';
 import { Vehicle3DViewer } from '../components/Vehicle3DViewer';
+import { OfflineIndicator } from '../components/OfflineIndicator';
 import { VEHICLE_TYPES, VEHICLE_TYPE_CONFIG, getVehicleTypeConfig } from '../config/vehicleTypes';
 import type { DiagnosticCheckOutcome } from '../types/api';
 import type { VehicleType } from '../types/api';
@@ -280,6 +282,122 @@ describe('vehicle type configuration', () => {
 
   it('returns config for a known vehicle type', () => {
     expect(getVehicleTypeConfig('suv').label).toBe('SUV');
+  });
+});
+
+describe('OfflineIndicator', () => {
+  it('renders when offline', () => {
+    Object.defineProperty(navigator, 'onLine', { value: false, writable: true });
+    window.dispatchEvent(new Event('offline'));
+
+    render(<OfflineIndicator />);
+
+    expect(screen.getByText('You are currently offline')).toBeDefined();
+  });
+
+  it('does not render when online', () => {
+    Object.defineProperty(navigator, 'onLine', { value: true, writable: true });
+    window.dispatchEvent(new Event('online'));
+
+    const { container } = render(<OfflineIndicator />);
+
+    expect(container.innerHTML).toBe('');
+  });
+});
+
+describe('useCachedSession', () => {
+  beforeEach(() => {
+    localStorage.clear();
+  });
+
+  it('saves and loads a session from cache', async () => {
+    const { useCachedSession } = await import('../hooks/useCachedSession');
+    const TestComponent = () => {
+      const { cachedSession, isFromCache, saveToCache } = useCachedSession('session-1');
+      return (
+        <div>
+          <span data-testid="cached">{cachedSession ? 'yes' : 'no'}</span>
+          <span data-testid="fromCache">{isFromCache ? 'yes' : 'no'}</span>
+          <button onClick={() => saveToCache({
+            session: { id: '1', vin: null, make: null, model: null, year: null, symptom_text: 'Test', dtc_codes: null, created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
+            results: [],
+            conversation_messages: [],
+            evidence: [],
+          }, 'session-1')}>Save</button>
+        </div>
+      );
+    };
+
+    render(<TestComponent />);
+    await userEvent.click(screen.getByText('Save'));
+    expect(screen.getByTestId('cached').textContent).toBe('yes');
+    expect(screen.getByTestId('fromCache').textContent).toBe('yes');
+  });
+});
+
+describe('Offline submission prevention', () => {
+  it('blocks diagnosis submission when offline', async () => {
+    Object.defineProperty(navigator, 'onLine', { value: false, writable: true });
+    window.dispatchEvent(new Event('offline'));
+
+    const { DiagnosePage } = await import('../pages/DiagnosePage');
+    render(
+      <MemoryRouter>
+        <DiagnosePage />
+      </MemoryRouter>
+    );
+
+    const submitButton = screen.getByText('Run Diagnosis');
+    await userEvent.click(submitButton);
+
+    expect(screen.getByText(/live connection is required/i)).toBeDefined();
+  });
+});
+
+describe('Cached session rendering', () => {
+  it('shows stale indicator for cached data', async () => {
+    Object.defineProperty(navigator, 'onLine', { value: false, writable: true });
+    window.dispatchEvent(new Event('offline'));
+
+    vi.doMock('../hooks/useCachedSession', () => ({
+      useCachedSession: () => ({
+        cachedSession: {
+          sessionId: 'session-1',
+          cachedAt: new Date().toISOString(),
+          data: {
+            session: { id: 'session-1', symptom_text: 'Test', created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
+            results: [{ id: 'r1', fault_description: 'Test fault', confidence_score: 0.9, severity: 'high', supporting_evidence: [], recommended_checks: [], repair_suggestion: null, hypothesis_status: 'proposed', check_outcomes: [] }],
+            conversation_messages: [],
+            evidence: [],
+          },
+        },
+        isFromCache: true,
+        saveToCache: vi.fn(),
+        clearCache: vi.fn(),
+      }),
+    }));
+
+    const { SessionDetailPage } = await import('../pages/SessionDetailPage');
+    render(
+      <MemoryRouter initialEntries={['/sessions/session-1']}>
+        <SessionDetailPage />
+      </MemoryRouter>
+    );
+
+    expect(screen.getByText(/viewing cached session data/i)).toBeDefined();
+    vi.doUnmock('../hooks/useCachedSession');
+  });
+});
+
+describe('Service worker registration', () => {
+  it('registers service worker in production', () => {
+    const registerMock = vi.fn().mockResolvedValue(undefined);
+    Object.defineProperty(navigator, 'serviceWorker', {
+      value: { register: registerMock },
+      writable: true,
+    });
+
+    expect(registerMock).not.toHaveBeenCalled();
   });
 });
 

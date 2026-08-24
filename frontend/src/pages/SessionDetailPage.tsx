@@ -6,6 +6,8 @@ import { DtcInput } from '../components/DtcInput';
 import { ErrorMessage } from '../components/Alert';
 import { HypothesisCard, CheckOutcomeSection } from '../components/DiagnosticResults';
 import { useSession, useUpdateOutcome, useCreateCheck, useUpdateCheck, useAnalyzeInSession } from '../hooks/useDiagnostics';
+import { useOnlineStatus } from '../hooks/useOnlineStatus';
+import { useCachedSession } from '../hooks/useCachedSession';
 import type { DiagnosticResult, HypothesisStatus, DiagnosticCheckOutcomeUpdate, DiagnosticAnalyzeRequest } from '../types/api';
 
 const DTC_REGEX = /^[PCBU][0-9]{4}$/i;
@@ -13,6 +15,7 @@ const DTC_REGEX = /^[PCBU][0-9]{4}$/i;
 export function SessionDetailPage() {
   const { sessionId } = useParams<{ sessionId: string }>();
   const navigate = useNavigate();
+  const isOnline = useOnlineStatus();
   const { loadSession, ...apiState } = useSession();
   const { updateOutcome, ...outcomeState } = useUpdateOutcome();
   const { createCheck, ...createCheckState } = useCreateCheck();
@@ -25,6 +28,7 @@ export function SessionDetailPage() {
   const [model, setModel] = useState('');
   const [year, setYear] = useState('');
   const [localError, setLocalError] = useState<string | null>(null);
+  const { cachedSession, isFromCache, saveToCache } = useCachedSession(sessionId || null);
 
   useEffect(() => {
     if (sessionId) loadSession(sessionId);
@@ -33,8 +37,23 @@ export function SessionDetailPage() {
   useEffect(() => {
     if (apiState.data) {
       setResults(apiState.data.results || []);
+      if (sessionId) {
+        saveToCache({
+          session: {
+            ...apiState.data,
+            vin: apiState.data.vin ?? null,
+            make: apiState.data.make ?? null,
+            model: apiState.data.model ?? null,
+            year: apiState.data.year ?? null,
+            dtc_codes: apiState.data.dtc_codes ?? null,
+          },
+          results: apiState.data.results || [],
+          conversation_messages: apiState.data.conversation_messages || [],
+          evidence: [],
+        }, sessionId);
+      }
     }
-  }, [apiState.data]);
+  }, [apiState.data, sessionId, saveToCache]);
 
   const refresh = useCallback(async () => {
     if (!sessionId) return;
@@ -84,6 +103,10 @@ export function SessionDetailPage() {
     async (e: React.FormEvent) => {
       e.preventDefault();
       if (!sessionId) return;
+      if (!isOnline) {
+        setLocalError('A live connection is required to run a follow-up diagnosis. Please check your network connection and try again.');
+        return;
+      }
       const validationError = validateFollowUp();
       if (validationError) {
         setLocalError(validationError);
@@ -105,7 +128,7 @@ export function SessionDetailPage() {
       setModel('');
       setYear('');
     },
-    [sessionId, validateFollowUp, make, model, year, dtcCodes, symptomText, analyzeInSession]
+    [sessionId, validateFollowUp, make, model, year, dtcCodes, symptomText, analyzeInSession, isOnline]
   );
 
   const formatDate = (dateStr: string) => {
@@ -134,6 +157,141 @@ export function SessionDetailPage() {
   }
 
   if (apiState.error || !apiState.data) {
+    if (isFromCache && cachedSession) {
+      const session = cachedSession.data.session;
+      return (
+        <div className="mx-auto max-w-4xl">
+          <div className="mb-4">
+            <button type="button" onClick={() => navigate('/sessions')} className="text-sm text-brand-600 hover:text-brand-700">
+              ← Back to Sessions
+            </button>
+          </div>
+          <div className="rounded-lg border border-amber-200 bg-amber-50 p-4 mb-6" role="status" aria-live="polite">
+            <div className="flex items-start gap-3">
+              <svg className="h-5 w-5 shrink-0 text-amber-400" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                <path fillRule="evenodd" d="M8.485 2.495c.673-1.167 2.357-1.167 3.03 0l6.28 10.88c.673 1.167-.17 2.625-1.516 2.625H3.72c-1.347 0-2.189-1.458-1.516-2.625l6.28-10.88zM10 6a.75.75 0 01.75.75v3.5a.75.75 0 01-1.5 0v-3.5A.75.75 0 0110 6zm0 9a1 1 0 100-2 1 1 0 000 2z" clipRule="evenodd" />
+              </svg>
+              <div>
+                <p className="text-sm font-medium text-amber-800">Viewing cached session data</p>
+                <p className="mt-0.5 text-xs text-amber-700">
+                  This information was loaded previously and may not reflect the current state. Cached on {new Date(cachedSession.cachedAt).toLocaleString()}.
+                </p>
+              </div>
+            </div>
+          </div>
+          <div className="grid gap-6 lg:grid-cols-3">
+            <div className="lg:col-span-1 space-y-6">
+              <Card>
+                <CardHeader title="Vehicle Information" />
+                <CardBody>
+                  <dl className="space-y-3 text-sm">
+                    {session.vin && (
+                      <div>
+                        <dt className="text-slate-500">VIN</dt>
+                        <dd className="mt-0.5 font-mono text-slate-900">{session.vin}</dd>
+                      </div>
+                    )}
+                    {session.make && (
+                      <div>
+                        <dt className="text-slate-500">Make</dt>
+                        <dd className="mt-0.5 text-slate-900">{session.make}</dd>
+                      </div>
+                    )}
+                    {session.model && (
+                      <div>
+                        <dt className="text-slate-500">Model</dt>
+                        <dd className="mt-0.5 text-slate-900">{session.model}</dd>
+                      </div>
+                    )}
+                    {session.year && (
+                      <div>
+                        <dt className="text-slate-500">Year</dt>
+                        <dd className="mt-0.5 text-slate-900">{session.year}</dd>
+                      </div>
+                    )}
+                  </dl>
+                </CardBody>
+              </Card>
+              <Card>
+                <CardHeader title="Session Details" />
+                <CardBody>
+                  <dl className="space-y-3 text-sm">
+                    <div>
+                      <dt className="text-slate-500">Created</dt>
+                      <dd className="mt-0.5 text-slate-900">{new Date(session.created_at).toLocaleString()}</dd>
+                    </div>
+                    <div>
+                      <dt className="text-slate-500">Updated</dt>
+                      <dd className="mt-0.5 text-slate-900">{new Date(session.updated_at).toLocaleString()}</dd>
+                    </div>
+                    <div>
+                      <dt className="text-slate-500">Session ID</dt>
+                      <dd className="mt-0.5 break-all font-mono text-xs text-slate-600">{session.id}</dd>
+                    </div>
+                  </dl>
+                </CardBody>
+              </Card>
+            </div>
+            <div className="lg:col-span-2 space-y-6">
+              <Card>
+                <CardHeader title="Symptoms" />
+                <CardBody>
+                  <p className="text-sm text-slate-700 whitespace-pre-wrap">{session.symptom_text}</p>
+                  {session.dtc_codes && (
+                    <div className="mt-3">
+                      <span className="text-xs font-medium uppercase tracking-wider text-slate-500">DTC Codes</span>
+                      <div className="mt-1.5 flex flex-wrap gap-2">
+                        {session.dtc_codes.split(',').map((code) => (
+                          <span key={code.trim()} className="rounded-md bg-brand-50 px-2 py-1 font-mono text-sm text-brand-700 ring-1 ring-inset ring-brand-700/10">
+                            {code.trim()}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </CardBody>
+              </Card>
+              {cachedSession.data.results.length > 0 && (
+                <div>
+                  <h3 className="text-base font-semibold text-slate-900 mb-3">
+                    Diagnostic Results ({cachedSession.data.results.length})
+                  </h3>
+                  <div className="space-y-4">
+                    {cachedSession.data.results.map((result) => (
+                      <div key={result.id}>
+                        <HypothesisCard
+                          hypothesis={{
+                            fault_description: result.fault_description,
+                            confidence_score: result.confidence_score,
+                            severity: (result.severity || 'low') as 'low',
+                            supporting_evidence: result.supporting_evidence,
+                            recommended_checks: result.recommended_checks,
+                            repair_suggestion: result.repair_suggestion,
+                            component_id: result.component_id,
+                            system_category: result.system_category,
+                            vehicle_region: result.vehicle_region,
+                            safety_tier: result.safety_tier as import('../types/api').RepairSafetyTier | undefined,
+                            safety_tier_label: result.safety_tier_label,
+                            safety_tier_description: result.safety_tier_description,
+                            safety_tier_reasoning: result.safety_tier_reasoning,
+                            differential_rank: result.differential_rank,
+                            evidence_quality: result.evidence_quality,
+                          }}
+                          resultId={result.id}
+                          currentStatus={(result.hypothesis_status || 'proposed') as import('../types/api').HypothesisStatus}
+                          onUpdateStatus={async () => {}}
+                          updating={false}
+                        />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      );
+    }
     return (
       <div className="mx-auto max-w-3xl">
         <div className="mb-4">

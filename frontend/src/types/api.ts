@@ -89,6 +89,8 @@ export interface DiagnosticResult {
   safety_tier_label?: string;
   safety_tier_description?: string;
   safety_tier_reasoning?: string[];
+  differential_rank?: number;
+  evidence_quality?: string;
 }
 
 export interface DiagnosticSession {

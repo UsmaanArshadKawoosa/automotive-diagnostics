@@ -31,6 +31,7 @@ interface InputProps {
   type?: 'text' | 'number' | 'email';
   maxLength?: number;
   error?: string;
+  helperText?: string;
   disabled?: boolean;
   onKeyDown?: (e: React.KeyboardEvent<HTMLInputElement>) => void;
   className?: string;
@@ -46,6 +47,7 @@ export function Input({
   type = 'text',
   maxLength,
   error,
+  helperText,
   disabled,
   onKeyDown,
   className,
@@ -63,7 +65,7 @@ export function Input({
         maxLength={maxLength}
         disabled={disabled}
         className={cn(
-          'block w-full rounded-md border px-3 py-2 text-sm shadow-sm transition-colors',
+          'block w-full rounded-md border px-3 py-2.5 text-sm shadow-sm transition-colors min-h-[44px]',
           'placeholder:text-slate-400',
           'focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500',
           error
@@ -73,7 +75,11 @@ export function Input({
           className
         )}
       />
-      {error && <p className="text-sm text-red-600">{error}</p>}
+      {(error || helperText) && (
+        <p className={cn('text-xs', error ? 'text-red-600' : 'text-slate-500')}>
+          {error || helperText}
+        </p>
+      )}
     </div>
   );
 }
@@ -88,6 +94,7 @@ interface TextareaProps {
   rows?: number;
   maxLength?: number;
   error?: string;
+  helperText?: string;
   disabled?: boolean;
 }
 
@@ -101,6 +108,7 @@ export function Textarea({
   rows = 4,
   maxLength,
   error,
+  helperText,
   disabled,
 }: TextareaProps) {
   return (
@@ -115,7 +123,7 @@ export function Textarea({
         maxLength={maxLength}
         disabled={disabled}
         className={cn(
-          'block w-full rounded-md border px-3 py-2 text-sm shadow-sm transition-colors',
+          'block w-full rounded-md border px-3 py-2.5 text-sm shadow-sm transition-colors min-h-[44px]',
           'placeholder:text-slate-400',
           'focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500',
           'resize-y',
@@ -125,7 +133,11 @@ export function Textarea({
           disabled && 'bg-slate-50 text-slate-500'
         )}
       />
-      {error && <p className="text-sm text-red-600">{error}</p>}
+      {(error || helperText) && (
+        <p className={cn('text-xs', error ? 'text-red-600' : 'text-slate-500')}>
+          {error || helperText}
+        </p>
+      )}
     </div>
   );
 }
@@ -138,6 +150,7 @@ interface SelectProps {
   placeholder?: string;
   label?: string;
   required?: boolean;
+  helperText?: string;
   disabled?: boolean;
   className?: string;
 }
@@ -150,6 +163,7 @@ export function Select({
   placeholder,
   label,
   required,
+  helperText,
   disabled,
   className,
 }: SelectProps) {
@@ -162,7 +176,7 @@ export function Select({
         onChange={(e) => onChange(e.target.value)}
         disabled={disabled}
         className={cn(
-          'block w-full rounded-md border px-3 py-2 text-sm shadow-sm transition-colors',
+          'block w-full rounded-md border px-3 py-2.5 text-sm shadow-sm transition-colors min-h-[44px]',
           'focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500',
           disabled && 'bg-slate-50 text-slate-500',
           'border-slate-300 bg-white text-slate-900',
@@ -180,6 +194,7 @@ export function Select({
           </option>
         ))}
       </select>
+      {helperText && <p className="text-xs text-slate-500">{helperText}</p>}
     </div>
   );
 }
@@ -206,10 +221,10 @@ export function Button({
   className,
 }: ButtonProps) {
   const base =
-    'inline-flex items-center justify-center gap-2 rounded-md font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed';
+    'inline-flex items-center justify-center gap-2 rounded-md font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed min-h-[44px]';
   const sizes = {
-    sm: 'px-3 py-1.5 text-xs',
-    md: 'px-4 py-2 text-sm',
+    sm: 'px-3 py-2 text-xs min-h-[40px]',
+    md: 'px-4 py-2.5 text-sm',
   };
   const variants = {
     primary: 'bg-brand-600 text-white hover:bg-brand-700 focus:ring-brand-500',

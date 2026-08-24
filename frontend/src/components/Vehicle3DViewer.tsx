@@ -394,83 +394,115 @@ export function Vehicle3DViewer({
     </div>
   );
 
+  const isUsingFallback = !modelAsset && highlightedComponents.length > 0;
+
   return (
     <div
       className={[
-        'flex flex-col items-center justify-center rounded-lg border border-dashed border-slate-300 bg-slate-50 p-6 text-center',
+        'flex flex-col items-center justify-center rounded-lg border border-dashed border-slate-300 bg-slate-50 p-3 sm:p-4 text-center sm:text-left',
         className,
       ].join(' ')}
     >
-      <div className="text-sm font-medium text-slate-500">3D Vehicle Visualization</div>
-      <div className="mt-1 text-xs text-slate-400">
-        Vehicle type: {vehicleType}
+      <div className="w-full">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 sm:gap-3">
+          <div>
+            <div className="text-sm font-medium text-slate-500">3D Vehicle Visualization</div>
+            <div className="mt-1 text-xs text-slate-400">
+              <span className="font-medium">Vehicle type: {vehicleType}</span>
+            </div>
+          </div>
+          {isUsingFallback && (
+            <span className="inline-flex items-center rounded-md bg-amber-50 px-2 py-1 text-xs font-medium text-amber-700 ring-1 ring-inset ring-amber-700/10">
+              Fallback view
+            </span>
+          )}
+        </div>
       </div>
 
-      <ErrorBoundary fallback={fallback}>
-        <Suspense fallback={<div className="text-xs text-slate-400">Loading 3D model...</div>}>
-          <Canvas camera={{ position: [0, 3, 8], fov: 45 }} style={{ height: 240, width: '100%' }}>
-            <OrbitControls enableZoom={true} enablePan={true} enableRotate={true} minDistance={3} maxDistance={15} />
-            <ambientLight intensity={0.5} />
-            <directionalLight position={[5, 5, 5]} intensity={0.8} />
+      <div className="mt-3 w-full">
+        <ErrorBoundary fallback={fallback}>
+          <Suspense fallback={
+            <div className="flex items-center justify-center rounded-lg border border-dashed border-slate-200 bg-white p-4 sm:p-6">
+              <div className="flex items-center gap-3">
+                <svg className="h-5 w-5 animate-spin text-brand-600" viewBox="0 0 24 24" fill="none">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                </svg>
+                <span className="text-sm text-slate-600">Loading 3D model...</span>
+              </div>
+            </div>
+          }>
+            <div className="w-full overflow-hidden rounded-md">
+              <Canvas camera={{ position: [0, 3, 8], fov: 45 }} style={{ height: 220, width: '100%' }}>
+                <OrbitControls enableZoom={true} enablePan={true} enableRotate={true} minDistance={3} maxDistance={15} />
+                <ambientLight intensity={0.5} />
+                <directionalLight position={[5, 5, 5]} intensity={0.8} />
 
-            {modelAsset ? (
-              <GLBModelWrapper
-                modelAsset={modelAsset}
-                highlightedComponents={highlightedComponents}
-                selectedComponent={selectedComponent}
-                onComponentSelect={handleComponentClick}
-                onRegionClick={handleRegionClick}
-                vehicleType={vehicleType}
-              />
-            ) : (
-              <GenericVehicleModel highlightedRegions={highlightedRegions} selectedComponent={selectedComponent} onRegionClick={handleRegionClick} />
-            )}
-            
-            <CameraControls selectedComponent={selectedComponent} activePreset={activePreset} />
-          </Canvas>
-        </Suspense>
-      </ErrorBoundary>
+                {modelAsset ? (
+                  <GLBModelWrapper
+                    modelAsset={modelAsset}
+                    highlightedComponents={highlightedComponents}
+                    selectedComponent={selectedComponent}
+                    onComponentSelect={handleComponentClick}
+                    onRegionClick={handleRegionClick}
+                    vehicleType={vehicleType}
+                  />
+                ) : (
+                  <GenericVehicleModel highlightedRegions={highlightedRegions} selectedComponent={selectedComponent} onRegionClick={handleRegionClick} />
+                )}
+                
+                <CameraControls selectedComponent={selectedComponent} activePreset={activePreset} />
+              </Canvas>
+            </div>
+          </Suspense>
+        </ErrorBoundary>
+      </div>
 
       {/* Camera Presets */}
-      <div className="mt-3 w-full flex flex-wrap gap-1.5 justify-center">
-        {Object.keys(CAMERA_PRESETS).map((preset) => (
+      <div className="mt-3 w-full">
+        <p className="text-xs font-medium uppercase tracking-wider text-slate-500 mb-1.5">Camera</p>
+        <div className="flex flex-wrap gap-1.5 sm:gap-2 justify-center">
+          {Object.keys(CAMERA_PRESETS).map((preset) => (
+            <button
+              key={preset}
+              type="button"
+              onClick={() => handlePresetChange(preset)}
+              className={[
+                'rounded-md border px-2.5 py-2 text-xs transition-colors min-w-[44px] min-h-[44px]',
+                activePreset === preset
+                  ? 'border-brand-500 bg-brand-50 text-brand-700'
+                  : 'border-slate-200 bg-white text-slate-600 hover:bg-slate-50',
+              ].join(' ')}
+              aria-label={`Camera preset ${preset}`}
+            >
+              {preset.charAt(0).toUpperCase() + preset.slice(1).replace('_', ' ')}
+            </button>
+          ))}
           <button
-            key={preset}
             type="button"
-            onClick={() => handlePresetChange(preset)}
+            onClick={() => handlePresetChange('overview')}
             className={[
-              'rounded-md border px-2 py-1 text-xs transition-colors',
-              activePreset === preset
-                ? 'border-brand-500 bg-brand-50 text-brand-700'
-                : 'border-slate-200 bg-white text-slate-600 hover:bg-slate-50',
+              'rounded-md border px-2.5 py-2 text-xs transition-colors min-w-[44px] min-h-[44px]',
+              'border-slate-200 bg-white text-slate-600 hover:bg-slate-50',
             ].join(' ')}
+            aria-label="Reset camera to overview"
           >
-            {preset.charAt(0).toUpperCase() + preset.slice(1).replace('_', ' ')}
+            Reset
           </button>
-        ))}
-        <button
-          type="button"
-          onClick={() => handlePresetChange('overview')}
-          className={[
-            'rounded-md border px-2 py-1 text-xs transition-colors',
-            'border-slate-200 bg-white text-slate-600 hover:bg-slate-50',
-          ].join(' ')}
-        >
-          Reset
-        </button>
+        </div>
       </div>
 
       {highlightedComponents.length > 0 && (
-        <div className="mt-3 w-full text-left">
-          <p className="text-xs font-medium uppercase tracking-wider text-slate-500 mb-1">Highlighted</p>
-          <div className="flex flex-wrap gap-1.5">
+        <div className="mt-3 w-full">
+          <p className="text-xs font-medium uppercase tracking-wider text-slate-500 mb-1.5">Highlighted</p>
+          <div className="flex flex-wrap gap-1.5 sm:gap-2">
             {highlightedComponents.map((c) => (
               <button
                 key={c.component_id}
                 type="button"
                 onClick={() => onComponentSelect?.(c)}
                 className={[
-                  'rounded-md border px-2 py-1 text-xs transition-colors',
+                  'rounded-md border px-2.5 py-2 text-xs transition-colors min-w-[44px] min-h-[44px]',
                   selectedComponent?.component_id === c.component_id
                     ? 'border-brand-500 bg-brand-50 text-brand-700'
                     : 'border-slate-200 bg-white text-slate-600 hover:bg-slate-50',
@@ -484,8 +516,9 @@ export function Vehicle3DViewer({
       )}
 
       {selectedComponent && (
-        <div className="mt-2 text-xs text-brand-600">
-          Selected: {selectedComponent.component_id.replace(/_/g, ' ')}
+        <div className="mt-2 flex items-center gap-2 text-xs text-brand-700">
+          <span className="inline-flex h-2 w-2 shrink-0 rounded-full bg-brand-500" aria-hidden="true" />
+          <span className="font-medium">Selected: {selectedComponent.component_id.replace(/_/g, ' ')}</span>
         </div>
       )}
 

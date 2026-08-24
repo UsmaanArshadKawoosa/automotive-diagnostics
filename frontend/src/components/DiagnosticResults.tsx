@@ -54,6 +54,8 @@ interface HypothesisCardProps {
     safety_tier_label?: string;
     safety_tier_description?: string;
     safety_tier_reasoning?: string[];
+    differential_rank?: number;
+    evidence_quality?: string;
   };
   resultId: string;
   currentStatus: HypothesisStatus;
@@ -62,6 +64,7 @@ interface HypothesisCardProps {
   className?: string;
   isSelected?: boolean;
   onSelect?: () => void;
+  isTopHypothesis?: boolean;
 }
 
 const STATUS_OPTIONS: { value: HypothesisStatus; label: string }[] = [
@@ -80,6 +83,7 @@ export const HypothesisCard = forwardRef<HTMLDivElement, HypothesisCardProps>(({
   className,
   isSelected = false,
   onSelect,
+  isTopHypothesis = false,
 }, ref) => {
   const confidencePercent = Math.round(hypothesis.confidence_score * 100);
   const confidenceColor =
@@ -89,20 +93,32 @@ export const HypothesisCard = forwardRef<HTMLDivElement, HypothesisCardProps>(({
         ? 'bg-amber-500'
         : 'bg-red-500';
 
+  const confidenceLabel =
+    hypothesis.confidence_score >= 0.8
+      ? 'High confidence'
+      : hypothesis.confidence_score >= 0.5
+        ? 'Medium confidence'
+        : 'Low confidence';
+
   const safetyTier = hypothesis.safety_tier;
   const safetyTierLabel = hypothesis.safety_tier_label || (safetyTier ? SAFETY_TIER_LABELS[safetyTier] : '');
   const safetyTierColor = safetyTier ? SAFETY_TIER_COLORS[safetyTier] : '';
   const safetyTierAction = safetyTier ? SAFETY_TIER_ACTIONS[safetyTier] : '';
   const severityColor = hypothesis.severity ? SEVERITY_COLORS[hypothesis.severity] : '';
   const severityLabel = hypothesis.severity ? SEVERITY_LABELS[hypothesis.severity] : '';
+  const differentialRank = hypothesis.differential_rank;
+  const evidenceQuality = hypothesis.evidence_quality;
 
   return (
     <div
       ref={ref}
       className={cn(
-        'rounded-lg border border-slate-200 bg-white p-5 transition-all duration-200',
-        isSelected && 'border-brand-500 ring-2 ring-brand-500/20',
-        onSelect && 'cursor-pointer hover:shadow-md',
+        'rounded-lg border p-4 sm:p-5 transition-all duration-200',
+        isTopHypothesis
+          ? 'border-brand-500 bg-brand-50/50 shadow-md'
+          : 'border-slate-200 bg-white hover:shadow-md',
+        isSelected && 'ring-2 ring-brand-500/30',
+        onSelect && 'cursor-pointer',
         className
       )}
       onClick={onSelect}
@@ -110,7 +126,19 @@ export const HypothesisCard = forwardRef<HTMLDivElement, HypothesisCardProps>(({
       <div className="flex items-start justify-between gap-4">
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 flex-wrap">
+            {isTopHypothesis && (
+              <span className="inline-flex items-center rounded-md bg-brand-100 px-2 py-0.5 text-xs font-semibold text-brand-800 ring-1 ring-inset ring-brand-700/10">
+                Top Hypothesis
+              </span>
+            )}
+            {differentialRank && (
+              <span className="inline-flex items-center rounded-md bg-slate-100 px-2 py-0.5 text-xs font-medium text-slate-700 ring-1 ring-inset ring-slate-700/10">
+                #{differentialRank}
+              </span>
+            )}
             <h4 className="text-sm font-semibold text-slate-900">{hypothesis.fault_description}</h4>
+          </div>
+          <div className="mt-2 flex items-center gap-2 flex-wrap">
             {hypothesis.severity && (
               <span className={cn('text-xs font-medium px-2 py-0.5 rounded-full text-white', severityColor)}>
                 {severityLabel}
@@ -119,6 +147,11 @@ export const HypothesisCard = forwardRef<HTMLDivElement, HypothesisCardProps>(({
             {safetyTier && (
               <span className={cn('text-xs font-medium px-2 py-0.5 rounded-full text-white', safetyTierColor)}>
                 {safetyTierLabel}
+              </span>
+            )}
+            {evidenceQuality && (
+              <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-slate-100 text-slate-700 ring-1 ring-inset ring-slate-700/10">
+                {evidenceQuality} evidence
               </span>
             )}
           </div>
@@ -131,7 +164,10 @@ export const HypothesisCard = forwardRef<HTMLDivElement, HypothesisCardProps>(({
       <div className="mt-4">
         <div className="flex items-center justify-between text-sm">
           <span className="text-slate-600">Confidence</span>
-          <span className="font-medium text-slate-900">{confidencePercent}%</span>
+          <div className="flex items-center gap-2">
+            <span className="text-xs text-slate-500">{confidenceLabel}</span>
+            <span className="font-medium text-slate-900">{confidencePercent}%</span>
+          </div>
         </div>
         <div className="mt-1.5 h-2 w-full overflow-hidden rounded-full bg-slate-100">
           <div
@@ -142,7 +178,7 @@ export const HypothesisCard = forwardRef<HTMLDivElement, HypothesisCardProps>(({
       </div>
 
       {(hypothesis.component_id || hypothesis.system_category || hypothesis.vehicle_region) && (
-        <div className="mt-4 rounded-md border border-slate-200 bg-slate-50 p-3">
+        <div className={cn('mt-4 rounded-md border p-3', isTopHypothesis ? 'border-brand-200 bg-white' : 'border-slate-200 bg-slate-50')}>
           <h5 className="text-xs font-semibold uppercase tracking-wider text-slate-500">Affected Component</h5>
           <div className="mt-1 space-y-1 text-sm text-slate-700">
             {hypothesis.component_id && (
@@ -165,7 +201,7 @@ export const HypothesisCard = forwardRef<HTMLDivElement, HypothesisCardProps>(({
       )}
 
       {safetyTier && (
-        <div className="mt-4 rounded-md border border-slate-200 bg-slate-50 p-3">
+        <div className={cn('mt-4 rounded-md border p-3', isTopHypothesis ? 'border-brand-200 bg-white' : 'border-slate-200 bg-slate-50')}>
           <div className="flex items-start gap-3">
             <div className={cn('flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center', safetyTierColor)}>
               <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -219,20 +255,26 @@ export const HypothesisCard = forwardRef<HTMLDivElement, HypothesisCardProps>(({
       {hypothesis.supporting_evidence.length > 0 && (
         <div className="mt-4">
           <h5 className="text-xs font-semibold uppercase tracking-wider text-slate-500">Supporting Evidence</h5>
-          <ul className="mt-1.5 list-disc space-y-1 pl-4 text-sm text-slate-600">
+          <ul className="mt-1.5 space-y-1.5 text-sm text-slate-600">
             {hypothesis.supporting_evidence.map((item, idx) => (
-              <li key={idx}>{item}</li>
+              <li key={idx} className="flex items-start gap-2">
+                <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-slate-400" aria-hidden="true" />
+                <span>{item}</span>
+              </li>
             ))}
           </ul>
         </div>
       )}
 
       {hypothesis.recommended_checks.length > 0 && (
-        <div className="mt-4">
-          <h5 className="text-xs font-semibold uppercase tracking-wider text-slate-500">Recommended Checks</h5>
-          <ul className="mt-1.5 list-disc space-y-1 pl-4 text-sm text-slate-600">
+        <div className="mt-4 rounded-md border border-amber-200 bg-amber-50 p-3">
+          <h5 className="text-xs font-semibold uppercase tracking-wider text-amber-800">Next Steps</h5>
+          <ul className="mt-1.5 space-y-1.5 text-sm text-amber-900">
             {hypothesis.recommended_checks.map((check, idx) => (
-              <li key={idx}>{check}</li>
+              <li key={idx} className="flex items-start gap-2">
+                <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-amber-500" aria-hidden="true" />
+                <span>{check}</span>
+              </li>
             ))}
           </ul>
         </div>
@@ -249,6 +291,7 @@ export const HypothesisCard = forwardRef<HTMLDivElement, HypothesisCardProps>(({
               variant={currentStatus === option.value ? 'primary' : 'secondary'}
               onClick={() => onUpdateStatus(resultId, option.value)}
               disabled={updating || currentStatus === option.value}
+              className="min-h-[44px]"
             >
               {option.label}
             </Button>
@@ -322,13 +365,14 @@ export function CheckOutcomeSection({
           </p>
           <div className="space-y-2">
             {pendingRecommendations.map((desc, idx) => (
-              <div key={idx} className="flex items-center justify-between gap-3">
+              <div key={idx} className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
                 <span className="text-sm text-slate-700">{desc}</span>
                 <Button
                   size="sm"
                   variant="secondary"
                   onClick={() => handleStartRecommendation(desc)}
                   disabled={loading}
+                  className="w-full sm:w-auto"
                 >
                   Start Check
                 </Button>
@@ -368,7 +412,7 @@ export function CheckOutcomeSection({
                     type="button"
                     onClick={() => onUpdateCheck(check.id, nextStatus)}
                     disabled={loading}
-                    className="rounded-md border border-slate-200 px-2.5 py-1 text-xs font-medium text-slate-600 hover:bg-slate-50 disabled:opacity-50"
+                    className="rounded-md border border-slate-200 px-2.5 py-2 text-xs font-medium text-slate-600 hover:bg-slate-50 disabled:opacity-50 min-h-[44px]"
                   >
                     Mark {nextStatus.charAt(0).toUpperCase() + nextStatus.slice(1)}
                   </button>
@@ -385,9 +429,9 @@ export function CheckOutcomeSection({
             value={newCheck}
             onChange={(e) => setNewCheck(e.target.value)}
             placeholder="Add a diagnostic check..."
-            className="block flex-1 rounded-md border border-slate-300 px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500"
+            className="block flex-1 rounded-md border border-slate-300 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500 min-h-[44px]"
           />
-          <Button size="sm" onClick={handleCreate} disabled={loading || !newCheck.trim()}>
+          <Button size="sm" onClick={handleCreate} disabled={loading || !newCheck.trim()} className="min-h-[44px]">
             Add
           </Button>
         </div>

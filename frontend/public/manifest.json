@@ -1,0 +1,18 @@
+{
+  "name": "AutoDiagAI - Automotive Diagnostic Engine",
+  "short_name": "AutoDiagAI",
+  "description": "Automotive diagnostic analysis tool with AI-powered hypothesis generation",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#2563eb",
+  "orientation": "any",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
