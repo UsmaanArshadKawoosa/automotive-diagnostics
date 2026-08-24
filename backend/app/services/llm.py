@@ -62,11 +62,12 @@ class OllamaProvider(LLMProvider):
 
 
 class OpenAIProvider(LLMProvider):
-    def __init__(self, api_key: str, model: str, temperature: float = 0.2, max_tokens: int = 2048) -> None:
+    def __init__(self, api_key: str, model: str, temperature: float = 0.2, max_tokens: int = 2048, base_url: str | None = None) -> None:
         self._api_key = api_key
         self._model = model
         self._temperature = temperature
         self._max_tokens = max_tokens
+        self._base_url = base_url
         self._client: Any | None = None
 
     @property
@@ -74,7 +75,10 @@ class OpenAIProvider(LLMProvider):
         if self._client is None:
             import openai
 
-            self._client = openai.OpenAI(api_key=self._api_key)
+            kwargs: dict[str, Any] = {"api_key": self._api_key}
+            if self._base_url:
+                kwargs["base_url"] = self._base_url
+            self._client = openai.OpenAI(**kwargs)
         return self._client
 
     def complete(self, prompt: str, response_schema: dict[str, Any] | None = None) -> str:
@@ -114,6 +118,7 @@ class LLMService:
                 model=self._settings.llm_model,
                 temperature=self._settings.llm_temperature,
                 max_tokens=self._settings.llm_max_tokens,
+                base_url=self._settings.llm_base_url or None,
             )
         raise ValueError(f"Unsupported LLM provider: {self._settings.llm_provider}")
 
