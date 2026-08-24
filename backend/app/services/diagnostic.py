@@ -868,7 +868,7 @@ Return a single JSON object with this schema:
                                         "similarity_score": {"type": "number"},
                                         "relevance": {"type": "string", "enum": ["supporting", "conflicting", "contextual"]}
                                     },
-                                    "required": ["evidence_id", "category", "excerpt", "similarity_score", "relevance"],
+                                    "required": ["evidence_id", "category", "entry_key", "excerpt", "similarity_score", "relevance"],
                                     "additionalProperties": False
                                 }
                             },
