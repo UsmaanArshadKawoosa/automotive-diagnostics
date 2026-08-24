@@ -133,7 +133,7 @@ def update_knowledge_entry_embedding(
 
 def hybrid_search_knowledge_entries(
     db: Session,
-    query_embedding: list[float],
+    query_embedding: list[float] | None,
     query_text: str,
     category: str | None = None,
     top_k: int = 5,
@@ -141,8 +141,10 @@ def hybrid_search_knowledge_entries(
 ) -> list[tuple[models.KnowledgeEntry, float]]:
     dtc_codes = _extract_dtc_codes(query_text)
 
-    semantic_top_k = max(top_k * 3, 20)
-    semantic_rows = search_knowledge_entries(db, query_embedding, category, semantic_top_k)
+    semantic_rows = []
+    if query_embedding is not None:
+        semantic_top_k = max(top_k * 3, 20)
+        semantic_rows = search_knowledge_entries(db, query_embedding, category, semantic_top_k)
 
     tsquery = func.plainto_tsquery("english", query_text)
     keyword_stmt = (
@@ -151,7 +153,7 @@ def hybrid_search_knowledge_entries(
     )
     if category:
         keyword_stmt = keyword_stmt.where(models.KnowledgeEntry.category == category)
-    keyword_stmt = keyword_stmt.order_by(func.ts_rank(models.KnowledgeEntry.search_vector, tsquery).desc()).limit(semantic_top_k)
+    keyword_stmt = keyword_stmt.order_by(func.ts_rank(models.KnowledgeEntry.search_vector, tsquery).desc()).limit(max(top_k * 3, 20))
     keyword_rows = db.execute(keyword_stmt).all()
 
     entry_scores: dict[uuid.UUID, tuple[models.KnowledgeEntry, float, float]] = {}

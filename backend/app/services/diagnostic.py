@@ -803,7 +803,13 @@ Return a single JSON object with this schema:
         if session_context:
             query = f"{session_context}\n\n{query}"
 
-        query_embedding = self._embedding_service.embed_query(query)
+        if self._settings.embedding_enabled:
+            try:
+                query_embedding = self._embedding_service.embed_query(query)
+            except Exception:
+                query_embedding = None
+        else:
+            query_embedding = None
 
         # Extract component IDs from DTC codes and symptoms for retrieval boost
         request_components: list[str] = []

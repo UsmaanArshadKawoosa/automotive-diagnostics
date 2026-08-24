@@ -1,6 +1,7 @@
 import json
 import uuid
 from collections.abc import Generator
+from pathlib import Path
 from typing import Any
 
 import pytest
@@ -13,6 +14,8 @@ from app.db.database import get_db
 from app.main import app
 from app.schemas import DiagnosticHypothesis
 from app.services.embeddings import EmbeddingService, get_embedding_service
+from app.services.knowledge_ingestion import KnowledgeIngestionService
+from app.services.knowledge_loader import KnowledgeLoader
 from app.services.llm import LLMProvider, LLMService, get_llm_service
 
 TEST_EMBEDDING_DIMENSIONS = 384
@@ -59,6 +62,24 @@ class FakeLLMService(LLMService):
 
     def complete(self, prompt: str, response_schema: dict[str, Any] | None = None) -> str:
         return self._provider.complete(prompt, response_schema)
+
+
+@pytest.fixture(scope="session", autouse=True)
+def seed_knowledge_base(engine):
+    with engine.connect() as conn:
+        result = conn.execute(text("SELECT count(*) FROM knowledge_entries"))
+        count = result.scalar()
+    if count > 0:
+        return
+
+    fake_emb = FakeEmbeddingService()
+    knowledge_dir = Path(__file__).resolve().parent.parent.parent / "knowledge_base"
+    loader = KnowledgeLoader(knowledge_dir)
+
+    with Session(engine) as session:
+        service = KnowledgeIngestionService(session, fake_emb, loader)
+        result = service.ingest_from_loader(skip_existing=False)
+        session.commit()
 
 
 @pytest.fixture(scope="session")

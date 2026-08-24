@@ -29,6 +29,8 @@ class Settings(BaseSettings):
     diagnostic_max_conversation_messages: int = 20
     diagnostic_max_follow_up_turns: int = 3
 
+    embedding_enabled: bool = True
+
     cors_origins: str = "http://localhost:3000"
 
     model_config = SettingsConfigDict(

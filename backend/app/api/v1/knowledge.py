@@ -71,7 +71,12 @@ def search_entries(
     db: Session = Depends(get_db),
     embedding_service: EmbeddingService = Depends(get_embedding_service),
 ) -> KnowledgeSearchResponse:
-    query_embedding = embedding_service.embed_query(search_in.query)
+    query_embedding = None
+    if embedding_service is not None:
+        try:
+            query_embedding = embedding_service.embed_query(search_in.query)
+        except Exception:
+            query_embedding = None
     rows = hybrid_search_knowledge_entries(
         db,
         query_embedding=query_embedding,
