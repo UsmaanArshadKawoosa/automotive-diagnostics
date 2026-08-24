@@ -880,10 +880,13 @@ Return a single JSON object with this schema:
                             "severity",
                             "supporting_evidence",
                             "recommended_checks",
+                            "repair_suggestion",
+                            "evidence_references",
+                            "differential_rank"
                         ],
-                    },
+                        "additionalProperties": False
+                    }
                 },
-            },
             "required": ["status", "hypotheses"],
         }
 
