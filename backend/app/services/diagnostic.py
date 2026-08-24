@@ -842,37 +842,90 @@ Return a single JSON object with this schema:
         response_schema = {
             "type": "object",
             "properties": {
-                "status": {"type": "string", "enum": ["complete", "needs_more_information"]},
-                "follow_up_question": {"type": ["string", "null"]},
-                "follow_up_reason": {"type": ["string", "null"]},
+                "status": {
+                    "type": "string",
+                    "enum": ["complete", "needs_more_information"]
+                },
+                "follow_up_question": {
+                    "type": ["string", "null"]
+                },
+                "follow_up_reason": {
+                    "type": ["string", "null"]
+                },
                 "hypotheses": {
                     "type": "array",
                     "items": {
                         "type": "object",
                         "properties": {
-                            "fault_description": {"type": "string"},
-                            "confidence_score": {"type": "number"},
-                            "severity": {"type": "string", "enum": ["low", "medium", "high", "critical"]},
-                            "supporting_evidence": {"type": "array", "items": {"type": "string"}},
-                            "recommended_checks": {"type": "array", "items": {"type": "string"}},
-                            "repair_suggestion": {"type": ["string", "null"]},
+                            "fault_description": {
+                                "type": "string"
+                            },
+                            "confidence_score": {
+                                "type": "number"
+                            },
+                            "severity": {
+                                "type": "string",
+                                "enum": ["low", "medium", "high", "critical"]
+                            },
+                            "supporting_evidence": {
+                                "type": "array",
+                                "items": {
+                                    "type": "string"
+                                }
+                            },
+                            "recommended_checks": {
+                                "type": "array",
+                                "items": {
+                                    "type": "string"
+                                }
+                            },
+                            "repair_suggestion": {
+                                "type": ["string", "null"]
+                            },
                             "evidence_references": {
                                 "type": "array",
                                 "items": {
                                     "type": "object",
                                     "properties": {
-                                        "evidence_id": {"type": "string", "format": "uuid"},
-                                        "category": {"type": "string"},
-                                        "entry_key": {"type": ["string", "null"]},
-                                        "excerpt": {"type": "string"},
-                                        "similarity_score": {"type": "number"},
-                                        "relevance": {"type": "string", "enum": ["supporting", "conflicting", "contextual"]}
+                                        "evidence_id": {
+                                            "type": "string",
+                                            "format": "uuid"
+                                        },
+                                        "category": {
+                                            "type": "string"
+                                        },
+                                        "entry_key": {
+                                            "type": ["string", "null"]
+                                        },
+                                        "excerpt": {
+                                            "type": "string"
+                                        },
+                                        "similarity_score": {
+                                            "type": "number"
+                                        },
+                                        "relevance": {
+                                            "type": "string",
+                                            "enum": [
+                                                "supporting",
+                                                "conflicting",
+                                                "contextual"
+                                            ]
+                                        }
                                     },
-                                    "required": ["evidence_id", "category", "entry_key", "excerpt", "similarity_score", "relevance"],
+                                    "required": [
+                                        "evidence_id",
+                                        "category",
+                                        "entry_key",
+                                        "excerpt",
+                                        "similarity_score",
+                                        "relevance"
+                                    ],
                                     "additionalProperties": False
                                 }
                             },
-                            "differential_rank": {"type": ["integer", "null"]}
+                            "differential_rank": {
+                                "type": ["integer", "null"]
+                            }
                         },
                         "required": [
                             "fault_description",
@@ -886,10 +939,14 @@ Return a single JSON object with this schema:
                         ],
                         "additionalProperties": False
                     }
-                },
-            "required": ["status", "hypotheses"],
+                }
+            },
+            "required": [
+                "status",
+                "hypotheses"
+            ],
+            "additionalProperties": False
         }
-
         try:
             raw_response = self._llm_service.complete(prompt, response_schema=response_schema)
         except LLMProviderError as exc:
