@@ -5,18 +5,22 @@ from sqlalchemy.orm import Session
 
 from app.crud import (
     create_check_outcome,
+    create_confirmed_case,
     create_diagnostic_result,
     create_diagnostic_session,
     get_check_outcome,
     get_diagnostic_result,
     get_diagnostic_session,
     list_check_outcomes,
+    list_confirmed_cases,
     list_diagnostic_sessions,
     update_check_outcome,
     update_hypothesis_outcome,
 )
 from app.db.database import get_db
 from app.schemas import (
+    ConfirmedDiagnosticCaseCreate,
+    ConfirmedDiagnosticCaseRead,
     DiagnosticAnalyzeRequest,
     DiagnosticAnalyzeResponse,
     DiagnosticCheckOutcomeCreate,
@@ -156,3 +160,41 @@ def list_result_checks(
 def get_outcome_analytics(db: Session = Depends(get_db)) -> dict:
     service = get_diagnostic_analytics_service(db)
     return service.get_outcome_analytics().model_dump()
+
+
+@router.post("/results/{result_id}/confirmed-case", response_model=ConfirmedDiagnosticCaseRead, status_code=201)
+def create_confirmed_case_from_result(
+    result_id: uuid.UUID,
+    case_in: ConfirmedDiagnosticCaseCreate,
+    db: Session = Depends(get_db),
+    embedding_service: EmbeddingService = Depends(get_embedding_service),
+) -> ConfirmedDiagnosticCaseRead:
+    result = get_diagnostic_result(db, result_id)
+    if result is None:
+        raise HTTPException(status_code=404, detail="Diagnostic result not found")
+    session = get_diagnostic_session(db, result.session_id)
+    if session is None:
+        raise HTTPException(status_code=404, detail="Diagnostic session not found")
+    diagnostic_service = get_diagnostic_service(embedding_service, get_llm_service())
+    confirmed_case = diagnostic_service.create_confirmed_case_from_result(
+        db, session, result,
+        confirmed_fault=case_in.confirmed_fault,
+        confirmed_fault_description=case_in.confirmed_fault_description,
+        repair_suggestion=case_in.repair_suggestion,
+        severity=case_in.severity,
+    )
+    if confirmed_case is None:
+        raise HTTPException(status_code=500, detail="Failed to create confirmed case")
+    return confirmed_case
+
+
+@router.get("/confirmed-cases", response_model=list[ConfirmedDiagnosticCaseRead])
+def read_confirmed_cases(
+    make: str | None = None,
+    model: str | None = None,
+    year: int | None = None,
+    skip: int = 0,
+    limit: int = 100,
+    db: Session = Depends(get_db),
+) -> list[ConfirmedDiagnosticCaseRead]:
+    return list_confirmed_cases(db, skip=skip, limit=limit, make=make, model=model, year=year)

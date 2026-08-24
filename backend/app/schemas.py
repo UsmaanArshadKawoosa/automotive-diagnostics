@@ -287,3 +287,32 @@ class DiagnosticSessionRead(DiagnosticSessionBase):
     updated_at: datetime
     results: list[DiagnosticResultRead] = []
     conversation_messages: list[DiagnosticConversationMessageRead] = []
+
+
+class ConfirmedDiagnosticCaseBase(BaseModel):
+    make: str | None = Field(default=None, max_length=100)
+    model: str | None = Field(default=None, max_length=100)
+    year: int | None = Field(default=None, ge=1900, le=2100)
+    vin: str | None = Field(default=None, max_length=17)
+    symptom_text: str = Field(min_length=1, max_length=4000)
+    dtc_codes: str | None = None
+    confirmed_fault: str = Field(min_length=1)
+    confirmed_fault_description: str | None = None
+    repair_suggestion: str | None = None
+    severity: str | None = Field(default=None, pattern=r"^(low|medium|high|critical)$")
+    is_verified: bool = True
+
+
+class ConfirmedDiagnosticCaseCreate(ConfirmedDiagnosticCaseBase):
+    case_text: str = Field(min_length=1)
+    embedding: list[float] | None = None
+    source_session_id: uuid.UUID | None = None
+    source_result_id: uuid.UUID | None = None
+
+
+class ConfirmedDiagnosticCaseRead(ConfirmedDiagnosticCaseBase):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: uuid.UUID
+    created_at: datetime
+    updated_at: datetime

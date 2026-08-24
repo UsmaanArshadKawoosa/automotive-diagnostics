@@ -85,6 +85,7 @@ describe('HypothesisCard', () => {
       />
     );
 
+    await user.click(screen.getByText('Show technical details'));
     await user.click(screen.getByText('Confirmed'));
     expect(onUpdateStatus).toHaveBeenCalledWith('result-1', 'confirmed');
   });
@@ -347,7 +348,7 @@ describe('Offline submission prevention', () => {
       </MemoryRouter>
     );
 
-    const submitButton = screen.getByText('Run Diagnosis');
+    const submitButton = screen.getByText('Diagnose my car');
     await userEvent.click(submitButton);
 
     expect(screen.getByText(/live connection is required/i)).toBeDefined();

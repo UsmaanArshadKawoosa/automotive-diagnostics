@@ -121,3 +121,30 @@ class KnowledgeEntry(Base):
         ),
         nullable=True,
     )
+
+
+class ConfirmedDiagnosticCase(Base):
+    __tablename__ = "confirmed_diagnostic_cases"
+
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), nullable=False)
+    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now(), nullable=False)
+
+    make: Mapped[str | None] = mapped_column(String(100), nullable=True, index=True)
+    model: Mapped[str | None] = mapped_column(String(100), nullable=True, index=True)
+    year: Mapped[int | None] = mapped_column(Integer, nullable=True, index=True)
+    vin: Mapped[str | None] = mapped_column(String(17), nullable=True)
+    symptom_text: Mapped[str] = mapped_column(Text, nullable=False)
+    dtc_codes: Mapped[str | None] = mapped_column(Text, nullable=True)
+
+    confirmed_fault: Mapped[str] = mapped_column(Text, nullable=False)
+    confirmed_fault_description: Mapped[str | None] = mapped_column(Text, nullable=True)
+    repair_suggestion: Mapped[str | None] = mapped_column(Text, nullable=True)
+    severity: Mapped[str | None] = mapped_column(String(20), nullable=True)
+
+    case_text: Mapped[str] = mapped_column(Text, nullable=False)
+    embedding: Mapped[list[float] | None] = mapped_column(Vector(384), nullable=True)
+
+    source_session_id: Mapped[uuid.UUID | None] = mapped_column(UUID(as_uuid=True), nullable=True)
+    source_result_id: Mapped[uuid.UUID | None] = mapped_column(UUID(as_uuid=True), nullable=True)
+    is_verified: Mapped[bool] = mapped_column(default=True, nullable=False)

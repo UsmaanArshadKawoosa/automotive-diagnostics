@@ -60,6 +60,7 @@ interface HypothesisCardProps {
   resultId: string;
   currentStatus: HypothesisStatus;
   onUpdateStatus: (resultId: string, status: HypothesisStatus) => void;
+  onConfirmedFix?: (resultId: string, fault: string) => void;
   updating: boolean;
   className?: string;
   isSelected?: boolean;
@@ -79,6 +80,7 @@ export const HypothesisCard = forwardRef<HTMLDivElement, HypothesisCardProps>(({
   resultId,
   currentStatus,
   onUpdateStatus,
+  onConfirmedFix,
   updating,
   className,
   isSelected = false,
@@ -108,6 +110,20 @@ export const HypothesisCard = forwardRef<HTMLDivElement, HypothesisCardProps>(({
   const severityLabel = hypothesis.severity ? SEVERITY_LABELS[hypothesis.severity] : '';
   const differentialRank = hypothesis.differential_rank;
   const evidenceQuality = hypothesis.evidence_quality;
+
+  const [showDetails, setShowDetails] = useState(false);
+  const [feedbackGiven, setFeedbackGiven] = useState(false);
+
+  const handleConfirmed = () => {
+    setFeedbackGiven(true);
+    onConfirmedFix?.(resultId, hypothesis.fault_description);
+    onUpdateStatus(resultId, 'confirmed');
+  };
+
+  const handleRejected = () => {
+    setFeedbackGiven(true);
+    onUpdateStatus(resultId, 'rejected');
+  };
 
   return (
     <div
@@ -268,7 +284,7 @@ export const HypothesisCard = forwardRef<HTMLDivElement, HypothesisCardProps>(({
 
       {hypothesis.recommended_checks.length > 0 && (
         <div className="mt-4 rounded-md border border-amber-200 bg-amber-50 p-3">
-          <h5 className="text-xs font-semibold uppercase tracking-wider text-amber-800">Next Steps</h5>
+          <h5 className="text-xs font-semibold uppercase tracking-wider text-amber-800">What to check next</h5>
           <ul className="mt-1.5 space-y-1.5 text-sm text-amber-900">
             {hypothesis.recommended_checks.map((check, idx) => (
               <li key={idx} className="flex items-start gap-2">
@@ -280,23 +296,94 @@ export const HypothesisCard = forwardRef<HTMLDivElement, HypothesisCardProps>(({
         </div>
       )}
 
-      <div className="mt-5 pt-4 border-t border-slate-100">
-        <h5 className="text-xs font-semibold uppercase tracking-wider text-slate-500 mb-2">
-          Update Status
-        </h5>
-        <div className="flex flex-wrap gap-2">
-          {STATUS_OPTIONS.map((option) => (
+      {!feedbackGiven && (
+        <div className="mt-5 pt-4 border-t border-slate-100">
+          <h5 className="text-xs font-semibold uppercase tracking-wider text-slate-500 mb-2">
+            Was this helpful?
+          </h5>
+          <div className="flex flex-wrap gap-2">
             <Button
-              key={option.value}
-              variant={currentStatus === option.value ? 'primary' : 'secondary'}
-              onClick={() => onUpdateStatus(resultId, option.value)}
-              disabled={updating || currentStatus === option.value}
+              variant="primary"
+              onClick={handleConfirmed}
+              disabled={updating}
               className="min-h-[44px]"
             >
-              {option.label}
+              Yes, this was the problem
             </Button>
-          ))}
+            <Button
+              variant="secondary"
+              onClick={handleRejected}
+              disabled={updating}
+              className="min-h-[44px]"
+            >
+              Something else was wrong
+            </Button>
+          </div>
         </div>
+      )}
+
+      {feedbackGiven && (
+        <div className="mt-5 pt-4 border-t border-slate-100">
+          <p className="text-sm text-slate-600">Thanks for your feedback! This helps improve future diagnoses.</p>
+        </div>
+      )}
+
+      <div className="mt-4">
+        <button
+          type="button"
+          onClick={() => setShowDetails(!showDetails)}
+          className="text-sm text-brand-600 hover:text-brand-700 font-medium"
+        >
+          {showDetails ? 'Hide technical details' : 'Show technical details'}
+        </button>
+        {showDetails && (
+          <div className="mt-3 space-y-3">
+            {hypothesis.supporting_evidence.length > 0 && (
+              <div>
+                <h5 className="text-xs font-semibold uppercase tracking-wider text-slate-500 mb-2">Supporting Evidence</h5>
+                <ul className="space-y-1.5 text-sm text-slate-600">
+                  {hypothesis.supporting_evidence.map((item, idx) => (
+                    <li key={idx} className="flex items-start gap-2">
+                      <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-slate-400" aria-hidden="true" />
+                      <span>{item}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
+            {(hypothesis.component_id || hypothesis.system_category || hypothesis.vehicle_region) && (
+              <div className="rounded-md border p-3 bg-slate-50">
+                <h5 className="text-xs font-semibold uppercase tracking-wider text-slate-500 mb-2">Technical Details</h5>
+                <div className="space-y-1 text-sm text-slate-700">
+                  {hypothesis.component_id && (
+                    <p><span className="font-medium">Component:</span> {hypothesis.component_id.replace(/_/g, ' ')}</p>
+                  )}
+                  {hypothesis.system_category && (
+                    <p><span className="font-medium">System:</span> {hypothesis.system_category.replace(/_/g, ' ')}</p>
+                  )}
+                  {hypothesis.vehicle_region && (
+                    <p><span className="font-medium">Location:</span> {hypothesis.vehicle_region.replace(/_/g, ' ')}</p>
+                  )}
+                </div>
+              </div>
+            )}
+
+            <div className="flex flex-wrap gap-2">
+              {STATUS_OPTIONS.map((option) => (
+                <Button
+                  key={option.value}
+                  variant={currentStatus === option.value ? 'primary' : 'secondary'}
+                  onClick={() => onUpdateStatus(resultId, option.value)}
+                  disabled={updating || currentStatus === option.value}
+                  className="min-h-[44px]"
+                >
+                  {option.label}
+                </Button>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

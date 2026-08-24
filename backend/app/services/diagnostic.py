@@ -11,8 +11,10 @@ from app.crud import (
     create_conversation_message,
     create_diagnostic_result,
     create_diagnostic_session,
+    create_confirmed_case,
     get_conversation_messages,
     hybrid_search_knowledge_entries,
+    search_confirmed_cases,
 )
 from app.db import models
 from app.db.database import engine
@@ -238,6 +240,7 @@ class DiagnosticService:
         self,
         request: DiagnosticAnalyzeRequest,
         evidence: list[KnowledgeSearchResult],
+        historical_cases: list[tuple[models.ConfirmedDiagnosticCase, float]] | None = None,
         session_context: str = "",
         conversation_context: str = "",
     ) -> str:
@@ -266,6 +269,20 @@ Notes:
 
         evidence_catalog = self._build_evidence_catalog(evidence)
 
+        historical_section = ""
+        if historical_cases:
+            lines = ["HISTORICAL CONFIRMED CASES (similar past diagnoses):"]
+            for idx, (case, score) in enumerate(historical_cases, start=1):
+                lines.append(f"{idx}. Vehicle: {case.make or 'Unknown'} {case.model or ''} {case.year or ''}")
+                if case.dtc_codes:
+                    lines.append(f"   DTCs: {case.dtc_codes}")
+                lines.append(f"   Symptoms: {case.symptom_text}")
+                lines.append(f"   Confirmed fault: {case.confirmed_fault}")
+                if case.repair_suggestion:
+                    lines.append(f"   Repair: {case.repair_suggestion}")
+                lines.append(f"   Similarity: {score:.2f}")
+            historical_section = "\n".join(lines) + "\n\n"
+
         return f"""You are an expert automotive diagnostic assistant.
 
 Analyze the following case and produce structured diagnostic reasoning.
@@ -273,10 +290,11 @@ Analyze the following case and produce structured diagnostic reasoning.
 Vehicle: {vehicle}
 DTC codes: {dtcs}
 Symptoms: {request.symptom_text}
-{context_section}{evidence_catalog}
+{context_section}{historical_section}{evidence_catalog}
 
 Instructions:
 - Use ONLY the retrieved evidence above as supporting facts. Do not invent automotive knowledge.
+- Historical confirmed cases are provided for reference only; they are not guaranteed to apply to this vehicle.
 - If evidence is insufficient, clearly state uncertainty and recommend checks before repair.
 - Each hypothesis must include a confidence score between 0 and 1 that reflects the available evidence.
 - Severity must be one of: low, medium, high, critical.
@@ -826,6 +844,19 @@ Return a single JSON object with this schema:
             top_k=10,
             request_components=request_components,
         )
+
+        historical_cases = []
+        if query_embedding is not None:
+            historical_cases = search_confirmed_cases(
+                db,
+                query_embedding=query_embedding,
+                query_text=query,
+                top_k=5,
+                make=request.make,
+                model=request.model,
+                year=request.year,
+            )
+
         evidence = [
             KnowledgeSearchResult(
                 id=entry.id,
@@ -838,7 +869,7 @@ Return a single JSON object with this schema:
             for entry, score in rows
         ]
 
-        prompt = self._build_prompt(request, evidence, session_context=session_context, conversation_context=conversation_context)
+        prompt = self._build_prompt(request, evidence, historical_cases=historical_cases, session_context=session_context, conversation_context=conversation_context)
         response_schema = {
             "type": "object",
             "properties": {
@@ -1092,6 +1123,56 @@ Return a single JSON object with this schema:
             follow_up_question=follow_up_question,
             follow_up_reason=follow_up_reason,
         )
+
+    def create_confirmed_case_from_result(
+        self,
+        db: Session,
+        session: models.DiagnosticSession,
+        result: models.DiagnosticResult,
+        confirmed_fault: str,
+        confirmed_fault_description: str | None = None,
+        repair_suggestion: str | None = None,
+        severity: str | None = None,
+    ) -> models.ConfirmedDiagnosticCase | None:
+        if not self._settings.embedding_enabled:
+            return None
+
+        case_text = (
+            f"Vehicle: {session.make or 'Unknown'} {session.model or ''} {session.year or ''}\n"
+            f"Symptoms: {session.symptom_text}\n"
+            f"DTCs: {session.dtc_codes or 'None'}\n"
+            f"Confirmed fault: {confirmed_fault}\n"
+        )
+        if confirmed_fault_description:
+            case_text += f"Description: {confirmed_fault_description}\n"
+        if repair_suggestion:
+            case_text += f"Repair: {repair_suggestion}\n"
+
+        try:
+            embedding = self._embedding_service.embed_query(case_text)
+        except Exception:
+            return None
+
+        from app.schemas import ConfirmedDiagnosticCaseCreate
+
+        case_in = ConfirmedDiagnosticCaseCreate(
+            make=session.make,
+            model=session.model,
+            year=session.year,
+            vin=session.vin,
+            symptom_text=session.symptom_text,
+            dtc_codes=session.dtc_codes,
+            confirmed_fault=confirmed_fault,
+            confirmed_fault_description=confirmed_fault_description,
+            repair_suggestion=repair_suggestion,
+            severity=severity,
+            case_text=case_text,
+            embedding=embedding,
+            source_session_id=session.id,
+            source_result_id=result.id,
+            is_verified=True,
+        )
+        return create_confirmed_case(db, case_in)
 
 
 def get_diagnostic_service(

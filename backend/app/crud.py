@@ -13,6 +13,7 @@ from app.schemas import (
     DiagnosticSessionCreate,
     HypothesisOutcomeUpdate,
     KnowledgeEntryCreate,
+    ConfirmedDiagnosticCaseCreate,
 )
 
 _DTC_PATTERN = re.compile(r"\b[PCBU][0-9]{4}\b", re.IGNORECASE)
@@ -197,11 +198,9 @@ def hybrid_search_knowledge_entries(
     scored.sort(key=lambda x: (-x[1], x[0].entry_key or ""))
 
     # Content-based deduplication: remove entries with very similar content
-    # Keep the highest-scored entry for each content cluster
     if len(scored) > 1:
         deduped: list[tuple[models.KnowledgeEntry, float]] = []
         for entry, score in scored:
-            # Check if this content is too similar to already selected entries
             is_duplicate = False
             for existing_entry, _ in deduped:
                 if entry.content == existing_entry.content:
@@ -211,6 +210,25 @@ def hybrid_search_knowledge_entries(
                 deduped.append((entry, score))
         scored = deduped
 
+    return scored[:top_k]
+
+
+def search_confirmed_cases(
+    db: Session,
+    query_embedding: list[float],
+    query_text: str,
+    top_k: int = 5,
+    make: str | None = None,
+    model: str | None = None,
+    year: int | None = None,
+) -> list[tuple[models.ConfirmedDiagnosticCase, float]]:
+    """Search confirmed historical diagnostic cases by semantic similarity."""
+    rows = search_confirmed_cases_by_embedding(db, query_embedding, top_k * 2, make, model, year)
+    scored: list[tuple[models.ConfirmedDiagnosticCase, float]] = []
+    for case, distance in rows:
+        semantic_score = 1.0 - float(distance)
+        scored.append((case, semantic_score))
+    scored.sort(key=lambda x: -x[1])
     return scored[:top_k]
 
 
@@ -283,3 +301,59 @@ def get_conversation_messages(db: Session, session_id: uuid.UUID) -> list[models
         .order_by(models.DiagnosticConversationMessage.turn_index)
         .all()
     )
+
+
+def create_confirmed_case(
+    db: Session, case_in: ConfirmedDiagnosticCaseCreate
+) -> models.ConfirmedDiagnosticCase:
+    case = models.ConfirmedDiagnosticCase(**case_in.model_dump())
+    db.add(case)
+    db.commit()
+    db.refresh(case)
+    return case
+
+
+def get_confirmed_case(db: Session, case_id: uuid.UUID) -> models.ConfirmedDiagnosticCase | None:
+    return db.get(models.ConfirmedDiagnosticCase, case_id)
+
+
+def list_confirmed_cases(
+    db: Session,
+    skip: int = 0,
+    limit: int = 100,
+    make: str | None = None,
+    model: str | None = None,
+    year: int | None = None,
+) -> list[models.ConfirmedDiagnosticCase]:
+    query = db.query(models.ConfirmedDiagnosticCase)
+    if make:
+        query = query.filter(models.ConfirmedDiagnosticCase.make.ilike(f"%{make}%"))
+    if model:
+        query = query.filter(models.ConfirmedDiagnosticCase.model.ilike(f"%{model}%"))
+    if year:
+        query = query.filter(models.ConfirmedDiagnosticCase.year == year)
+    return query.offset(skip).limit(limit).all()
+
+
+def search_confirmed_cases_by_embedding(
+    db: Session,
+    query_embedding: list[float],
+    top_k: int = 5,
+    make: str | None = None,
+    model: str | None = None,
+    year: int | None = None,
+) -> list[tuple[models.ConfirmedDiagnosticCase, float]]:
+    distance = models.ConfirmedDiagnosticCase.embedding.cosine_distance(query_embedding)
+    stmt = (
+        select(models.ConfirmedDiagnosticCase, distance.label("distance"))
+        .where(models.ConfirmedDiagnosticCase.embedding.is_not(None))
+        .where(models.ConfirmedDiagnosticCase.is_verified == True)
+    )
+    if make:
+        stmt = stmt.where(models.ConfirmedDiagnosticCase.make.ilike(f"%{make}%"))
+    if model:
+        stmt = stmt.where(models.ConfirmedDiagnosticCase.model.ilike(f"%{model}%"))
+    if year:
+        stmt = stmt.where(models.ConfirmedDiagnosticCase.year == year)
+    stmt = stmt.order_by(distance).limit(top_k)
+    return db.execute(stmt).all()
