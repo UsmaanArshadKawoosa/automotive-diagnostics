@@ -89,8 +89,16 @@ class OpenAIProvider(LLMProvider):
             "temperature": self._temperature,
             "max_tokens": self._max_tokens,
         }
+        
         if response_schema is not None:
-            kwargs["response_format"] = {"type": "json_schema", "json_schema": response_schema}
+            kwargs["response_format"] = {
+                "type": "json_schema",
+                "json_schema": {
+                    "name": "diagnostic_response",
+                    "schema": response_schema,
+                    "strict": True,
+                },
+            }
 
         response = self.client.chat.completions.create(**kwargs)
         return response.choices[0].message.content or ""
