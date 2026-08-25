@@ -310,9 +310,20 @@ class ConfirmedDiagnosticCaseCreate(ConfirmedDiagnosticCaseBase):
     source_result_id: uuid.UUID | None = None
 
 
+class ConfirmedDiagnosticCaseConfirmRequest(BaseModel):
+    confirmed_fault: str = Field(min_length=1)
+    confirmed_fault_description: str | None = None
+    repair_suggestion: str | None = None
+    severity: str | None = Field(default=None, pattern=r"^(low|medium|high|critical)$")
+
+
 class ConfirmedDiagnosticCaseRead(ConfirmedDiagnosticCaseBase):
     model_config = ConfigDict(from_attributes=True)
 
     id: uuid.UUID
     created_at: datetime
     updated_at: datetime
+    case_text: str
+    embedding: list[float] | None = None
+    source_session_id: uuid.UUID | None = None
+    source_result_id: uuid.UUID | None = None

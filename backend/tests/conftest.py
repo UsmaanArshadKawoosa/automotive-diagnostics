@@ -101,7 +101,7 @@ def db(engine) -> Generator[Session, None, None]:
 @pytest.fixture(scope="function")
 def clean_diagnostic_tables(engine):
     with engine.connect() as conn:
-        conn.execute(text("TRUNCATE TABLE diagnostic_results, diagnostic_sessions RESTART IDENTITY CASCADE"))
+        conn.execute(text("TRUNCATE TABLE diagnostic_results, diagnostic_sessions, confirmed_diagnostic_cases RESTART IDENTITY CASCADE"))
         conn.commit()
     yield
 

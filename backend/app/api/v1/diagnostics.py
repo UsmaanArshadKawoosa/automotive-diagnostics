@@ -1,6 +1,7 @@
 import uuid
 
 from fastapi import APIRouter, Depends, HTTPException
+from starlette.responses import JSONResponse
 from sqlalchemy.orm import Session
 
 from app.crud import (
@@ -9,6 +10,7 @@ from app.crud import (
     create_diagnostic_result,
     create_diagnostic_session,
     get_check_outcome,
+    get_confirmed_case_by_source_result_id,
     get_diagnostic_result,
     get_diagnostic_session,
     list_check_outcomes,
@@ -19,6 +21,7 @@ from app.crud import (
 )
 from app.db.database import get_db
 from app.schemas import (
+    ConfirmedDiagnosticCaseConfirmRequest,
     ConfirmedDiagnosticCaseCreate,
     ConfirmedDiagnosticCaseRead,
     DiagnosticAnalyzeRequest,
@@ -162,30 +165,38 @@ def get_outcome_analytics(db: Session = Depends(get_db)) -> dict:
     return service.get_outcome_analytics().model_dump()
 
 
-@router.post("/results/{result_id}/confirmed-case", response_model=ConfirmedDiagnosticCaseRead, status_code=201)
+@router.post("/results/{result_id}/confirmed-case", response_model=ConfirmedDiagnosticCaseRead)
 def create_confirmed_case_from_result(
     result_id: uuid.UUID,
-    case_in: ConfirmedDiagnosticCaseCreate,
+    case_in: ConfirmedDiagnosticCaseConfirmRequest,
     db: Session = Depends(get_db),
     embedding_service: EmbeddingService = Depends(get_embedding_service),
 ) -> ConfirmedDiagnosticCaseRead:
     result = get_diagnostic_result(db, result_id)
     if result is None:
         raise HTTPException(status_code=404, detail="Diagnostic result not found")
+    existing = get_confirmed_case_by_source_result_id(db, result_id)
+    if existing is not None:
+        return JSONResponse(content=ConfirmedDiagnosticCaseRead.model_validate(existing).model_dump(mode="json"), status_code=200)
     session = get_diagnostic_session(db, result.session_id)
     if session is None:
         raise HTTPException(status_code=404, detail="Diagnostic session not found")
     diagnostic_service = get_diagnostic_service(embedding_service, get_llm_service())
-    confirmed_case = diagnostic_service.create_confirmed_case_from_result(
-        db, session, result,
-        confirmed_fault=case_in.confirmed_fault,
-        confirmed_fault_description=case_in.confirmed_fault_description,
-        repair_suggestion=case_in.repair_suggestion,
-        severity=case_in.severity,
-    )
-    if confirmed_case is None:
-        raise HTTPException(status_code=500, detail="Failed to create confirmed case")
-    return confirmed_case
+    try:
+        confirmed_case = diagnostic_service.create_confirmed_case_from_result(
+            db, session, result,
+            confirmed_fault=case_in.confirmed_fault,
+            confirmed_fault_description=case_in.confirmed_fault_description,
+            repair_suggestion=case_in.repair_suggestion,
+            severity=case_in.severity,
+        )
+    except Exception:
+        db.rollback()
+        existing = get_confirmed_case_by_source_result_id(db, result_id)
+        if existing is not None:
+            return JSONResponse(content=ConfirmedDiagnosticCaseRead.model_validate(existing).model_dump(mode="json"), status_code=200)
+        raise
+    return JSONResponse(content=ConfirmedDiagnosticCaseRead.model_validate(confirmed_case).model_dump(mode="json"), status_code=201)
 
 
 @router.get("/confirmed-cases", response_model=list[ConfirmedDiagnosticCaseRead])

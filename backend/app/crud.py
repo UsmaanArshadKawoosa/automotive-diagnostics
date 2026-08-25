@@ -313,6 +313,16 @@ def create_confirmed_case(
     return case
 
 
+def get_confirmed_case_by_source_result_id(
+    db: Session, source_result_id: uuid.UUID
+) -> models.ConfirmedDiagnosticCase | None:
+    return (
+        db.query(models.ConfirmedDiagnosticCase)
+        .filter(models.ConfirmedDiagnosticCase.source_result_id == source_result_id)
+        .first()
+    )
+
+
 def get_confirmed_case(db: Session, case_id: uuid.UUID) -> models.ConfirmedDiagnosticCase | None:
     return db.get(models.ConfirmedDiagnosticCase, case_id)
 

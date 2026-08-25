@@ -1274,3 +1274,359 @@ class TestHypothesisOutcomeTracking:
         assert response.status_code == 201
         data = response.json()
         assert data["vehicle"].get("vehicle_type") is None
+
+
+class TestConfirmedCaseMemorySystem:
+    def test_confirmed_diagnosis_creates_verified_historical_case(
+        self, client: TestClient, clean_diagnostic_tables
+    ):
+        payload = {
+            "make": "Toyota",
+            "model": "Corolla",
+            "year": 2020,
+            "dtc_codes": ["P0300"],
+            "symptom_text": "Engine misfires at idle",
+        }
+        response = client.post("/api/v1/diagnostics/analyze", json=payload)
+        assert response.status_code == 201
+        session_id = response.json()["session_id"]
+
+        session_response = client.get(f"/api/v1/diagnostics/sessions/{session_id}")
+        assert session_response.status_code == 200
+        result_id = session_response.json()["results"][0]["id"]
+
+        confirmed_response = client.post(
+            f"/api/v1/diagnostics/results/{result_id}/confirmed-case",
+            json={"confirmed_fault": "Faulty ignition coil", "severity": "high"},
+        )
+        assert confirmed_response.status_code == 201
+        case = confirmed_response.json()
+        assert case["is_verified"] is True
+        assert case["confirmed_fault"] == "Faulty ignition coil"
+        assert case["make"] == "Toyota"
+        assert case["model"] == "Corolla"
+        assert case["year"] == 2020
+        assert case["source_result_id"] == result_id
+        assert case["source_session_id"] == session_id
+        assert "case_text" in case
+
+    def test_confirmed_case_embedding_has_correct_dimension(
+        self, client: TestClient, clean_diagnostic_tables
+    ):
+        payload = {
+            "make": "Honda",
+            "model": "Civic",
+            "year": 2018,
+            "symptom_text": "Brake pedal feels soft",
+        }
+        response = client.post("/api/v1/diagnostics/analyze", json=payload)
+        assert response.status_code == 201
+        session_id = response.json()["session_id"]
+
+        session_response = client.get(f"/api/v1/diagnostics/sessions/{session_id}")
+        result_id = session_response.json()["results"][0]["id"]
+
+        confirmed_response = client.post(
+            f"/api/v1/diagnostics/results/{result_id}/confirmed-case",
+            json={"confirmed_fault": "Air in brake lines"},
+        )
+        assert confirmed_response.status_code == 201
+        case = confirmed_response.json()
+        assert case["embedding"] is not None
+        assert len(case["embedding"]) == 384
+
+    def test_unverified_cases_excluded_from_retrieval(self, db, clean_diagnostic_tables):
+        from app.crud import create_confirmed_case, search_confirmed_cases
+        from app.schemas import ConfirmedDiagnosticCaseCreate
+
+        emb = [1.0 if i == 0 else 0.0 for i in range(384)]
+        verified_case = create_confirmed_case(
+            db,
+            ConfirmedDiagnosticCaseCreate(
+                make="Toyota",
+                model="Corolla",
+                year=2020,
+                symptom_text="Engine misfires",
+                dtc_codes="P0300",
+                confirmed_fault="Faulty spark plugs",
+                case_text="Vehicle: Toyota Corolla 2020\nSymptoms: Engine misfires\nDTCs: P0300\nConfirmed fault: Faulty spark plugs\n",
+                embedding=emb,
+                is_verified=True,
+            ),
+        )
+        unverified_case = create_confirmed_case(
+            db,
+            ConfirmedDiagnosticCaseCreate(
+                make="Honda",
+                model="Civic",
+                year=2018,
+                symptom_text="Rough idle",
+                dtc_codes="P0171",
+                confirmed_fault="Vacuum leak",
+                case_text="Vehicle: Honda Civic 2018\nSymptoms: Rough idle\nDTCs: P0171\nConfirmed fault: Vacuum leak\n",
+                embedding=emb,
+                is_verified=False,
+            ),
+        )
+        db.commit()
+
+        query_embedding = [1.0 if i == 0 else 0.0 for i in range(384)]
+        results = search_confirmed_cases(db, query_embedding, "misfire rough idle", top_k=10)
+        returned_ids = {case.id for case, _ in results}
+        assert verified_case.id in returned_ids
+        assert unverified_case.id not in returned_ids
+
+    def test_similar_future_diagnosis_retrieves_confirmed_case(self, db, clean_diagnostic_tables):
+        from app.crud import create_confirmed_case, search_confirmed_cases
+        from app.schemas import ConfirmedDiagnosticCaseCreate
+
+        create_confirmed_case(
+            db,
+            ConfirmedDiagnosticCaseCreate(
+                make="Toyota",
+                model="Corolla",
+                year=2020,
+                symptom_text="Engine misfires at idle",
+                dtc_codes="P0300",
+                confirmed_fault="Faulty spark plugs",
+                case_text="Vehicle: Toyota Corolla 2020\nSymptoms: Engine misfires at idle\nDTCs: P0300\nConfirmed fault: Faulty spark plugs\n",
+                embedding=[1.0 if i == 0 else 0.0 for i in range(384)],
+                is_verified=True,
+            ),
+        )
+        db.commit()
+
+        query_embedding = [1.0 if i == 0 else 0.0 for i in range(384)]
+        results = search_confirmed_cases(
+            db,
+            query_embedding=query_embedding,
+            query_text="Engine misfires at idle P0300",
+            top_k=5,
+            make="Toyota",
+            model="Corolla",
+            year=2020,
+        )
+        assert len(results) >= 1
+        assert results[0][0].confirmed_fault == "Faulty spark plugs"
+
+    def test_retrieved_historical_case_included_in_reasoning(
+        self, client: TestClient, clean_diagnostic_tables
+    ):
+        embedding_service = FakeEmbeddingService()
+        llm_service = FakeLLMService()
+        service = DiagnosticService(
+            app_settings=embedding_service._settings,
+            embedding_service=embedding_service,
+            llm_service=llm_service,
+        )
+
+        payload = {
+            "make": "Toyota",
+            "model": "Corolla",
+            "year": 2020,
+            "dtc_codes": ["P0300"],
+            "symptom_text": "Engine misfires at idle",
+        }
+        response = client.post("/api/v1/diagnostics/analyze", json=payload)
+        assert response.status_code == 201
+        session_id = response.json()["session_id"]
+
+        session_response = client.get(f"/api/v1/diagnostics/sessions/{session_id}")
+        result_id = session_response.json()["results"][0]["id"]
+
+        client.post(
+            f"/api/v1/diagnostics/results/{result_id}/confirmed-case",
+            json={"confirmed_fault": "Faulty spark plugs", "severity": "medium"},
+        )
+
+        request = DiagnosticAnalyzeRequest(
+            make="Toyota",
+            model="Corolla",
+            year=2020,
+            dtc_codes=["P0300"],
+            symptom_text="Engine misfires at idle",
+        )
+        with patch("app.crud.search_confirmed_cases") as mock_search:
+            from app.db import models as db_models
+
+            mock_case = db_models.ConfirmedDiagnosticCase(
+                id=uuid.uuid4(),
+                make="Toyota",
+                model="Corolla",
+                year=2020,
+                symptom_text="Engine misfires at idle",
+                dtc_codes="P0300",
+                confirmed_fault="Faulty spark plugs",
+                case_text="Vehicle: Toyota Corolla 2020\nSymptoms: Engine misfires at idle\nDTCs: P0300\nConfirmed fault: Faulty spark plugs\n",
+                is_verified=True,
+            )
+            mock_search.return_value = [(mock_case, 0.92)]
+            prompt = service._build_prompt(
+                request, evidence=[], historical_cases=[(mock_case, 0.92)]
+            )
+
+        assert "HISTORICAL CONFIRMED CASES" in prompt
+        assert "Faulty spark plugs" in prompt
+        assert "Toyota" in prompt
+
+    def test_historical_retrieval_failure_does_not_crash_diagnosis(
+        self, client: TestClient, clean_diagnostic_tables
+    ):
+        with patch("app.services.diagnostic.search_confirmed_cases", side_effect=Exception("vector search down")):
+            payload = {
+                "make": "Toyota",
+                "model": "Corolla",
+                "year": 2020,
+                "dtc_codes": ["P0300"],
+                "symptom_text": "Engine misfires at idle",
+            }
+            response = client.post("/api/v1/diagnostics/analyze", json=payload)
+            assert response.status_code == 201
+            data = response.json()
+            assert len(data["hypotheses"]) >= 1
+
+    def test_duplicate_confirmation_returns_existing_case(
+        self, client: TestClient, clean_diagnostic_tables
+    ):
+        payload = {
+            "make": "Toyota",
+            "model": "Corolla",
+            "year": 2020,
+            "dtc_codes": ["P0300"],
+            "symptom_text": "Engine misfires at idle",
+        }
+        response = client.post("/api/v1/diagnostics/analyze", json=payload)
+        assert response.status_code == 201
+        session_id = response.json()["session_id"]
+
+        session_response = client.get(f"/api/v1/diagnostics/sessions/{session_id}")
+        result_id = session_response.json()["results"][0]["id"]
+
+        body = {"confirmed_fault": "Faulty spark plugs", "severity": "medium"}
+        first = client.post(
+            f"/api/v1/diagnostics/results/{result_id}/confirmed-case", json=body
+        )
+        assert first.status_code == 201
+        first_id = first.json()["id"]
+
+        second = client.post(
+            f"/api/v1/diagnostics/results/{result_id}/confirmed-case", json=body
+        )
+        assert second.status_code == 200
+        assert second.json()["id"] == first_id
+
+    def test_confirmed_case_source_result_id_unique_constraint(
+        self, db, clean_diagnostic_tables
+    ):
+        from app.crud import create_confirmed_case
+        from app.schemas import ConfirmedDiagnosticCaseCreate
+        from sqlalchemy.exc import IntegrityError
+
+        result_id = uuid.uuid4()
+        create_confirmed_case(
+            db,
+            ConfirmedDiagnosticCaseCreate(
+                make="Toyota",
+                model="Corolla",
+                year=2020,
+                symptom_text="Engine misfires",
+                confirmed_fault="Faulty spark plugs",
+                case_text="Vehicle: Toyota Corolla 2020\nSymptoms: Engine misfires\nDTCs: None\nConfirmed fault: Faulty spark plugs\n",
+                source_result_id=result_id,
+                is_verified=True,
+            ),
+        )
+        db.commit()
+
+        with pytest.raises(IntegrityError):
+            create_confirmed_case(
+                db,
+                ConfirmedDiagnosticCaseCreate(
+                    make="Honda",
+                    model="Civic",
+                    year=2018,
+                    symptom_text="Rough idle",
+                    confirmed_fault="Vacuum leak",
+                    case_text="Vehicle: Honda Civic 2018\nSymptoms: Rough idle\nDTCs: None\nConfirmed fault: Vacuum leak\n",
+                    source_result_id=result_id,
+                    is_verified=True,
+                ),
+            )
+            db.commit()
+
+    def test_confirmed_case_source_result_id_null_allowed(
+        self, db, clean_diagnostic_tables
+    ):
+        from app.crud import create_confirmed_case
+        from app.schemas import ConfirmedDiagnosticCaseCreate
+
+        case = create_confirmed_case(
+            db,
+            ConfirmedDiagnosticCaseCreate(
+                make="Toyota",
+                model="Corolla",
+                year=2020,
+                symptom_text="Engine misfires",
+                confirmed_fault="Faulty spark plugs",
+                case_text="Vehicle: Toyota Corolla 2020\nSymptoms: Engine misfires\nDTCs: None\nConfirmed fault: Faulty spark plugs\n",
+                source_result_id=None,
+                is_verified=True,
+            ),
+        )
+        db.commit()
+        assert case.source_result_id is None
+
+    def test_confirmed_case_source_result_id_index_exists(
+        self, db, clean_diagnostic_tables
+    ):
+        from sqlalchemy import inspect
+
+        inspector = inspect(db.bind)
+        indexes = inspector.get_indexes("confirmed_diagnostic_cases")
+        index_names = {idx["name"] for idx in indexes}
+        assert "ix_confirmed_diagnostic_cases_source_result_id" in index_names
+
+    def test_confirmed_case_stores_without_embedding_when_disabled(
+        self, db, clean_diagnostic_tables
+    ):
+        from app.crud import create_diagnostic_session, create_diagnostic_result
+        from app.schemas import (
+            ConfirmedDiagnosticCaseCreate,
+            DiagnosticSessionCreate,
+            DiagnosticResultCreate,
+        )
+        from app.services.diagnostic import DiagnosticService, get_diagnostic_service
+        from app.services.llm import get_llm_service
+
+        session = create_diagnostic_session(
+            db,
+            DiagnosticSessionCreate(
+                make="Toyota",
+                model="Corolla",
+                year=2020,
+                symptom_text="Engine misfires at idle",
+                dtc_codes="P0300",
+            ),
+        )
+        result = create_diagnostic_result(
+            db,
+            session.id,
+            DiagnosticResultCreate(
+                fault_description="Faulty spark plugs",
+                confidence_score=0.8,
+                severity="medium",
+            ),
+        )
+
+        embedding_service = FakeEmbeddingService()
+        llm_service = get_llm_service()
+        service = get_diagnostic_service(embedding_service, llm_service)
+        service._settings.embedding_enabled = False
+
+        case = service.create_confirmed_case_from_result(
+            db, session, result, confirmed_fault="Faulty spark plugs"
+        )
+        assert case is not None
+        assert case.is_verified is True
+        assert case.embedding is None
+        assert case.confirmed_fault == "Faulty spark plugs"

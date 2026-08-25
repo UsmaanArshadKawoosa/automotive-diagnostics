@@ -847,15 +847,18 @@ Return a single JSON object with this schema:
 
         historical_cases = []
         if query_embedding is not None:
-            historical_cases = search_confirmed_cases(
-                db,
-                query_embedding=query_embedding,
-                query_text=query,
-                top_k=5,
-                make=request.make,
-                model=request.model,
-                year=request.year,
-            )
+            try:
+                historical_cases = search_confirmed_cases(
+                    db,
+                    query_embedding=query_embedding,
+                    query_text=query,
+                    top_k=5,
+                    make=request.make,
+                    model=request.model,
+                    year=request.year,
+                )
+            except Exception:
+                historical_cases = []
 
         evidence = [
             KnowledgeSearchResult(
@@ -1133,10 +1136,7 @@ Return a single JSON object with this schema:
         confirmed_fault_description: str | None = None,
         repair_suggestion: str | None = None,
         severity: str | None = None,
-    ) -> models.ConfirmedDiagnosticCase | None:
-        if not self._settings.embedding_enabled:
-            return None
-
+    ) -> models.ConfirmedDiagnosticCase:
         case_text = (
             f"Vehicle: {session.make or 'Unknown'} {session.model or ''} {session.year or ''}\n"
             f"Symptoms: {session.symptom_text}\n"
@@ -1145,13 +1145,17 @@ Return a single JSON object with this schema:
         )
         if confirmed_fault_description:
             case_text += f"Description: {confirmed_fault_description}\n"
+        if severity:
+            case_text += f"Severity: {severity}\n"
         if repair_suggestion:
             case_text += f"Repair: {repair_suggestion}\n"
 
-        try:
-            embedding = self._embedding_service.embed_query(case_text)
-        except Exception:
-            return None
+        embedding: list[float] | None = None
+        if self._settings.embedding_enabled:
+            try:
+                embedding = self._embedding_service.embed_query(case_text)
+            except Exception:
+                embedding = None
 
         from app.schemas import ConfirmedDiagnosticCaseCreate
 

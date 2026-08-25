@@ -146,5 +146,5 @@ class ConfirmedDiagnosticCase(Base):
     embedding: Mapped[list[float] | None] = mapped_column(Vector(384), nullable=True)
 
     source_session_id: Mapped[uuid.UUID | None] = mapped_column(UUID(as_uuid=True), nullable=True)
-    source_result_id: Mapped[uuid.UUID | None] = mapped_column(UUID(as_uuid=True), nullable=True)
+    source_result_id: Mapped[uuid.UUID | None] = mapped_column(UUID(as_uuid=True), nullable=True, unique=True, index=True)
     is_verified: Mapped[bool] = mapped_column(default=True, nullable=False)
