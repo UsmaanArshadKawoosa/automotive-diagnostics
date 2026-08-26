@@ -977,6 +977,8 @@ Return a single JSON object with this schema:
             },
             "required": [
                 "status",
+                "follow_up_question",
+                "follow_up_reason",
                 "hypotheses"
             ],
             "additionalProperties": False
