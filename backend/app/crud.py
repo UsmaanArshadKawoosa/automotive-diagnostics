@@ -116,7 +116,7 @@ def search_knowledge_entries(
     )
     if category:
         stmt = stmt.where(models.KnowledgeEntry.category == category)
-    stmt = stmt.order_by(distance).limit(top_k)
+    stmt = stmt.order_by(distance, models.KnowledgeEntry.entry_key).limit(top_k)
     return db.execute(stmt).all()
 
 

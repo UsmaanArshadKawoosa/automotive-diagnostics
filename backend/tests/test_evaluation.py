@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 
 from app.config import Settings, settings
 from app.db.database import engine as app_engine
-from app.services.embeddings import EmbeddingService
+from tests.conftest import FakeEmbeddingService
 from app.services.llm import LLMProvider
 from tests.benchmark_cases import (
     BenchmarkCase,
@@ -117,8 +117,7 @@ class TestDeterministicScoring:
         SessionLocal = sessionmaker(bind=db_engine, autoflush=False, autocommit=False)
         db = SessionLocal()
 
-        from app.services.embeddings import get_embedding_service
-        embedding_service = get_embedding_service()
+        embedding_service = FakeEmbeddingService()
 
         case_responses = {
             "B001": {
@@ -200,8 +199,7 @@ class TestDeterministicScoring:
         SessionLocal = sessionmaker(bind=db_engine, autoflush=False, autocommit=False)
         db = SessionLocal()
 
-        from app.services.embeddings import get_embedding_service
-        embedding_service = get_embedding_service()
+        embedding_service = FakeEmbeddingService()
 
         case_responses = {
             "B001": {
@@ -248,8 +246,7 @@ class TestDTCScoring:
         SessionLocal = sessionmaker(bind=db_engine, autoflush=False, autocommit=False)
         db = SessionLocal()
 
-        from app.services.embeddings import get_embedding_service
-        embedding_service = get_embedding_service()
+        embedding_service = FakeEmbeddingService()
 
         case_responses = {
             "B001": {
@@ -296,8 +293,7 @@ class TestDTCScoring:
         SessionLocal = sessionmaker(bind=db_engine, autoflush=False, autocommit=False)
         db = SessionLocal()
 
-        from app.services.embeddings import get_embedding_service
-        embedding_service = get_embedding_service()
+        embedding_service = FakeEmbeddingService()
 
         case_responses = {
             "B006": {
@@ -341,8 +337,7 @@ class TestSafetyTierScoring:
         SessionLocal = sessionmaker(bind=db_engine, autoflush=False, autocommit=False)
         db = SessionLocal()
 
-        from app.services.embeddings import get_embedding_service
-        embedding_service = get_embedding_service()
+        embedding_service = FakeEmbeddingService()
 
         case_responses = {
             "B003": {
@@ -393,8 +388,7 @@ class TestEvidenceScoring:
         SessionLocal = sessionmaker(bind=db_engine, autoflush=False, autocommit=False)
         db = SessionLocal()
 
-        from app.services.embeddings import get_embedding_service
-        embedding_service = get_embedding_service()
+        embedding_service = FakeEmbeddingService()
 
         case_responses = {
             "B001": {
@@ -444,8 +438,7 @@ class TestFollowUpScoring:
         SessionLocal = sessionmaker(bind=db_engine, autoflush=False, autocommit=False)
         db = SessionLocal()
 
-        from app.services.embeddings import get_embedding_service
-        embedding_service = get_embedding_service()
+        embedding_service = FakeEmbeddingService()
 
         case_responses = {
             "B006": {
@@ -492,8 +485,7 @@ class TestFollowUpScoring:
         SessionLocal = sessionmaker(bind=db_engine, autoflush=False, autocommit=False)
         db = SessionLocal()
 
-        from app.services.embeddings import get_embedding_service
-        embedding_service = get_embedding_service()
+        embedding_service = FakeEmbeddingService()
 
         case_responses = {
             "B001": {
@@ -538,8 +530,7 @@ class TestAggregateMetrics:
         SessionLocal = sessionmaker(bind=db_engine, autoflush=False, autocommit=False)
         db = SessionLocal()
 
-        from app.services.embeddings import get_embedding_service
-        embedding_service = get_embedding_service()
+        embedding_service = FakeEmbeddingService()
 
         case_responses = {
             "B001": {
@@ -695,8 +686,7 @@ class TestMockLLMInjection:
         SessionLocal = sessionmaker(bind=db_engine, autoflush=False, autocommit=False)
         db = SessionLocal()
 
-        from app.services.embeddings import get_embedding_service
-        embedding_service = get_embedding_service()
+        embedding_service = FakeEmbeddingService()
 
         case_responses = {
             "B001": {
@@ -736,8 +726,7 @@ class TestMockLLMInjection:
         SessionLocal = sessionmaker(bind=db_engine, autoflush=False, autocommit=False)
         db = SessionLocal()
 
-        from app.services.embeddings import get_embedding_service
-        embedding_service = get_embedding_service()
+        embedding_service = FakeEmbeddingService()
 
         responses = {
             "default": '{"status": "complete", "hypotheses": [{"fault_description": "Faulty spark plug", "confidence_score": 0.8, "severity": "high", "supporting_evidence": [], "recommended_checks": [], "repair_suggestion": null, "evidence_references": [], "differential_rank": 1}]}'
@@ -769,8 +758,7 @@ class TestEvaluationWithoutOllama:
         SessionLocal = sessionmaker(bind=db_engine, autoflush=False, autocommit=False)
         db = SessionLocal()
 
-        from app.services.embeddings import get_embedding_service
-        embedding_service = get_embedding_service()
+        embedding_service = FakeEmbeddingService()
 
         case_responses = {
             "B001": {

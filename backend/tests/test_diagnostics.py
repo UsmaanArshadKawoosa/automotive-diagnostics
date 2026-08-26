@@ -1621,11 +1621,16 @@ class TestConfirmedCaseMemorySystem:
         embedding_service = FakeEmbeddingService()
         llm_service = get_llm_service()
         service = get_diagnostic_service(embedding_service, llm_service)
+        original_embedding_enabled = service._settings.embedding_enabled
         service._settings.embedding_enabled = False
 
-        case = service.create_confirmed_case_from_result(
-            db, session, result, confirmed_fault="Faulty spark plugs"
-        )
+        try:
+            case = service.create_confirmed_case_from_result(
+                db, session, result, confirmed_fault="Faulty spark plugs"
+            )
+        finally:
+            service._settings.embedding_enabled = original_embedding_enabled
+
         assert case is not None
         assert case.is_verified is True
         assert case.embedding is None

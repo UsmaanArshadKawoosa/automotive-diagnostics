@@ -1,4 +1,4 @@
-﻿import { useState, useCallback, useEffect, useRef } from 'react';
+﻿import { useState, useCallback, useEffect, useRef, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Input, Textarea, Button } from '../components/Form';
 import { HypothesisCard } from '../components/DiagnosticResults';
@@ -70,8 +70,8 @@ export function DiagnosePage() {
         conversation_messages: session.conversation_messages || [],
         evidence: session.evidence || [],
       }, sid);
-    } catch {
-      // silently ignore
+    } catch (err) {
+      setLocalError(err instanceof Error ? err.message : 'Failed to load session results');
     } finally {
       setLoadingSession(false);
     }
@@ -193,7 +193,8 @@ export function DiagnosePage() {
           h.confidence_score > max.confidence_score ? h : max
         );
         const hypothesisIndex = analysisHypotheses.findIndex((h) => h.component_id === component.component_id && h.confidence_score === highestConfidence.confidence_score);
-        const hypothesisId = `hypothesis-${hypothesisIndex}`;
+        const realResultId = results[hypothesisIndex]?.id;
+        const hypothesisId = realResultId || `hypothesis-${hypothesisIndex}`;
         setSelectedHypothesisId(hypothesisId);
         requestAnimationFrame(() => {
           const card = hypothesisCardsRef.current.get(hypothesisId);
@@ -205,23 +206,36 @@ export function DiagnosePage() {
     } else {
       setSelectedHypothesisId(null);
     }
-  }, [analysisHypotheses]);
+  }, [analysisHypotheses, results]);
 
-  const displayResults = analysisHypotheses.length > 0
-    ? analysisHypotheses.map((h, idx) => ({
+  const displayResults = useMemo(() => {
+    if (analysisHypotheses.length > 0 && results.length > 0) {
+      return analysisHypotheses.map((h, idx) => ({
+        ...h,
+        id: results[idx]?.id || `hypothesis-${idx}`,
+        session_id: sessionId || '',
+        hypothesis_status: (results[idx]?.hypothesis_status || 'proposed') as HypothesisStatus,
+        check_outcomes: results[idx]?.check_outcomes || [],
+      }));
+    }
+    if (analysisHypotheses.length > 0) {
+      return analysisHypotheses.map((h, idx) => ({
         ...h,
         id: `hypothesis-${idx}`,
         session_id: sessionId || '',
         hypothesis_status: 'proposed' as HypothesisStatus,
         check_outcomes: [],
-      }))
-    : isFromCache && cachedSession
-      ? cachedSession.data.results.map((r, idx) => ({
-          ...r,
-          id: r.id || `cached-hypothesis-${idx}`,
-          session_id: sessionId || r.id || '',
-        }))
-      : results;
+      }));
+    }
+    if (isFromCache && cachedSession) {
+      return cachedSession.data.results.map((r, idx) => ({
+        ...r,
+        id: r.id || `cached-hypothesis-${idx}`,
+        session_id: sessionId || r.id || '',
+      }));
+    }
+    return results;
+  }, [analysisHypotheses, results, sessionId, isFromCache, cachedSession]);
 
   const showResults = (apiState.data && !apiState.loading && !loadingSession) || (isFromCache && cachedSession && !isOnline);
   const isAnalyzing = apiState.loading;
@@ -480,7 +494,7 @@ export function DiagnosePage() {
               <div className="space-y-3 sm:space-y-4">
                 {displayResults.map((result, index) => (
                   <HypothesisCard
-                    key={result.id}
+                    key={`hypothesis-${index}`}
                     ref={(el) => {
                       if (el) {
                         hypothesisCardsRef.current.set(result.id, el);
