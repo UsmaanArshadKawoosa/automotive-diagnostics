@@ -15,7 +15,7 @@ export function DiagnosePage() {
   const navigate = useNavigate();
   const isOnline = useOnlineStatus();
   const { analyze, ...apiState } = useAnalyze();
-  const { analyzeInSession } = useAnalyzeInSession();
+  const { analyzeInSession, ...sessionApiState } = useAnalyzeInSession();
   const [make, setMake] = useState('');
   const [model, setModel] = useState('');
   const [year, setYear] = useState('');
@@ -55,6 +55,25 @@ export function DiagnosePage() {
       }
     }
   }, [apiState.data]);
+
+  useEffect(() => {
+    if (sessionApiState.data) {
+      const sid = sessionApiState.data.session_id;
+      setSessionId(sid);
+      loadSessionResults(sid);
+
+      if (sessionApiState.data.status === 'needs_more_information') {
+        setFollowUpQuestion(sessionApiState.data.follow_up_question || '');
+        setFollowUpReason(sessionApiState.data.follow_up_reason || '');
+        setAwaitingFollowUp(true);
+        setFollowUpAnswer('');
+      } else {
+        setFollowUpQuestion(null);
+        setFollowUpReason(null);
+        setAwaitingFollowUp(false);
+      }
+    }
+  }, [sessionApiState.data]);
 
   const loadSessionResults = async (sid: string) => {
     setLoadingSession(true);
@@ -169,8 +188,8 @@ export function DiagnosePage() {
     navigate(`/sessions/${sessionId}`);
   }, [sessionId, navigate]);
 
-  const analysisHypotheses: DiagnosticHypothesis[] = apiState.data?.hypotheses || [];
-  const currentVehicleType = (apiState.data?.vehicle?.vehicle_type as VehicleType) || 'sedan';
+  const analysisHypotheses: DiagnosticHypothesis[] = sessionApiState.data?.hypotheses || apiState.data?.hypotheses || [];
+  const currentVehicleType = (sessionApiState.data?.vehicle?.vehicle_type || apiState.data?.vehicle?.vehicle_type || 'sedan') as VehicleType;
   const hasComponentHighlights = analysisHypotheses.some((h) => h.component_id);
   const highlightedComponents = analysisHypotheses
     .filter((h): h is DiagnosticHypothesis & { component_id: string } => !!h.component_id)
@@ -237,8 +256,8 @@ export function DiagnosePage() {
     return results;
   }, [analysisHypotheses, results, sessionId, isFromCache, cachedSession]);
 
-  const showResults = (apiState.data && !apiState.loading && !loadingSession) || (isFromCache && cachedSession && !isOnline);
-  const isAnalyzing = apiState.loading;
+  const showResults = (sessionApiState.data || apiState.data) && !(apiState.loading || sessionApiState.loading) && !loadingSession || (isFromCache && cachedSession && !isOnline);
+  const isAnalyzing = apiState.loading || sessionApiState.loading;
 
   return (
     <div className="mx-auto max-w-3xl px-4 sm:px-6">
@@ -256,8 +275,8 @@ export function DiagnosePage() {
           </Alert>
         )}
 
-        {apiState.error && (
-          <ErrorMessage message={apiState.error} />
+        {(apiState.error || sessionApiState.error) && (
+          <ErrorMessage message={apiState.error || sessionApiState.error || ''} />
         )}
 
         <div className="rounded-lg border border-slate-200 bg-white p-4 sm:p-5 shadow-sm">
@@ -502,23 +521,25 @@ export function DiagnosePage() {
                         hypothesisCardsRef.current.delete(result.id);
                       }
                     }}
-                    hypothesis={{
-                      fault_description: result.fault_description,
-                      confidence_score: result.confidence_score,
-                      severity: (result.severity || 'low') as 'low',
-                      supporting_evidence: result.supporting_evidence,
-                      recommended_checks: result.recommended_checks,
-                      repair_suggestion: result.repair_suggestion,
-                      component_id: result.component_id,
-                      system_category: result.system_category,
-                      vehicle_region: result.vehicle_region,
-                      safety_tier: result.safety_tier as import('../types/api').RepairSafetyTier | undefined,
-                      safety_tier_label: result.safety_tier_label,
-                      safety_tier_description: result.safety_tier_description,
-                      safety_tier_reasoning: result.safety_tier_reasoning,
-                      differential_rank: result.differential_rank,
-                      evidence_quality: result.evidence_quality,
-                    }}
+                     hypothesis={{
+                       fault_description: result.fault_description,
+                       confidence_score: result.confidence_score,
+                       severity: (result.severity || 'low') as 'low',
+                       supporting_evidence: result.supporting_evidence,
+                       recommended_checks: result.recommended_checks,
+                       repair_suggestion: result.repair_suggestion,
+                       component_id: result.component_id,
+                       system_category: result.system_category,
+                       vehicle_region: result.vehicle_region,
+                       safety_tier: result.safety_tier as import('../types/api').RepairSafetyTier | undefined,
+                       safety_tier_label: result.safety_tier_label,
+                       safety_tier_description: result.safety_tier_description,
+                       safety_tier_reasoning: result.safety_tier_reasoning,
+                       differential_rank: result.differential_rank,
+                       evidence_quality: result.evidence_quality,
+                       diy_repair: result.diy_repair as import('../types/api').DIYRepairGuidance | null | undefined,
+                       resources: result.resources as import('../types/api').ResourceLink[] | undefined,
+                     }}
                     resultId={result.id}
                     currentStatus={(result.hypothesis_status || 'proposed') as import('../types/api').HypothesisStatus}
                     onUpdateStatus={handleOutcomeUpdate}

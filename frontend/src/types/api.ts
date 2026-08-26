@@ -26,6 +26,27 @@ export interface EvidenceReference {
 
 export type EvidenceQuality = 'strong' | 'moderate' | 'weak' | 'insufficient';
 
+export interface DIYRepairGuidance {
+  suitable: boolean;
+  suitability: string;
+  difficulty?: 'easy' | 'moderate' | 'advanced';
+  estimated_time?: string | null;
+  tools: string[];
+  parts: string[];
+  safety_warnings: string[];
+  preparation_steps: string[];
+  steps: string[];
+  verification_steps: string[];
+  professional_help_conditions: string[];
+}
+
+export interface ResourceLink {
+  type: 'guide' | 'youtube';
+  title: string;
+  source: string;
+  url: string;
+}
+
 export interface DiagnosticHypothesis {
   fault_description: string;
   confidence_score: number;
@@ -44,6 +65,8 @@ export interface DiagnosticHypothesis {
   evidence_references: EvidenceReference[];
   differential_rank?: number;
   evidence_quality?: EvidenceQuality;
+  diy_repair?: DIYRepairGuidance | null;
+  resources?: ResourceLink[];
 }
 
 export interface DiagnosticAnalyzeResponse {
@@ -91,6 +114,8 @@ export interface DiagnosticResult {
   safety_tier_reasoning?: string[];
   differential_rank?: number;
   evidence_quality?: string;
+  diy_repair?: DIYRepairGuidance | null;
+  resources?: ResourceLink[];
 }
 
 export interface DiagnosticSession {

@@ -214,6 +214,27 @@ class DiagnosticAnalyzeRequest(BaseModel):
         return ", ".join(self.dtc_codes)
 
 
+class DIYRepairGuidance(BaseModel):
+    suitable: bool = False
+    suitability: str = Field(default="Not recommended for DIY", max_length=255)
+    difficulty: str | None = Field(default=None, pattern=r"^(easy|moderate|advanced)$")
+    estimated_time: str | None = Field(default=None, max_length=255)
+    tools: list[str] = Field(default_factory=list)
+    parts: list[str] = Field(default_factory=list)
+    safety_warnings: list[str] = Field(default_factory=list)
+    preparation_steps: list[str] = Field(default_factory=list)
+    steps: list[str] = Field(default_factory=list)
+    verification_steps: list[str] = Field(default_factory=list)
+    professional_help_conditions: list[str] = Field(default_factory=list)
+
+
+class ResourceLink(BaseModel):
+    type: str = Field(pattern=r"^(guide|youtube)$")
+    title: str = Field(min_length=1, max_length=255)
+    source: str = Field(min_length=1, max_length=255)
+    url: str = Field(min_length=1, max_length=2048)
+
+
 class DiagnosticHypothesis(BaseModel):
     fault_description: str = Field(min_length=1)
     confidence_score: float = Field(ge=0.0, le=1.0)
@@ -232,6 +253,8 @@ class DiagnosticHypothesis(BaseModel):
     evidence_references: list[EvidenceReference] = Field(default_factory=list)
     differential_rank: int | None = None
     evidence_quality: str | None = Field(default=None, pattern=r"^(strong|moderate|weak|insufficient)$")
+    diy_repair: DIYRepairGuidance | None = None
+    resources: list[ResourceLink] = Field(default_factory=list)
 
 
 class RepairSafetyTier(BaseModel):

@@ -1,6 +1,6 @@
 import { useState, useMemo, forwardRef } from 'react';
 import { Button } from './Form';
-import type { Severity, HypothesisStatus, RepairSafetyTier, DiagnosticCheckOutcome } from '../types/api';
+import type { Severity, HypothesisStatus, RepairSafetyTier, DiagnosticCheckOutcome, DIYRepairGuidance, ResourceLink } from '../types/api';
 import { StatusBadge, CheckStatusBadge } from './Badges';
 import { cn } from '../utils/cn';
 
@@ -56,6 +56,8 @@ interface HypothesisCardProps {
     safety_tier_reasoning?: string[];
     differential_rank?: number;
     evidence_quality?: string;
+    diy_repair?: DIYRepairGuidance | null;
+    resources?: ResourceLink[];
   };
   resultId: string;
   currentStatus: HypothesisStatus;
@@ -74,6 +76,126 @@ const STATUS_OPTIONS: { value: HypothesisStatus; label: string }[] = [
   { value: 'confirmed', label: 'Confirmed' },
   { value: 'rejected', label: 'Rejected' },
 ];
+
+interface DIYRepairSectionProps {
+  diy: DIYRepairGuidance;
+}
+
+function DIYRepairSection({ diy }: DIYRepairSectionProps) {
+  const suitabilityColors: Record<string, string> = {
+    'Recommended for DIY': 'border-green-200 bg-green-50 text-green-800',
+    'Possible with caution': 'border-amber-200 bg-amber-50 text-amber-800',
+    'Professional recommended': 'border-red-200 bg-red-50 text-red-800',
+  };
+
+  const difficultyColors: Record<string, string> = {
+    easy: 'bg-green-100 text-green-700',
+    moderate: 'bg-amber-100 text-amber-700',
+    advanced: 'bg-red-100 text-red-700',
+  };
+
+  return (
+    <div className="mt-4 rounded-lg border border-slate-200 bg-white overflow-hidden">
+      <div className="border-b border-slate-100 px-4 py-3 bg-slate-50">
+        <h5 className="text-sm font-semibold text-slate-900">DIY Repair Guidance</h5>
+        <div className="mt-1 flex items-center gap-2 flex-wrap">
+          <span className={cn('text-xs font-medium px-2 py-0.5 rounded-full', suitabilityColors[diy.suitability] || 'bg-slate-100 text-slate-700')}>
+            {diy.suitability}
+          </span>
+          {diy.difficulty && (
+            <span className={cn('text-xs font-medium px-2 py-0.5 rounded-full', difficultyColors[diy.difficulty] || 'bg-slate-100 text-slate-700')}>
+              {diy.difficulty.charAt(0).toUpperCase() + diy.difficulty.slice(1)}
+            </span>
+          )}
+          {diy.estimated_time && (
+            <span className="text-xs text-slate-600">
+              Est. time: {diy.estimated_time}
+            </span>
+          )}
+        </div>
+      </div>
+
+      <div className="p-4 space-y-4">
+        {diy.tools.length > 0 && (
+          <div>
+            <h6 className="text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">Tools Required</h6>
+            <ul className="list-disc space-y-1 pl-4 text-sm text-slate-700">
+              {diy.tools.map((tool, idx) => (
+                <li key={idx}>{tool}</li>
+              ))}
+            </ul>
+          </div>
+        )}
+
+        {diy.parts.length > 0 && (
+          <div>
+            <h6 className="text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">Parts / Materials</h6>
+            <ul className="list-disc space-y-1 pl-4 text-sm text-slate-700">
+              {diy.parts.map((part, idx) => (
+                <li key={idx}>{part}</li>
+              ))}
+            </ul>
+          </div>
+        )}
+
+        {diy.safety_warnings.length > 0 && (
+          <div className="rounded-md border border-red-200 bg-red-50 p-3">
+            <h6 className="text-xs font-semibold uppercase tracking-wider text-red-800 mb-1">Safety Precautions</h6>
+            <ul className="list-disc space-y-1 pl-4 text-sm text-red-900">
+              {diy.safety_warnings.map((warning, idx) => (
+                <li key={idx}>{warning}</li>
+              ))}
+            </ul>
+          </div>
+        )}
+
+        {diy.preparation_steps.length > 0 && (
+          <div>
+            <h6 className="text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">Preparation</h6>
+            <ol className="list-decimal space-y-1 pl-4 text-sm text-slate-700">
+              {diy.preparation_steps.map((step, idx) => (
+                <li key={idx}>{step}</li>
+              ))}
+            </ol>
+          </div>
+        )}
+
+        {diy.steps.length > 0 && (
+          <div>
+            <h6 className="text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">Steps</h6>
+            <ol className="list-decimal space-y-1 pl-4 text-sm text-slate-700">
+              {diy.steps.map((step, idx) => (
+                <li key={idx}>{step}</li>
+              ))}
+            </ol>
+          </div>
+        )}
+
+        {diy.verification_steps.length > 0 && (
+          <div>
+            <h6 className="text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">After Repair — Verification</h6>
+            <ol className="list-decimal space-y-1 pl-4 text-sm text-slate-700">
+              {diy.verification_steps.map((step, idx) => (
+                <li key={idx}>{step}</li>
+              ))}
+            </ol>
+          </div>
+        )}
+
+        {diy.professional_help_conditions.length > 0 && (
+          <div className="rounded-md border border-amber-200 bg-amber-50 p-3">
+            <h6 className="text-xs font-semibold uppercase tracking-wider text-amber-800 mb-1">When to Seek Professional Help</h6>
+            <ul className="list-disc space-y-1 pl-4 text-sm text-amber-900">
+              {diy.professional_help_conditions.map((condition, idx) => (
+                <li key={idx}>{condition}</li>
+              ))}
+            </ul>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
 
 export const HypothesisCard = forwardRef<HTMLDivElement, HypothesisCardProps>(({
   hypothesis,
@@ -265,6 +387,30 @@ export const HypothesisCard = forwardRef<HTMLDivElement, HypothesisCardProps>(({
         <div className="mt-4">
           <h5 className="text-xs font-semibold uppercase tracking-wider text-slate-500">Repair Suggestion</h5>
           <p className="mt-1 text-sm text-slate-700">{hypothesis.repair_suggestion}</p>
+        </div>
+      )}
+
+      {hypothesis.diy_repair && (
+        <DIYRepairSection diy={hypothesis.diy_repair} />
+      )}
+
+      {hypothesis.resources && hypothesis.resources.length > 0 && (
+        <div className="mt-4">
+          <h5 className="text-xs font-semibold uppercase tracking-wider text-slate-500 mb-2">Helpful Guides</h5>
+          <div className="space-y-2">
+            {hypothesis.resources.map((resource, idx) => (
+              <a
+                key={idx}
+                href={resource.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-2 text-sm text-brand-600 hover:text-brand-700 underline"
+              >
+                <span className="font-medium">{resource.title}</span>
+                <span className="text-xs text-slate-500">({resource.source})</span>
+              </a>
+            ))}
+          </div>
         </div>
       )}
 

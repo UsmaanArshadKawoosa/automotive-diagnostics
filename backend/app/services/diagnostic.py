@@ -25,8 +25,10 @@ from app.schemas import (
     DiagnosticHypothesis,
     DiagnosticResultCreate,
     DiagnosticSessionCreate,
+    DIYRepairGuidance,
     EvidenceReference,
     KnowledgeSearchResult,
+    ResourceLink,
 )
 from app.services.component_taxonomy import (
     map_evidence_to_component,
@@ -305,6 +307,11 @@ Instructions:
 - For each hypothesis, reference supporting evidence by evidence_id from the catalog above.
 - If multiple plausible causes exist, return them as a differential diagnosis ranked by likelihood.
 - If evidence conflicts between hypotheses, note this and prefer asking a follow-up question.
+- For each hypothesis, evaluate whether the repair is suitable for DIY. Consider safety, complexity, tools required, and vehicle type.
+- Only mark a repair as DIY-suitable when it is genuinely safe and feasible for an experienced vehicle owner with basic tools.
+- For high-risk systems (brakes, airbags/SRS, high-voltage EV systems, fuel systems, steering, suspension under load), strongly recommend professional help even if the repair seems simple.
+- Do not invent torque specifications, fluid capacities, or vehicle-specific instructions. Only include guidance that is supported by the retrieved evidence or is generic, well-known automotive practice.
+- If you include external resources, only include links that are real, reputable, and directly relevant. Do not hallucinate URLs. If you are not certain a resource exists, omit it rather than inventing one.
 
 Return a single JSON object with this schema:
 {{
@@ -329,7 +336,28 @@ Return a single JSON object with this schema:
           "relevance": "supporting|conflicting|contextual"
         }}
       ],
-      "differential_rank": 1
+      "differential_rank": 1,
+      "diy_repair": {{
+        "suitable": true or false,
+        "suitability": "Recommended for DIY" | "Possible with caution" | "Professional recommended",
+        "difficulty": "easy" | "moderate" | "advanced" or null,
+        "estimated_time": "string or null",
+        "tools": ["string"],
+        "parts": ["string"],
+        "safety_warnings": ["string"],
+        "preparation_steps": ["string"],
+        "steps": ["string"],
+        "verification_steps": ["string"],
+        "professional_help_conditions": ["string"]
+      }},
+      "resources": [
+        {{
+          "type": "guide" | "youtube",
+          "title": "string",
+          "source": "string",
+          "url": "string"
+        }}
+      ]
     }}
   ]
 }}
@@ -763,6 +791,26 @@ Return a single JSON object with this schema:
                     sanitized["evidence_references"] = evidence_refs
             if "differential_rank" in sanitized:
                 sanitized["differential_rank"] = sanitized.get("differential_rank")
+            # Handle diy_repair field
+            if "diy_repair" in sanitized:
+                raw_diy = sanitized.pop("diy_repair")
+                if isinstance(raw_diy, dict):
+                    try:
+                        sanitized["diy_repair"] = DIYRepairGuidance(**raw_diy)
+                    except ValidationError:
+                        sanitized["diy_repair"] = None
+            # Handle resources field
+            if "resources" in sanitized:
+                raw_resources = sanitized.pop("resources")
+                if isinstance(raw_resources, list):
+                    resources = []
+                    for res_data in raw_resources:
+                        if isinstance(res_data, dict):
+                            try:
+                                resources.append(ResourceLink(**res_data))
+                            except ValidationError:
+                                pass
+                    sanitized["resources"] = resources
             try:
                 hypotheses.append(DiagnosticHypothesis(**sanitized))
             except ValidationError as exc:
@@ -959,6 +1007,50 @@ Return a single JSON object with this schema:
                             },
                             "differential_rank": {
                                 "type": ["integer", "null"]
+                            },
+                            "diy_repair": {
+                                "type": "object",
+                                "properties": {
+                                    "suitable": {"type": "boolean"},
+                                    "suitability": {"type": "string"},
+                                    "difficulty": {"type": "string", "enum": ["easy", "moderate", "advanced"]},
+                                    "estimated_time": {"type": ["string", "null"]},
+                                    "tools": {"type": "array", "items": {"type": "string"}},
+                                    "parts": {"type": "array", "items": {"type": "string"}},
+                                    "safety_warnings": {"type": "array", "items": {"type": "string"}},
+                                    "preparation_steps": {"type": "array", "items": {"type": "string"}},
+                                    "steps": {"type": "array", "items": {"type": "string"}},
+                                    "verification_steps": {"type": "array", "items": {"type": "string"}},
+                                    "professional_help_conditions": {"type": "array", "items": {"type": "string"}}
+                                },
+                                "required": [
+                                    "suitable",
+                                    "suitability",
+                                    "difficulty",
+                                    "estimated_time",
+                                    "tools",
+                                    "parts",
+                                    "safety_warnings",
+                                    "preparation_steps",
+                                    "steps",
+                                    "verification_steps",
+                                    "professional_help_conditions"
+                                ],
+                                "additionalProperties": False
+                            },
+                            "resources": {
+                                "type": "array",
+                                "items": {
+                                    "type": "object",
+                                    "properties": {
+                                        "type": {"type": "string", "enum": ["guide", "youtube"]},
+                                        "title": {"type": "string"},
+                                        "source": {"type": "string"},
+                                        "url": {"type": "string"}
+                                    },
+                                    "required": ["type", "title", "source", "url"],
+                                    "additionalProperties": False
+                                }
                             }
                         },
                         "required": [
@@ -969,7 +1061,9 @@ Return a single JSON object with this schema:
                             "recommended_checks",
                             "repair_suggestion",
                             "evidence_references",
-                            "differential_rank"
+                            "differential_rank",
+                            "diy_repair",
+                            "resources"
                         ],
                         "additionalProperties": False
                     }
