@@ -147,6 +147,8 @@ export interface DiagnosticAnalyzeRequest {
   model?: string;
   year?: number;
   vehicle_type?: VehicleType;
+  fuel_type?: string;
+  transmission?: string;
   dtc_codes?: string[];
   symptom_text: string;
   session_id?: string;

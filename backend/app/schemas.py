@@ -167,6 +167,8 @@ class DiagnosticAnalyzeRequest(BaseModel):
     model: str | None = Field(default=None, max_length=100)
     year: int | None = Field(default=None, ge=1900, le=2100)
     vehicle_type: str | None = Field(default=None, pattern=r"^(hatchback|sedan|suv|pickup|van)$")
+    fuel_type: str | None = Field(default=None, max_length=50)
+    transmission: str | None = Field(default=None, max_length=50)
     dtc_codes: list[str] | None = Field(default=None)
     symptom_text: str = Field(min_length=1, max_length=4000)
     session_id: uuid.UUID | None = Field(default=None)

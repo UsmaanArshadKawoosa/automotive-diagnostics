@@ -348,7 +348,7 @@ describe('Offline submission prevention', () => {
       </MemoryRouter>
     );
 
-    const submitButton = screen.getByText('Diagnose my car');
+    const submitButton = screen.getByText('Diagnose Vehicle');
     await userEvent.click(submitButton);
 
     expect(screen.getByText(/live connection is required/i)).toBeDefined();

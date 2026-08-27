@@ -248,7 +248,13 @@ class DiagnosticService:
     ) -> str:
         query = self._build_search_query(request)
         vehicle = " ".join(
-            p for p in [request.make, request.model, str(request.year) if request.year else None] if p
+            p for p in [
+                request.make,
+                request.model,
+                str(request.year) if request.year else None,
+                request.fuel_type,
+                request.transmission,
+            ] if p
         ) or "Unknown vehicle"
         dtcs = ", ".join(request.dtc_codes) if request.dtc_codes else "None provided"
 

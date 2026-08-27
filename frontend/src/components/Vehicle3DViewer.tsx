@@ -24,6 +24,7 @@ export interface Vehicle3DViewerProps {
   selectedComponent?: ComponentHighlight | null;
   onComponentSelect?: (component: ComponentHighlight | null) => void;
   className?: string;
+  height?: number;
   children?: ReactNode;
 }
 
@@ -310,11 +311,8 @@ function GLBScene({ modelAsset, highlightedComponents, selectedComponent, onComp
     }
   }, [scene, modelAsset, onLoadStateChange]);
 
-  if (!scene) {
-    return null;
-  }
-
   useFrame(() => {
+    if (!scene) return;
     scene.traverse((object: THREE.Object3D) => {
       if (object instanceof THREE.Mesh) {
         const mesh = object as THREE.Mesh;
@@ -362,6 +360,10 @@ function GLBScene({ modelAsset, highlightedComponents, selectedComponent, onComp
     });
   });
 
+  if (!scene) {
+    return null;
+  }
+
   const handleClick = (event: React.MouseEvent<THREE.Object3D<THREE.Object3DEventMap>, MouseEvent>) => {
     const target = event.currentTarget as THREE.Object3D;
     if (target instanceof THREE.Mesh) {
@@ -406,6 +408,7 @@ export function Vehicle3DViewer({
   selectedComponent = null,
   onComponentSelect,
   className = '',
+  height = 320,
   children,
 }: Vehicle3DViewerProps) {
   const [loadState, setLoadState] = React.useState<'idle' | 'loading' | 'loaded' | 'error' | 'no-meshes'>('idle');
@@ -512,7 +515,7 @@ export function Vehicle3DViewer({
             </div>
           }>
             <div className="w-full overflow-hidden rounded-md">
-              <Canvas camera={{ position: [0, 3, 8], fov: 45 }} style={{ height: 220, width: '100%' }}>
+              <Canvas camera={{ position: [0, 3, 8], fov: 45 }} style={{ height, width: '100%' }}>
                 <OrbitControls ref={controlsRef} enableZoom={true} enablePan={true} enableRotate={true} minDistance={3} maxDistance={15} />
                 <ambientLight intensity={0.5} />
                 <directionalLight position={[5, 5, 5]} intensity={0.8} />

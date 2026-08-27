@@ -97,11 +97,15 @@ function DIYRepairSection({ diy }: DIYRepairSectionProps) {
   return (
     <div className="mt-4 rounded-lg border border-slate-200 bg-white overflow-hidden">
       <div className="border-b border-slate-100 px-4 py-3 bg-slate-50">
-        <h5 className="text-sm font-semibold text-slate-900">DIY Repair Guidance</h5>
+        <h5 className="text-sm font-semibold text-slate-900">
+          {diy.suitable ? 'DIY Repair Guide' : 'Professional Service Recommended'}
+        </h5>
         <div className="mt-1 flex items-center gap-2 flex-wrap">
-          <span className={cn('text-xs font-medium px-2 py-0.5 rounded-full', suitabilityColors[diy.suitability] || 'bg-slate-100 text-slate-700')}>
-            {diy.suitability}
-          </span>
+          {diy.suitability && (
+            <span className={cn('text-xs font-medium px-2 py-0.5 rounded-full', suitabilityColors[diy.suitability] || 'bg-slate-100 text-slate-700')}>
+              {diy.suitability}
+            </span>
+          )}
           {diy.difficulty && (
             <span className={cn('text-xs font-medium px-2 py-0.5 rounded-full', difficultyColors[diy.difficulty] || 'bg-slate-100 text-slate-700')}>
               {diy.difficulty.charAt(0).toUpperCase() + diy.difficulty.slice(1)}
@@ -116,77 +120,77 @@ function DIYRepairSection({ diy }: DIYRepairSectionProps) {
       </div>
 
       <div className="p-4 space-y-4">
-        {diy.tools.length > 0 && (
+        {(diy.tools?.length ?? 0) > 0 && (
           <div>
             <h6 className="text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">Tools Required</h6>
             <ul className="list-disc space-y-1 pl-4 text-sm text-slate-700">
-              {diy.tools.map((tool, idx) => (
+              {diy.tools?.map((tool, idx) => (
                 <li key={idx}>{tool}</li>
               ))}
             </ul>
           </div>
         )}
 
-        {diy.parts.length > 0 && (
+        {(diy.parts?.length ?? 0) > 0 && (
           <div>
             <h6 className="text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">Parts / Materials</h6>
             <ul className="list-disc space-y-1 pl-4 text-sm text-slate-700">
-              {diy.parts.map((part, idx) => (
+              {diy.parts?.map((part, idx) => (
                 <li key={idx}>{part}</li>
               ))}
             </ul>
           </div>
         )}
 
-        {diy.safety_warnings.length > 0 && (
+        {(diy.safety_warnings?.length ?? 0) > 0 && (
           <div className="rounded-md border border-red-200 bg-red-50 p-3">
             <h6 className="text-xs font-semibold uppercase tracking-wider text-red-800 mb-1">Safety Precautions</h6>
             <ul className="list-disc space-y-1 pl-4 text-sm text-red-900">
-              {diy.safety_warnings.map((warning, idx) => (
+              {diy.safety_warnings?.map((warning, idx) => (
                 <li key={idx}>{warning}</li>
               ))}
             </ul>
           </div>
         )}
 
-        {diy.preparation_steps.length > 0 && (
+        {(diy.preparation_steps?.length ?? 0) > 0 && (
           <div>
             <h6 className="text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">Preparation</h6>
             <ol className="list-decimal space-y-1 pl-4 text-sm text-slate-700">
-              {diy.preparation_steps.map((step, idx) => (
+              {diy.preparation_steps?.map((step, idx) => (
                 <li key={idx}>{step}</li>
               ))}
             </ol>
           </div>
         )}
 
-        {diy.steps.length > 0 && (
+        {(diy.steps?.length ?? 0) > 0 && (
           <div>
             <h6 className="text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">Steps</h6>
             <ol className="list-decimal space-y-1 pl-4 text-sm text-slate-700">
-              {diy.steps.map((step, idx) => (
+              {diy.steps?.map((step, idx) => (
                 <li key={idx}>{step}</li>
               ))}
             </ol>
           </div>
         )}
 
-        {diy.verification_steps.length > 0 && (
+        {(diy.verification_steps?.length ?? 0) > 0 && (
           <div>
             <h6 className="text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">After Repair — Verification</h6>
             <ol className="list-decimal space-y-1 pl-4 text-sm text-slate-700">
-              {diy.verification_steps.map((step, idx) => (
+              {diy.verification_steps?.map((step, idx) => (
                 <li key={idx}>{step}</li>
               ))}
             </ol>
           </div>
         )}
 
-        {diy.professional_help_conditions.length > 0 && (
+        {(diy.professional_help_conditions?.length ?? 0) > 0 && (
           <div className="rounded-md border border-amber-200 bg-amber-50 p-3">
             <h6 className="text-xs font-semibold uppercase tracking-wider text-amber-800 mb-1">When to Seek Professional Help</h6>
             <ul className="list-disc space-y-1 pl-4 text-sm text-amber-900">
-              {diy.professional_help_conditions.map((condition, idx) => (
+              {diy.professional_help_conditions?.map((condition, idx) => (
                 <li key={idx}>{condition}</li>
               ))}
             </ul>
