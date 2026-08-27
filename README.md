@@ -1,50 +1,470 @@
-# Automotive AI Diagnostic Engine
+# Automotive Diagnostic AI
 
-A provider-agnostic, RAG-backed diagnostic reasoning API for automotive symptoms and DTC codes.
+An AI-powered automotive diagnostic assistant that turns natural-language vehicle
+symptoms into structured, safety-aware diagnostic assessments.
+
+The system is an engineering project that combines natural-language symptom
+understanding, retrieval-augmented diagnostic reasoning, structured LLM outputs,
+ranked fault hypotheses, evidence-based confidence, adaptive follow-up questioning,
+safety classification, repair guidance, semantic knowledge retrieval, an interactive
+3D vehicle visualization, and a mechanic-ready report. It is a **decision-support and
+diagnostic-assistance system** — not a replacement for a professional mechanic, and
+not a thin wrapper around a chat completion API.
+
+---
 
 ## Overview
 
-The engine accepts vehicle symptoms and optional diagnostic trouble codes (DTCs), retrieves relevant knowledge using vector similarity search, and uses a local or cloud LLM to generate structured diagnostic hypotheses with supporting evidence, severity, recommended checks, and repair suggestions.
+### The problem
 
-## Architecture
+A vehicle owner experiences a symptom — a grinding noise while braking, a shake during
+acceleration, an engine that stalls at idle — but usually does not know:
+
+- which component or system is involved,
+- whether the issue is urgent or can be driven on,
+- what to inspect first,
+- whether the repair is appropriate for a confident DIYer,
+- which tools and parts the job would require,
+- or what concrete information to give a mechanic.
+
+Generic "ask an AI" chat interfaces return prose that is hard to act on, easy to
+misread, and rarely tied to evidence or safety constraints.
+
+### What this project does
+
+It frames diagnosis as a **structured reasoning problem**:
+
+1. The user describes the symptom in their own words (no automotive jargon required).
+2. The backend retrieves relevant automotive knowledge, constructs a constrained
+   prompt, and asks the LLM for a **schema-validated** diagnostic response.
+3. The response is parsed into ranked hypotheses, each with confidence, severity,
+   supporting evidence, recommended checks, repair suggestions, a safety tier, and
+   (when applicable) DIY repair guidance and external resources.
+4. The frontend presents this as a single, progressive report: hypotheses → safety →
+   affected-area visualization → repair guidance → resources → mechanic-ready summary.
+
+The product is intentionally a **symptom-first, single-page workflow**. No VIN, DTC
+codes, name, email, or other personal information is required to get a diagnosis.
+
+---
+
+## Core Experience
 
 ```
-┌─────────────────┐     ┌──────────────────┐     ┌─────────────────┐
-│  FastAPI API    │────▶│ Diagnostic Service│────▶│ Embedding Service│
-│  /api/v1/...    │     │ (RAG reasoning)  │     │ (sentence-     │
-└─────────────────┘     └──────────────────┘     │  transformers  │
-                             │                    │  or OpenAI)    │
-                             ▼                    └─────────────────┘
-                      ┌──────────────────┐
-                      │  LLM Service     │
-                      │  Ollama / OpenAI │
-                      └──────────────────┘
-                             │
-                             ▼
-                      ┌──────────────────┐
-                      │ PostgreSQL +     │
-                      │ pgvector         │
-                      └──────────────────┘
+Describe the symptom
+        ↓
+AI analyzes symptoms + retrieved knowledge
+        ↓
+Decide whether more information would materially change the assessment
+        ↓  (only if needed)
+Follow-up question (preserves original context)
+        ↓
+Ranked diagnostic hypotheses
+        ↓
+Evidence + recommended checks
+        ↓
+Safety assessment
+        ↓
+Affected-component 3D visualization
+        ↓
+DIY or professional-service guidance
+        ↓
+Tools, parts, and steps
+        ↓
+Technical resources
+        ↓
+Mechanic-ready summary (copy to clipboard)
 ```
 
-## Tech Stack
+Users do **not** need to understand automotive terminology. The diagnosis is
+symptom-first: "My car makes a grinding noise when braking" is a complete, valid input.
 
-- **FastAPI** - Web framework
-- **SQLAlchemy 2.0** - ORM
-- **PostgreSQL + pgvector** - Vector database
-- **Alembic** - Database migrations
-- **sentence-transformers** - Local embedding model (default: `all-MiniLM-L6-v2`, 384-dim)
-- **Ollama** - Default local LLM (default model: `llama3.1:latest`)
-- **OpenAI** - Optional cloud LLM / embedding provider
-- **pytest** - Testing
-- **React + TypeScript + Vite** - Frontend framework
+---
 
-## Prerequisites
+## Key Features
 
-- Python 3.8+
-- Node.js 16+ and npm
-- PostgreSQL 12+ with pgvector extension
-- Ollama (for local LLM, optional if using OpenAI)
+### Symptom-First Diagnosis
+
+Users describe problems in plain language. Example inputs the system is built to
+handle (these are illustrative, not hardcoded):
+
+- "grinding while braking"
+- "shaking during acceleration"
+- "engine stalls at idle"
+- "pulling to one side"
+- "clicking while turning"
+- "temperature keeps rising"
+
+No DTC scanner, VIN, or mechanical knowledge is required.
+
+### Structured Diagnostic Reasoning
+
+Each diagnosis returns a differential: a ranked list of hypotheses. Every hypothesis
+carries:
+
+- `fault_description`
+- `confidence_score` (0–1)
+- `severity` (low / medium / high / critical)
+- `supporting_evidence`
+- `recommended_checks`
+- `repair_suggestion`
+- `evidence_references`
+- `differential_rank`
+
+Structured output matters because the frontend can render, rank, persist, and reason
+about the result deterministically instead of scraping free text.
+
+### Adaptive Follow-Up Questions
+
+The diagnostic engine supports a multi-turn session. When the available evidence is
+insufficient to safely narrow the causes, the backend can return
+`status: "needs_more_information"` together with a specific, high-value question
+(e.g., "Does the grinding happen every time you brake, or only under hard braking?").
+The original symptom context and prior turns are preserved, so follow-up answers refine
+the same diagnosis rather than starting over. A preliminary differential is returned
+alongside the follow-up whenever the model can produce one.
+
+### Safety-Aware Recommendations
+
+Safety is a first-class output, not frontend decoration. Each hypothesis is assigned a
+repair-safety tier by a deterministic rules module (`services/repair_safety.py`):
+
+| Tier | Meaning |
+|------|---------|
+| `diy_inspection` | Safe to inspect yourself with basic tools |
+| `diy_repair` | DIY repair may be possible for a confident owner |
+| `mechanic_recommended` | Mechanic recommended (specialized tools / safety-critical system) |
+| `immediate_professional` | Seek professional service immediately; do not drive |
+
+The tier is derived from component criticality, system category, severity, and the
+repair action (for example, brakes/steering/airbags and critical severity escalate to
+`immediate_professional`).
+
+### DIY Repair Guidance
+
+When a repair is suitable for DIY, the response includes a `diy_repair` object:
+
+- `suitable`
+- `suitability`
+- `difficulty` (easy / moderate / advanced)
+- `estimated_time`
+- `tools`
+- `parts`
+- `safety_warnings`
+- `preparation_steps`
+- `steps`
+- `verification_steps`
+- `professional_help_conditions`
+
+`diy_repair` — and individual fields such as `difficulty` — may legitimately be `null`
+when the repair is not appropriate for DIY. The UI treats `null` as "not applicable"
+rather than an error.
+
+### Professional Service Recommendations
+
+When a repair is unsuitable or safety-critical, the system recommends professional
+service and explains why, using the backend-provided safety tier, description, and
+professional-help conditions.
+
+### 3D Vehicle Visualization
+
+A Three.js / React Three Fiber viewer (`Vehicle3DViewer`) helps users locate the
+suspected component or system. It supports:
+
+- GLB vehicle models per vehicle type,
+- vehicle-type → model mapping,
+- component highlighting from diagnostic results,
+- selected-component inspection with safety/repair context,
+- camera presets and component camera targeting,
+- fallback rendering when a GLB fails to load or contains no usable meshes,
+- WebGL / model-failure handling behind an error boundary.
+
+The viewer is illustrative; it localizes a suspected area, it does not perform diagnosis.
+
+### Technical Resources
+
+When the backend returns them, the report surfaces external resources:
+
+- web / technical guides,
+- YouTube videos,
+- manufacturer / technical documentation (when provided by the model).
+
+The system renders only real, backend-provided resource URLs and does not fabricate
+links.
+
+### Mechanic-Ready Summary
+
+The report ends with a copy-to-clipboard summary containing the symptom description,
+vehicle context (if provided), likely causes with confidence/severity, recommended
+checks, safety level, DIY/professional guidance, tools, parts, steps, safety warnings,
+and verification — a clean handoff for a workshop visit.
+
+---
+
+## System Architecture
+
+```mermaid
+flowchart TD
+    User[Vehicle owner] --> FE[React Frontend - single page]
+    FE --> API[Diagnostic API hooks / axios]
+    API --> BE[FastAPI Backend]
+    BE --> SVC[DiagnosticService]
+    SVC --> RET[Knowledge Retrieval - hybrid search]
+    RET --> KB[(Postgres + pgvector knowledge_entries)]
+    SVC --> LLM[LLM - Ollama or OpenAI, structured output]
+    SVC --> SAFE[Repair-safety classifier]
+    SVC --> COMP[Component taxonomy mapping]
+    LLM --> SVC
+    SVC --> RESP[Structured DiagnosticAnalyzeResponse]
+    RESP --> FE
+    FE --> REP[Report: hypotheses, safety, 3D, DIY, resources, summary]
+    BE --> DB[(Postgres: sessions, results, checks, cases)]
+```
+
+Every layer above is implemented in the repository:
+
+- **React frontend** issues a diagnostic request and renders the structured response.
+- **FastAPI backend** exposes `/api/diagnostics/analyze` and session-based follow-up.
+- **DiagnosticService** orchestrates retrieval, prompt construction, LLM calls,
+  evidence validation, safety classification, confidence calibration, differential
+  ranking, follow-up decisions, and persistence.
+- **Knowledge retrieval** blends semantic (pgvector) and keyword (PostgreSQL full-text)
+  search.
+- **LLM** is called with a JSON schema so the output is machine-validatable.
+- **Repair-safety classifier** and **component taxonomy** turn hypotheses into safety
+  tiers and 3D component references.
+
+---
+
+## Frontend Architecture
+
+- **React 19 + TypeScript**, bundled by **Vite**, styled with **Tailwind CSS v4**.
+- **3D** via **@react-three/fiber** and **@react-three/drei** (Three.js).
+- **Routing** via `react-router-dom`; the app intentionally exposes only the diagnostic
+  page (`/` and `/diagnose`) and avoids dashboard-style navigation.
+- **API layer**: typed hooks in `hooks/useDiagnostics.ts` (`useAnalyze`,
+  `useAnalyzeInSession`, session/analytics hooks) backed by an `axios` client.
+- **Request lifecycle**: `hooks/useApiRequest.ts` wraps every request with a monotonic
+  request-ID so a slow/stale response cannot overwrite a newer one.
+- **Session state**: follow-up turns are kept client-side and posted back to the same
+  backend session; `hooks/useCachedSession.ts` caches the last session in
+  `localStorage` for offline viewing.
+- **Resilience**: `hooks/useOnlineStatus.ts` blocks submission while offline; the 3D
+  viewer is wrapped in an error boundary with graceful fallback.
+- **Components**: `DiagnosePage` (the single-page workflow), `DiagnosticResults`
+  (`HypothesisCard`, `DIYRepairSection`, resource rendering), `Vehicle3DViewer`,
+  `MinimalHeader`, `Form`, `Alert`, `Badges`.
+
+---
+
+## Backend Architecture
+
+- **FastAPI** application (`app/main.py`) with a versioned router under `/api`.
+- **Pydantic** schemas (`app/schemas.py`) define the request/response contracts,
+  including `DiagnosticAnalyzeRequest`, `DiagnosticAnalyzeResponse`,
+  `DiagnosticHypothesis`, `DIYRepairGuidance`, and `ResourceLink`.
+- **Diagnostic service** (`app/services/diagnostic.py`) contains the reasoning pipeline.
+- **Session management** via SQLAlchemy models (`app/db/models.py`): diagnostic
+  sessions, results, check outcomes, conversation messages, knowledge entries, and
+  confirmed cases.
+- **Knowledge retrieval** in `app/crud.py` (`hybrid_search_knowledge_entries`) and
+  ingestion in `app/services/knowledge_ingestion.py`.
+- **Embeddings** in `app/services/embeddings.py`; **LLM** in `app/services/llm.py`.
+- **Safety** in `app/services/repair_safety.py`; **component mapping** in
+  `app/services/component_taxonomy.py`.
+
+### AI / LLM Architecture
+
+1. The user submits a symptom plus optional vehicle context (vehicle type, year, fuel
+   type, transmission).
+2. The service builds a query embedding and runs **hybrid retrieval** against the
+   knowledge base.
+3. A prompt is constructed with: vehicle context, symptom text, the retrieved evidence
+   catalog, prior session context, conversation history, and any similar confirmed
+   cases.
+4. The LLM is called with a **JSON schema** (`response_format` for OpenAI, `format`
+   for Ollama), so the response conforms to `DiagnosticAnalyzeResponse`.
+5. The backend **validates** the output:
+   - supporting evidence is matched against retrieved entries; unverifiable references
+     are dropped,
+   - hypotheses are mapped to components,
+   - a safety tier is assigned deterministically,
+   - confidence is calibrated modestly based on evidence strength,
+   - hypotheses are ranked into a differential,
+   - a follow-up decision is made when needed.
+6. The structured response is persisted and returned.
+
+Structured outputs are used instead of parsing prose because they make the result
+typable, rankable, persistable, and safe to render — and they keep the frontend honest
+about what the model actually returned.
+
+### LLM Providers
+
+- **Default: Ollama** (`llm_provider=ollama`, `llm_model=llama3.1:latest`).
+- **OpenAI** is supported (`llm_provider=openai` + `OPENAI_API_KEY`) and uses strict
+  JSON-schema structured outputs.
+- Temperature is low (default `0.2`) to keep reasoning consistent.
+
+### Diagnostic Data Model
+
+| Field | Meaning |
+|-------|---------|
+| `status` | `complete` or `needs_more_information` |
+| `follow_up_question` | specific question when more info is needed |
+| `follow_up_reason` | backend reasoning for the follow-up |
+| `hypotheses` | ranked list of `DiagnosticHypothesis` |
+| `fault_description` | what is likely wrong |
+| `confidence_score` | model + evidence calibrated confidence (0–1) |
+| `severity` | low / medium / high / critical |
+| `supporting_evidence` | evidence strings tied to retrieved knowledge |
+| `recommended_checks` | inspections a technician should perform |
+| `repair_suggestion` | suggested repair when supported |
+| `evidence_references` | structured references into retrieved knowledge |
+| `differential_rank` | position in the ranked differential |
+| `diy_repair` | repair guidance, or `null` when not DIY-suitable |
+| `resources` | guides / YouTube videos, or empty |
+| `safety_tier*` | safety classification fields per hypothesis |
+
+---
+
+## Knowledge / Retrieval
+
+The knowledge base is a set of JSON / JSONL automotive entries under `knowledge_base/`
+(covering systems such as engine management, fuel, emissions, exhaust, cooling,
+sensors, and known DTC series like P0300 and P0171). Entries are embedded and stored in
+Postgres with `pgvector`.
+
+`hybrid_search_knowledge_entries` combines:
+
+- **semantic search** — pgvector cosine similarity over entry embeddings (`top_k * 3`
+  candidates),
+- **keyword search** — PostgreSQL full-text (`tsvector` / `ts_rank`) over entry key and
+  content,
+- **DTC bonus** — entries whose `entry_key` matches a DTC extracted from the query get
+  a relevance boost,
+- **component-match bonus** — entries mapped to the requested components are boosted,
+
+then reranks by a combined score, deterministically dedupes near-identical content, and
+returns the top `k` entries. Retrieved evidence is what the LLM is instructed to reason
+from; the backend re-validates the model's citations against it.
+
+> Coverage depends on what has been ingested. Brake-specific knowledge is currently
+> limited in the bundled base, which is reflected honestly in confidence when a
+> symptom maps to an under-covered area.
+
+---
+
+## Safety Model
+
+Safety is computed by `determine_repair_safety_tier` using a fixed priority order:
+
+1. High-risk safety component (e.g., brake caliper, steering rack, airbag) →
+   `immediate_professional`.
+2. Safety-critical system (brakes, steering, airbags, structural) →
+   `immediate_professional`.
+3. Critical severity → `immediate_professional`.
+4. Safety-related system (fuel, emissions, cooling under pressure, etc.) with high
+   severity → `immediate_professional`; otherwise `mechanic_recommended`.
+5. High severity → `mechanic_recommended`.
+6. Repair requiring major disassembly / specialized procedure → `mechanic_recommended`.
+7. Medium severity → `diy_repair`.
+8. Low / unknown severity → `diy_inspection`.
+
+The tier, label, description, and reasoning are returned with each hypothesis and
+rendered in the UI. The system advises, but cannot guarantee, that a given repair is
+safe for a particular vehicle or owner.
+
+---
+
+## 3D System
+
+- **Assets**: GLB models in `frontend/public/models/` — `hatchback.glb`, `sedan.glb`,
+  `sedan_detailed.glb`, `suv.glb`, `pickup.glb`, `van.glb`.
+- **Mapping**: `frontend/src/config/vehicleTypes.ts` maps the five supported vehicle
+  types to models; `frontend/src/config/glbMeshMapping.ts` maps vehicle regions to GLB
+  node names for highlighting.
+- **Viewer**: `Vehicle3DViewer` renders the model, highlights components referenced by
+  the diagnosis, supports selecting a component (with camera focus), exposes camera
+  presets, and falls back to a non-3D component list when WebGL is unavailable, the GLB
+  fails to load, or the model has no usable meshes.
+- **Integration**: the diagnostic report passes `highlightedComponents` (component id,
+  system category, vehicle region, safety tier) into the viewer; selecting a component
+  scrolls the report to the matching hypothesis.
+
+The viewer is illustrative and should not be read as an exact physical representation
+of every vehicle configuration.
+
+---
+
+## Engineering / Reliability
+
+### Request Race Protection
+
+`hooks/useApiRequest.ts` assigns every request a monotonic request ID. When multiple
+diagnoses are submitted in quick succession (or a slow network reorders responses),
+only the newest response is applied; a stale earlier response is discarded. This
+prevents a slow first request from overwriting a faster, newer one.
+
+### Empty Input Validation
+
+Both frontend and backend reject empty or whitespace-only symptom text. The backend
+`DiagnosticAnalyzeRequest.symptom_text` requires `min_length=1`, and the frontend blocks
+submission and shows an inline error before any network call.
+
+### Structured Output Validation
+
+The OpenAI response schema is mirrored by Pydantic models (`app/schemas.py`) and
+TypeScript types (`frontend/src/types/api.ts`). The schema explicitly permits
+`diy_repair: null` and `difficulty: null`, so non-DIY results are valid, not errors.
+The backend also re-validates evidence references against retrieved knowledge and drops
+hallucinated citations.
+
+### 3D Error Handling
+
+The viewer is wrapped in a React error boundary and guards the OrbitControls lifecycle
+(`controls.target` is only accessed after controls are registered). GLB load failure,
+missing WebGL, or empty models degrade to a fallback component list rather than crashing
+the report. Raw implementation stack traces are never shown to users.
+
+---
+
+## Testing
+
+### Frontend
+
+- Runner: **Vitest** (`npm run test:run`).
+- Command: `cd frontend && npm run test:run`
+- Coverage (verified in this environment): **36 tests across 3 files**
+  - `test/app.test.tsx` — component/hook smoke tests (3D viewer, vehicle config,
+    offline submission blocking, cached-session rendering).
+  - `test/diagnosticQuality.test.tsx` — report richness: recommended checks, tools,
+    parts, prep/steps/verification, safety warnings, professional-help conditions,
+    resources (including YouTube "Watch Guide"), missing-resource hiding, `diy_repair:
+    null` and `difficulty: null` safety, multiple-hypothesis rendering, detailed
+    mechanic summary, empty/whitespace input rejection.
+  - `test/useApiRequest.test.ts` — request-ID race protection for rapid submissions.
+- Type checking / build: `npm run build` (`tsc -b && vite build`).
+- Lint: `npm run lint` (oxlint).
+
+### Backend
+
+- Runner: **pytest** (`pytest tests/...`).
+- Tests live in `backend/tests/`: `test_diagnostics.py`, `test_llm.py`,
+  `test_diagnostic_quality.py`, `test_component_taxonomy.py`, `test_repair_safety.py`,
+  `test_knowledge.py`, `test_knowledge_ingestion.py`, `test_evidence_validation.py`,
+  `test_evaluation.py`, `test_production.py`, and `conftest.py`.
+- **A full run requires a PostgreSQL database with the `pgvector` extension** (the
+  session/result/case tests create and query real tables). In this environment a
+  Postgres instance was not available, so the DB-backed suite was not executed end to
+  end.
+- Logic-level tests that do **not** require a live database were executed and pass:
+  prompt-construction assertions (multiple-hypothesis and conservative follow-up
+  instructions), hypothesis parsing + differential ranking, the follow-up decision
+  (weak evidence must not force a follow-up; no hypotheses does), and `null`
+  `diy_repair` / `difficulty` parsing. These validate the core reasoning pipeline
+  without external infrastructure.
+
+---
 
 ## Project Structure
 
@@ -52,423 +472,197 @@ The engine accepts vehicle symptoms and optional diagnostic trouble codes (DTCs)
 automotive-diagnostic-ai/
 ├── backend/
 │   ├── app/
-│   │   ├── api/v1/           # API routers
-│   │   ├── config.py         # Pydantic settings
-│   │   ├── db/               # SQLAlchemy models, session, migrations
-│   │   ├── schemas.py        # Pydantic request/response schemas
-│   │   └── services/         # Embedding, LLM, diagnostic services
-│   ├── tests/                # pytest suite
-│   ├── alembic/              # Alembic migrations
-│   ├── .env                  # Local environment variables
-│   └── requirements.txt
+│   │   ├── main.py                 # FastAPI app, CORS, health/ready, error handlers
+│   │   ├── config.py              # Settings (env-driven)
+│   │   ├── schemas.py             # Pydantic request/response models
+│   │   ├── crud.py                # DB access + hybrid knowledge search
+│   │   ├── api/v1/                # REST routers (diagnostics, knowledge, components)
+│   │   ├── db/                     # SQLAlchemy models + session
+│   │   └── services/
+│   │       ├── diagnostic.py       # Diagnostic reasoning pipeline
+│   │       ├── diagnostic_analytics.py
+│   │       ├── embeddings.py       # Embedding providers
+│   │       ├── llm.py              # LLM providers + structured output
+│   │       ├── knowledge_ingestion.py / knowledge_loader.py
+│   │       ├── repair_safety.py    # Safety-tier classifier
+│   │       └── component_taxonomy.py # Fault/component mapping
+│   └── tests/                     # pytest suites
 ├── frontend/
-│   ├── src/                  # Frontend source code
-│   ├── public/               # Static assets
-│   ├── .env                  # Frontend environment variables
-│   ├── package.json          # npm dependencies
-│   └── vite.config.ts        # Vite configuration
-├── .env.example
+│   ├── src/
+│   │   ├── pages/DiagnosePage.tsx  # Single-page diagnostic workflow
+│   │   ├── components/             # Report, 3D viewer, header, form, etc.
+│   │   ├── hooks/                  # useDiagnostics, useApiRequest, useCachedSession, ...
+│   │   ├── config/                 # vehicleTypes.ts, glbMeshMapping.ts
+│   │   ├── types/api.ts            # Frontend diagnostic types
+│   │   ├── api/                    # axios client
+│   │   └── test/                   # Vitest suites
+│   └── public/models/              # GLB vehicle models
+├── knowledge_base/                 # Automotive JSON/JSONL knowledge entries
+├── pgvector/                       # Vendored PostgreSQL vector extension
+├── ml/  3d/  docs/  infrastructure/ # Auxiliary / experiment directories
+├── requirements.txt                # Python dependencies
+├── .env.example                    # Environment variable template
 └── README.md
 ```
 
-## Environment Variables
+---
 
-Copy `.env.example` to `backend/.env` and adjust for your environment.
+## Technology Stack
 
-### Database
+| Layer | Technology | Purpose |
+|-------|------------|---------|
+| Frontend | React 19 | UI |
+| Language | TypeScript | Type safety across the diagnostic model |
+| Build | Vite | Frontend dev server / production build |
+| Styling | Tailwind CSS v4 | Utility-first styling |
+| 3D | Three.js / React Three Fiber / Drei | Vehicle visualization |
+| Routing | React Router | Single-page navigation |
+| HTTP | axios | API client |
+| Backend | FastAPI | REST API |
+| Validation | Pydantic | Typed diagnostic schemas |
+| AI | Ollama (default) or OpenAI | Diagnostic reasoning (structured output) |
+| Embeddings | sentence-transformers (default) or OpenAI | Text embeddings |
+| Database | PostgreSQL + pgvector | Persistence + semantic search |
+| Retrieval | SQLAlchemy + pgvector + PostgreSQL FTS | Hybrid knowledge retrieval |
+| Tests (FE) | Vitest | Frontend unit/component tests |
+| Tests (BE) | pytest | Backend tests |
 
-| Variable | Default | Description |
-|----------|---------|-------------|
-| `POSTGRES_USER` | `postgres` | PostgreSQL username |
-| `POSTGRES_PASSWORD` | `postgres` | PostgreSQL password |
-| `POSTGRES_SERVER` | `localhost` | PostgreSQL host |
-| `POSTGRES_PORT` | `5432` | PostgreSQL port |
-| `POSTGRES_DB` | `automotive_diagnostic` | Database name |
-| `DATABASE_URL` | auto-built | Optional full SQLAlchemy URL |
+---
 
-### Embedding
+## Local Development
 
-| Variable | Default | Description |
-|----------|---------|-------------|
-| `EMBEDDING_PROVIDER` | `sentence-transformers` | `sentence-transformers` or `openai` |
-| `EMBEDDING_MODEL` | `sentence-transformers/all-MiniLM-L6-v2` | Local model name |
-| `EMBEDDING_DIMENSIONS` | `384` | Vector dimension |
-| `OPENAI_EMBEDDING_MODEL` | `text-embedding-3-small` | OpenAI embedding model |
+### Prerequisites
 
-### LLM
+- Node.js 18+ and npm.
+- Python 3.10+.
+- A PostgreSQL database with the **pgvector** extension.
+- (Optional) Ollama running locally, or an OpenAI API key.
 
-| Variable | Default | Description |
-|----------|---------|-------------|
-| `LLM_PROVIDER` | `ollama` | `ollama` or `openai` |
-| `LLM_MODEL` | `llama3.1:latest` | Model tag/name |
-| `LLM_BASE_URL` | `http://localhost:11434` | Ollama base URL |
-| `LLM_TEMPERATURE` | `0.2` | Sampling temperature |
-| `LLM_MAX_TOKENS` | `2048` | Max response tokens |
-| `OPENAI_API_KEY` | | Required when using OpenAI |
-
-### Frontend
-
-| Variable | Default | Description |
-|----------|---------|-------------|
-| `VITE_API_BASE_URL` | `http://localhost:8000` | Backend API URL |
-
-## Setup
-
-### 1. Install Python dependencies
+### Backend
 
 ```bash
 cd backend
-python -m venv .venv
-source .venv/bin/activate  # Windows: .venv\Scripts\activate
+python -m venv .venv && source .venv/bin/activate   # or your environment manager
 pip install -r requirements.txt
+
+cp ../.env.example .env                              # adjust values
+# Set OPENAI_API_KEY if using LLM_PROVIDER=openai / EMBEDDING_PROVIDER=openai
+
+# Ensure the database exists and has pgvector enabled, then run migrations if applicable
+uvicorn app.main:app --reload --port 8000
 ```
 
-### 2. Install Node.js dependencies
+The API will be available at `http://localhost:8000` (`/docs` for OpenAPI).
+
+### Frontend
 
 ```bash
 cd frontend
 npm install
+npm run dev          # Vite dev server on http://localhost:3000
 ```
 
-### 3. Start PostgreSQL with pgvector
+`CORS_ORIGINS` in the backend defaults to `http://localhost:3000`.
 
-Ensure PostgreSQL is running and the `vector` extension is available in the target database.
-
-To install pgvector extension:
-```bash
-# For Ubuntu/Debian
-sudo apt-get install postgresql-postgis-12  # Version may vary
-
-# For macOS with Homebrew
-brew install postgis
-
-# Then enable the extension in your database:
-psql -U postgres -d automotive_diagnostic -c "CREATE EXTENSION IF NOT EXISTS vector;"
-```
-
-### 4. Run migrations
+### Tests and checks
 
 ```bash
-cd backend
-alembic upgrade head
-```
-
-### 5. Start Ollama (default LLM)
-
-```bash
-ollama run llama3.1:latest
-```
-
-### 6. Start the backend
-
-```bash
-cd backend
-uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
-```
-
-The API will be available at `http://localhost:8000`.
-
-### 7. Start the frontend
-
-```bash
+# Frontend
 cd frontend
-npm run dev
-```
+npm run test:run     # Vitest
+npm run build        # tsc -b && vite build
+npm run lint         # oxlint
 
-The frontend will be available at `http://localhost:5173`.
-
-## API Usage
-
-### Analyze symptoms
-
-```bash
-curl -X POST http://localhost:8000/api/v1/diagnostics/analyze \
-  -H "Content-Type: application/json" \
-  -d '{
-    "vin": "1HGCM82633A123456",
-    "make": "Toyota",
-    "model": "Camry",
-    "year": 2020,
-    "symptom_text": "Engine hesitates during acceleration and idles roughly",
-    "dtc_codes": ["P0300", "P0171"]
-  }'
-```
-
-### Response
-
-```json
-{
-  "session_id": "uuid",
-  "vehicle": {
-    "vin": "1HGCM82633A123456",
-    "make": "Toyota",
-    "model": "Camry",
-    "year": 2020
-  },
-  "query": "Engine hesitates during acceleration and idles roughly DTC codes: P0300,P0171",
-  "evidence": [
-    {
-      "id": "uuid",
-      "category": "symptom",
-      "entry_key": "rough_idle",
-      "content": "Rough idle can be caused by vacuum leaks...",
-      "source": "automotive-diagnostics-v1",
-      "similarity_score": 0.72
-    }
-  ],
-  "hypotheses": [
-    {
-      "fault_description": "Vacuum leak causing lean condition and rough idle",
-      "confidence_score": 0.85,
-      "severity": "high",
-      "supporting_evidence": [
-        "[symptom] rough_idle"
-      ],
-      "recommended_checks": [
-        "Smoke test intake manifold and vacuum lines",
-        "Inspect MAF sensor readings"
-      ],
-      "repair_suggestion": "Replace cracked vacuum hose and verify fuel trims"
-    }
-  ]
-}
-```
-
-## Knowledge management
-
-Knowledge documents can be loaded into the vector store via the seed scripts or API. The diagnostic pipeline retrieves the top-k most similar chunks using cosine distance and includes them as evidence in the LLM prompt.
-
-### Seed knowledge from files
-
-Place JSON arrays or JSON Lines (`.jsonl`) files under `knowledge_base/` and run:
-
-```bash
+# Backend (requires Postgres + pgvector)
 cd backend
-PYTHONPATH=. .venv/Scripts/python scripts/seed_knowledge.py
+pytest tests/test_diagnostics.py tests/test_llm.py tests/test_diagnostic_quality.py -q
 ```
 
-Use `--reset` to truncate existing entries before reseeding, or `--path <dir>` to load from a different directory.
+---
 
-### Bulk upload via API
+## Environment Variables
 
-```bash
-curl -X POST http://localhost:8000/api/v1/knowledge/bulk \
-  -H "Content-Type: application/json" \
-  -d '{
-    "entries": [
-      {
-        "category": "symptom",
-        "entry_key": "rough_idle",
-        "content": "Rough idle can be caused by vacuum leaks...",
-        "source": "service-manual"
-      }
-    ]
-  }'
-```
+Copy `.env.example` to `.env` and adjust. Key variables:
 
-Duplicate `(category, entry_key)` pairs are skipped by default.
+| Variable | Purpose |
+|----------|---------|
+| `DEBUG` | Verbose errors / stack traces (set `false` in production) |
+| `DATABASE_URL` | Full Postgres URL (overrides the `POSTGRES_*` fields) |
+| `POSTGRES_USER` / `POSTGRES_PASSWORD` / `POSTGRES_SERVER` / `POSTGRES_PORT` / `POSTGRES_DB` | Postgres connection |
+| `CORS_ORIGINS` | Comma-separated allowed frontend origins |
+| `EMBEDDING_PROVIDER` | `sentence-transformers` (default) or `openai` |
+| `EMBEDDING_MODEL` | Local embedding model (default `sentence-transformers/all-MiniLM-L6-v2`) |
+| `OPENAI_EMBEDDING_MODEL` | OpenAI embedding model when used |
+| `LLM_PROVIDER` | `ollama` (default) or `openai` |
+| `LLM_MODEL` | Model name (default `llama3.1:latest`) |
+| `LLM_BASE_URL` | LLM base URL (default `http://localhost:11434`) |
+| `LLM_TEMPERATURE` | Sampling temperature (default `0.2`) |
+| `OPENAI_API_KEY` | Required only when `LLM_PROVIDER=openai` or `EMBEDDING_PROVIDER=openai` |
 
-## Testing
+Never commit a real `OPENAI_API_KEY`; use `your_key_here` in examples.
 
-### Backend tests
+---
 
-```bash
-cd backend
-pytest -q
-```
+## Deployment
 
-The test suite uses:
-- `FakeEmbeddingService` to avoid loading the transformer model
-- `FakeLLMService` to avoid network calls
-- A separate test database engine to prevent connection pool contention
+The repository does not ship a preconfigured CI/deployment file. The two deployable
+units are:
 
-### Frontend tests
+- **Frontend**: a static Vite build (`npm run build` → `dist/`), deployable to any
+  static host (for example Vercel). GLB models are served from `public/models/`.
+- **Backend**: a FastAPI/uvicorn service that requires PostgreSQL with `pgvector`
+  enabled and network access to the configured LLM/embedding provider.
 
-```bash
-cd frontend
-npm test -- --run
-```
+Point the frontend at the backend via `CORS_ORIGINS` and the API base URL.
 
-### TypeScript checking
+---
 
-```bash
-cd frontend
-npx tsc --noEmit
-```
+## Limitations
 
-### Frontend build
+- AI diagnosis is **probabilistic** and a decision-support aid, not a substitute for
+  professional mechanical inspection.
+- Vehicle-specific detail is limited when the user provides only symptoms; filling in
+  optional vehicle context (type/year/fuel/transmission) improves relevance but is not
+  required.
+- Diagnostic confidence reflects the symptom pattern and retrieved evidence; areas with
+  thin knowledge-base coverage (for example, some brake-specific topics) yield lower,
+  honestly calibrated confidence.
+- The 3D viewer is illustrative and may not match every vehicle configuration.
+- External resources depend entirely on what the backend retrieves; none are fabricated.
+- Some repairs require professional tools, lifts, or calibrated equipment.
 
-```bash
-cd frontend
-npm run build
-```
+---
 
-## Production Deployment
+## Security / Privacy
 
-### Selected $0 stack (verified 2026)
+The diagnostic workflow is **symptom-first**. The UI does not require:
 
-| Component | Provider | Free tier limits |
-|-----------|----------|------------------|
-| Frontend | Vercel | Unlimited static hosting, HTTPS, preview deploys |
-| Backend | Render | 750 web-service hrs/mo, 512 MB RAM, spins down after 15 min idle |
-| Database | Neon | 0.5 GB storage, pgvector supported, no expiration, no credit card |
-| LLM | Groq | 30 RPM, 1,000 RPD, OpenAI-compatible API, no credit card |
+- name, email, phone, or address,
+- location,
+- VIN, license plate, or registration,
+- insurance information,
+- DTC / OBD codes (these remain usable internally in the backend knowledge base and
+  diagnostic system when provided, but are not part of the primary user workflow).
 
-**Why this stack:**
-- **Vercel**: Zero-config React/Vite hosting with global CDN and free HTTPS.
-- **Render**: Simplest Git-based backend deploy; Docker not required. Cold starts (~30-60s) are the main limitation.
-- **Neon**: Serverless Postgres with pgvector on every plan. Free tier has no time limit and no credit-card requirement. 0.5 GB is sufficient for knowledge entries and diagnostic sessions.
-- **Groq**: OpenAI-compatible inference with generous free rate limits. No credit card required. Fast LPU-backed inference.
+Diagnostic sessions are persisted server-side (symptom text plus optional vehicle
+context such as vehicle type, year, and any VIN/make/model the user chooses to supply).
+No personal information is required to receive a diagnosis.
 
-### Prerequisites
+---
 
-Accounts on:
-- [Vercel](https://vercel.com) (GitHub/GitLab/Bitbucket login)
-- [Render](https://render.com) (GitHub login)
-- [Neon](https://neon.tech) (email or GitHub login)
-- [Groq](https://console.groq.com) (email or Google login)
+## Roadmap
 
-### 1. Database (Neon)
+Future work (not yet implemented):
 
-1. Create a Neon project.
-2. Create a database (default name is fine).
-3. Enable pgvector:
-   ```sql
-   CREATE EXTENSION IF NOT EXISTS vector;
-   ```
-4. Copy the **connection string** (pooled or unpooled). It looks like:
-   ```
-   postgresql://user:password@ep-xyz.region.aws.neon.tech/dbname?sslmode=require
-   ```
+- Richer vehicle-specific and component-level knowledge coverage.
+- More granular 3D component mapping and camera presets.
+- Expanded evaluation of diagnostic accuracy against confirmed cases.
+- Performance optimization for retrieval and prompt construction.
+- Optional authenticated history sync.
 
-### 2. Backend (Render)
+---
 
-1. Push this repo to GitHub.
-2. In Render, create a new **Web Service** from your repo.
-3. **Runtime**: Docker (uses the included `Dockerfile`).
-   - If you prefer manual configuration instead of Docker:
-     - **Environment**: Python 3
-     - **Build Command**: `pip install -r requirements.txt`
-     - **Start Command**: `gunicorn app.main:app --workers 2 --worker-class uvicorn.workers.UvicornWorker --bind 0.0.0.0:$PORT`
-4. Add environment variables (see below).
-5. Deploy. Render gives you a URL like `https://your-app.onrender.com`.
+## License
 
-### 3. Frontend (Vercel)
-
-1. Import the `frontend/` directory (or the whole repo with root set to `frontend/`) into Vercel.
-2. Add environment variable `VITE_API_BASE_URL` pointing to your Render backend URL (e.g., `https://your-app.onrender.com`).
-3. Deploy. Vercel gives you a URL like `https://your-app.vercel.app`.
-
-### 4. Environment variables
-
-**Backend (`backend/.env` on Render → Environment tab):**
-
-```env
-APP_ENV=production
-DEBUG=false
-
-# Neon database connection string
-DATABASE_URL=postgresql://user:password@ep-xyz.region.aws.neon.tech/dbname?sslmode=require
-
-# CORS: add your Vercel frontend domain
-CORS_ORIGINS=https://your-app.vercel.app
-
-# Use Groq as a free LLM provider (OpenAI-compatible)
-LLM_PROVIDER=openai
-LLM_BASE_URL=https://api.groq.com/openai/v1
-LLM_MODEL=llama-3.1-8b-instant
-OPENAI_API_KEY=<your-groq-api-key>
-
-# Embeddings (local sentence-transformers works on Render free tier)
-EMBEDDING_PROVIDER=sentence-transformers
-EMBEDDING_MODEL=sentence-transformers/all-MiniLM-L6-v2
-EMBEDDING_DIMENSIONS=384
-```
-
-**Frontend (`frontend/.env` on Vercel → Settings → Environment Variables):**
-
-```env
-VITE_API_BASE_URL=https://your-app.onrender.com
-```
-
-### 5. Database migrations
-
-After the first deploy, run migrations against the Neon database:
-
-```bash
-# From your local machine with the Neon connection string:
-cd backend
-set DATABASE_URL=postgresql://user:password@ep-xyz.region.aws.neon.tech/dbname?sslmode=require
-alembic upgrade head
-```
-
-Or connect to Neon's SQL Editor and run:
-```sql
-CREATE EXTENSION IF NOT EXISTS vector;
-```
-
-### 6. Verify deployment
-
-```bash
-# Backend health
-curl https://your-app.onrender.com/health
-
-# Backend readiness (checks DB connection)
-curl https://your-app.onrender.com/ready
-
-# Frontend should load at
-# https://your-app.vercel.app
-```
-
-### Free-tier limitations to expect
-
-- **Render cold starts**: The free web service sleeps after 15 minutes of inactivity. The first request after sleep takes 30-60 seconds. Use a free uptime monitor (e.g., UptimeRobot) to ping `/health` every 10 minutes if you want to keep it warm. This does not prevent deployment, but public users will feel the cold start.
-- **Neon auto-suspend**: Neon free compute suspends after a period of inactivity. The first request after suspend may take a few seconds.
-- **Groq rate limits**: Free tier is 30 requests per minute and 1,000 requests per day per model. This is enough for a demo or low-traffic public launch. If you exceed limits, requests will return HTTP 429.
-- **Bandwidth**: Render free tier includes 100 GB/month. Vercel free tier has generous bandwidth for static sites.
-- **No persistent storage on Render**: Do not write files to the local filesystem. All data must go to the database.
-
-### Cost if you outgrow free tiers
-
-| Component | Cheapest paid upgrade | Approximate cost |
-|-----------|----------------------|------------------|
-| Render web service | Starter (always-on) | ~$7/mo |
-| Neon | Launch plan | ~$15/mo |
-| Groq | Developer tier | Pay-per-token (~$0.59-0.79/M tokens) |
-| Vercel | Pro | $20/mo |
-
-Most apps stay within free tiers indefinitely for low traffic.
-
-## Evaluation harness
-
-To run the full diagnostic evaluation suite:
-
-```bash
-cd backend
-python -m evaluation
-```
-
-This runs the system against 25 benchmark cases using a deterministic mock LLM provider for consistent results.
-
-The evaluation report is available at:
-`backend/evaluation/EVALUATION_REPORT.md`
-
-## Provider Switching
-
-To use OpenAI instead of Ollama:
-
-```bash
-export LLM_PROVIDER=openai
-export OPENAI_API_KEY=sk-...
-export LLM_MODEL=gpt-4o-mini
-```
-
-To use OpenAI embeddings:
-
-```bash
-export EMBEDDING_PROVIDER=openai
-export OPENAI_API_KEY=sk-...
-export EMBEDDING_DIMENSIONS=1536
-```
-
-No application code changes are required when switching providers.
+See repository sources for individual component licenses (for example, the 3D models
+in `frontend/public/models` carry their own attribution).
