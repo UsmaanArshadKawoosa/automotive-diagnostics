@@ -117,9 +117,8 @@ def fake_llm_service() -> FakeLLMService:
 
 
 @pytest.fixture
-def client(fake_embedding_service, fake_llm_service) -> Generator[TestClient, None, None]:
-    test_engine = create_engine(settings.sqlalchemy_database_url, pool_pre_ping=True)
-    TestingSessionLocal = sessionmaker(bind=test_engine, autoflush=False, autocommit=False)
+def client(engine, fake_embedding_service, fake_llm_service) -> Generator[TestClient, None, None]:
+    TestingSessionLocal = sessionmaker(bind=engine, autoflush=False, autocommit=False)
 
     def override_get_db():
         session = TestingSessionLocal()
@@ -134,4 +133,3 @@ def client(fake_embedding_service, fake_llm_service) -> Generator[TestClient, No
     with TestClient(app) as c:
         yield c
     app.dependency_overrides.clear()
-    test_engine.dispose()

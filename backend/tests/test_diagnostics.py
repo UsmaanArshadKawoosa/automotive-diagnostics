@@ -1635,3 +1635,19 @@ class TestConfirmedCaseMemorySystem:
         assert case.is_verified is True
         assert case.embedding is None
         assert case.confirmed_fault == "Faulty spark plugs"
+
+
+class TestP0301Regression:
+    def test_p0301_returns_non_empty_hypotheses(self, client: TestClient, clean_diagnostic_tables):
+        payload = {
+            "make": "Honda",
+            "model": "Civic",
+            "year": 2018,
+            "dtc_codes": ["P0301"],
+            "symptom_text": "Check Engine Light is on, rough idle, occasional hesitation during acceleration, decreased fuel economy.",
+        }
+        response = client.post("/api/v1/diagnostics/analyze", json=payload)
+        assert response.status_code == 201
+        data = response.json()
+        assert len(data["hypotheses"]) >= 1
+        assert len(data["evidence"]) >= 1
