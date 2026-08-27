@@ -29,7 +29,7 @@ export type EvidenceQuality = 'strong' | 'moderate' | 'weak' | 'insufficient';
 export interface DIYRepairGuidance {
   suitable: boolean;
   suitability: string;
-  difficulty?: 'easy' | 'moderate' | 'advanced';
+  difficulty?: 'easy' | 'moderate' | 'advanced' | null;
   estimated_time?: string | null;
   tools: string[];
   parts: string[];

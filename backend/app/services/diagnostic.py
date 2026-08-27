@@ -308,10 +308,11 @@ Instructions:
 - Severity must be one of: low, medium, high, critical.
 - Provide concrete recommended checks a technician should perform.
 - Provide a repair suggestion only when the evidence reasonably supports it.
-- If more information is needed from the user to narrow down the diagnosis, set "needs_more_information" to true and provide a specific follow-up question with reasoning.
+- Only set "needs_more_information" to true when the missing information would MATERIALLY change the diagnosis or the recommended action. Do not ask for more details merely because vehicle specifics (VIN, exact year, DTC codes, make/model) are absent. Always return a useful preliminary differential even when you also ask a follow-up question. The follow-up question, if any, must be specific and high-value (for example, "Does the grinding happen every time you brake, or only under hard braking?", "Does the noise come from the front, rear, or are you unsure?"), never a vague request for "more information".
 - The follow-up question should be specific and actionable for a vehicle owner.
 - For each hypothesis, reference supporting evidence by evidence_id from the catalog above.
-- If multiple plausible causes exist, return them as a differential diagnosis ranked by likelihood.
+- Return a ranked differential diagnosis. When the symptom supports more than one plausible cause, provide 3 to 5 distinct hypotheses ordered by likelihood. If only 1 or 2 causes are genuinely supported by the reasoning and retrieved evidence, return those. Never invent hypotheses merely to reach a number; each hypothesis must be clinically plausible and distinct.
+- Set confidence_score to reflect how strongly the symptom pattern and retrieved evidence support the fault. A characteristic symptom pattern may justify moderate-to-high confidence (for example, grinding during braking strongly suggests worn brake components); do not default to very low confidence simply because vehicle-specific details are missing.
 - If evidence conflicts between hypotheses, note this and prefer asking a follow-up question.
 - For each hypothesis, evaluate whether the repair is suitable for DIY. Consider safety, complexity, tools required, and vehicle type.
 - Only mark a repair as DIY-suitable when it is genuinely safe and feasible for an experienced vehicle owner with basic tools.
@@ -712,13 +713,10 @@ Return a single JSON object with this schema:
         if not hypotheses:
             return True, "Could you describe the symptoms in more detail?", "No hypotheses generated"
 
-        # Check if top hypothesis has insufficient evidence
-        top_hypothesis = hypotheses[0]
-        if top_hypothesis.evidence_quality in ("weak", "insufficient"):
-            return True, (
-                "Could you provide more details about when the symptom occurs "
-                "(e.g., only during acceleration, at idle, when cold)?"
-            ), "Top hypothesis has weak or insufficient evidence"
+        # Note: weak or insufficient evidence alone is NOT a reason to block a
+        # useful preliminary diagnosis. A clear symptom pattern can still yield a
+        # valuable first-pass differential, so we only force a follow-up when the
+        # missing information would materially change the assessment.
 
         # Check for conflicting evidence between top hypotheses
         if len(hypotheses) >= 2:

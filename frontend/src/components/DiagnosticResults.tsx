@@ -400,18 +400,23 @@ export const HypothesisCard = forwardRef<HTMLDivElement, HypothesisCardProps>(({
 
       {hypothesis.resources && hypothesis.resources.length > 0 && (
         <div className="mt-4">
-          <h5 className="text-xs font-semibold uppercase tracking-wider text-slate-500 mb-2">Helpful Guides</h5>
-          <div className="space-y-2">
+          <h5 className="text-xs font-semibold uppercase tracking-wider text-slate-500 mb-2">Helpful Resources</h5>
+          <div className="space-y-3">
             {hypothesis.resources.map((resource, idx) => (
               <a
                 key={idx}
                 href={resource.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center gap-2 text-sm text-brand-600 hover:text-brand-700 underline"
+                className="block text-sm text-brand-600 hover:text-brand-700"
               >
                 <span className="font-medium">{resource.title}</span>
-                <span className="text-xs text-slate-500">({resource.source})</span>
+                {resource.type === 'youtube' ? (
+                  <span className="ml-1 font-medium">— Watch Guide →</span>
+                ) : (
+                  <span className="ml-1 font-medium">— View Guide →</span>
+                )}
+                <span className="block text-xs text-slate-500">{resource.source}</span>
               </a>
             ))}
           </div>

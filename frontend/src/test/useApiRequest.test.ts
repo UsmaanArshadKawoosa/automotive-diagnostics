@@ -51,4 +51,29 @@ describe('useApiRequest', () => {
     expect(state.loading).toBe(false);
     expect(state.error).toBe(null);
   });
+
+  it('ignores stale responses from earlier rapid submissions', async () => {
+    let order = 0;
+    const fn = vi.fn().mockImplementation(
+      () =>
+        new Promise<string>((resolve) => {
+          const id = ++order;
+          // First request resolves slower than the second (simulating out-of-order network).
+          setTimeout(() => resolve(`result-${id}`), id === 1 ? 50 : 10);
+        })
+    );
+    const { result } = renderHook(() => useApiRequest<string, []>(fn));
+
+    await act(async () => {
+      void result.current[0]();
+    });
+    await act(async () => {
+      void result.current[0]();
+    });
+
+    await new Promise((r) => setTimeout(r, 90));
+
+    // Only the newest response must be applied; the stale earlier one is dropped.
+    expect(result.current[1].data).toBe('result-2');
+  });
 });

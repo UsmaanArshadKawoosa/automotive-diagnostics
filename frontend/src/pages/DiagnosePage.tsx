@@ -757,7 +757,7 @@ export function DiagnosePage() {
   );
 }
 
-function MechanicSummary({
+export function MechanicSummary({
   vehicleContext,
   symptomText,
   hypotheses,
@@ -770,31 +770,91 @@ function MechanicSummary({
 
   const summaryText = useMemo(() => {
     const lines: string[] = [];
-    lines.push('AUTOMOTIVE DIAGNOSTIC SUMMARY');
-    lines.push('');
-    if (vehicleContext) lines.push(`Vehicle: ${vehicleContext}`);
-    lines.push(`Reported symptoms: ${symptomText}`);
-    lines.push('');
-    lines.push('LIKELY CAUSES');
+    const push = (s = '') => lines.push(s);
+
+    push('AUTOMOTIVE DIAGNOSTIC SUMMARY');
+    push();
+    if (vehicleContext) push(`Vehicle: ${vehicleContext}`);
+    push(`Reported symptoms: ${symptomText}`);
+    push();
+
+    const top = hypotheses[0];
+    if (top) {
+      push('DIAGNOSTIC ASSESSMENT');
+      push(`Most likely: ${top.fault_description}`);
+      push(`Confidence: ${Math.round(top.confidence_score * 100)}%   Severity: ${top.severity || 'unknown'}`);
+      if (top.repair_suggestion) push(`Summary: ${top.repair_suggestion}`);
+      push();
+    }
+
+    push('LIKELY CAUSES');
     hypotheses.forEach((h, idx) => {
-      const conf = Math.round(h.confidence_score * 100);
-      lines.push(
-        `${idx + 1}. ${h.fault_description} (confidence: ${conf}%, severity: ${h.severity || 'unknown'})`
-      );
-      if (h.recommended_checks?.length) {
-        lines.push(`   Recommended checks: ${h.recommended_checks.join('; ')}`);
+      push(`${idx + 1}. ${h.fault_description}`);
+      push(`   Confidence: ${Math.round(h.confidence_score * 100)}%   Severity: ${h.severity || 'unknown'}`);
+      if (h.supporting_evidence?.length) {
+        push('   Supporting evidence:');
+        h.supporting_evidence.forEach((e) => push(`     - ${e}`));
       }
-      if (h.safety_tier_label) {
-        lines.push(`   Safety: ${h.safety_tier_label}`);
+      if (h.recommended_checks?.length) {
+        push('   Recommended checks:');
+        h.recommended_checks.forEach((c) => push(`     - ${c}`));
       }
     });
-    lines.push('');
-    lines.push('SAFETY LEVEL');
+    push();
+
     const worst = hypotheses
       .map((h) => h.safety_tier)
       .filter((t): t is RepairSafetyTier => !!t)
       .sort((a, b) => SAFETY_ORDER[b] - SAFETY_ORDER[a])[0];
-    lines.push(worst ? SAFETY_BANNER[worst].label : 'Not assessed');
+    if (worst) {
+      push('SAFETY ASSESSMENT');
+      push(SAFETY_BANNER[worst].label);
+      push(SAFETY_BANNER[worst].description);
+      push();
+    }
+
+    const diyHypotheses = hypotheses.filter((h) => h.diy_repair);
+    if (diyHypotheses.length) {
+      push('DIY / PROFESSIONAL GUIDANCE');
+      diyHypotheses.forEach((h) => {
+        const d = h.diy_repair!;
+        push(`For "${h.fault_description}":`);
+        push(`   ${d.suitability}`);
+        if (d.difficulty) push(`   Difficulty: ${d.difficulty}`);
+        if (d.estimated_time) push(`   Estimated time: ${d.estimated_time}`);
+        if (d.tools?.length) push('   Tools: ' + d.tools.join(', '));
+        if (d.parts?.length) push('   Parts: ' + d.parts.join(', '));
+        if (d.preparation_steps?.length) {
+          push('   Preparation:');
+          d.preparation_steps.forEach((s) => push(`     - ${s}`));
+        }
+        if (d.steps?.length) {
+          push('   Steps:');
+          d.steps.forEach((s) => push(`     - ${s}`));
+        }
+        if (d.verification_steps?.length) {
+          push('   Verification:');
+          d.verification_steps.forEach((s) => push(`     - ${s}`));
+        }
+        if (d.safety_warnings?.length) {
+          push('   Safety warnings:');
+          d.safety_warnings.forEach((s) => push(`     - ${s}`));
+        }
+        if (d.professional_help_conditions?.length) {
+          push('   Seek professional help if:');
+          d.professional_help_conditions.forEach((s) => push(`     - ${s}`));
+        }
+      });
+      push();
+    }
+
+    const allResources = hypotheses.flatMap((h) => h.resources ?? []);
+    if (allResources.length) {
+      push('RESOURCES');
+      allResources.forEach((r) => push(`- ${r.title} (${r.source}): ${r.url}`));
+      push();
+    }
+
     return lines.join('\n');
   }, [vehicleContext, symptomText, hypotheses]);
 
