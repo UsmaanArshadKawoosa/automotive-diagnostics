@@ -1077,6 +1077,8 @@ Return a single JSON object with this schema:
             ],
             "additionalProperties": False
         }
+        if not prompt or not prompt.strip():
+            raise DiagnosticServiceError("Cannot generate diagnosis: empty prompt. Please provide symptoms.")
         try:
             raw_response = self._llm_service.complete(prompt, response_schema=response_schema)
         except LLMProviderError as exc:

@@ -14,21 +14,21 @@ function useApiRequest<T, Args extends unknown[]>(
     loading: false,
     error: null,
   });
-  const cancelRef = useRef(false);
+  const requestIdRef = useRef(0);
 
   const execute = useCallback(
     async (...args: Args) => {
-      cancelRef.current = false;
-      setState((prev) => ({ ...prev, loading: true, error: null }));
+      const currentRequestId = ++requestIdRef.current;
+      setState({ data: null, loading: true, error: null });
       try {
         const result = await fn(...args);
-        if (!cancelRef.current) {
+        if (currentRequestId === requestIdRef.current) {
           setState({ data: result, loading: false, error: null });
         }
       } catch (err) {
-        if (!cancelRef.current) {
+        if (currentRequestId === requestIdRef.current) {
           const message = err instanceof Error ? err.message : 'An unexpected error occurred';
-          setState((prev) => ({ ...prev, loading: false, error: message }));
+          setState({ data: null, loading: false, error: message });
         }
       }
     },
@@ -36,7 +36,7 @@ function useApiRequest<T, Args extends unknown[]>(
   );
 
   const reset = useCallback(() => {
-    cancelRef.current = true;
+    requestIdRef.current = 0;
     setState({ data: null, loading: false, error: null });
   }, []);
 

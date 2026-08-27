@@ -1651,3 +1651,50 @@ class TestP0301Regression:
         data = response.json()
         assert len(data["hypotheses"]) >= 1
         assert len(data["evidence"]) >= 1
+
+
+class TestEmptyPromptGuard:
+    def test_empty_symptom_text_returns_422(self, client: TestClient, clean_diagnostic_tables):
+        payload = {
+            "symptom_text": "",
+        }
+        response = client.post("/api/v1/diagnostics/analyze", json=payload)
+        assert response.status_code == 422
+
+    def test_whitespace_symptom_text_returns_422(self, client: TestClient, clean_diagnostic_tables):
+        payload = {
+            "symptom_text": "   ",
+        }
+        response = client.post("/api/v1/diagnostics/analyze", json=payload)
+        assert response.status_code == 422
+
+
+class TestIndependentRequests:
+    def test_two_sequential_requests_are_independent(self, client: TestClient, clean_diagnostic_tables):
+        payload_a = {
+            "make": "Honda",
+            "model": "Civic",
+            "year": 2018,
+            "dtc_codes": ["P0301"],
+            "symptom_text": "Check Engine Light is on, rough idle.",
+        }
+        response_a = client.post("/api/v1/diagnostics/analyze", json=payload_a)
+        assert response_a.status_code == 201
+        data_a = response_a.json()
+        assert len(data_a["hypotheses"]) >= 1
+        session_id_a = data_a["session_id"]
+
+        payload_b = {
+            "make": "Toyota",
+            "model": "Camry",
+            "year": 2020,
+            "dtc_codes": ["P0171"],
+            "symptom_text": "Car is running rich, poor fuel economy.",
+        }
+        response_b = client.post("/api/v1/diagnostics/analyze", json=payload_b)
+        assert response_b.status_code == 201
+        data_b = response_b.json()
+        assert len(data_b["hypotheses"]) >= 1
+        session_id_b = data_b["session_id"]
+
+        assert session_id_a != session_id_b

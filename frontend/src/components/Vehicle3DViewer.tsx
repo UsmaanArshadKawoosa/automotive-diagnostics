@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
 import * as React from 'react';
-import { Suspense, useMemo, useRef, useEffect } from 'react';
+import { Suspense, useMemo, useRef, useEffect, useCallback } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { OrbitControls, useGLTF } from '@react-three/drei';
 import * as THREE from 'three';
@@ -256,12 +256,40 @@ interface GLBSceneProps {
   onComponentSelect: (componentId: string) => void;
   onRegionClick: (region: string) => void;
   vehicleType: VehicleType;
+  onLoadStateChange?: (state: 'loading' | 'loaded' | 'error' | 'no-meshes', detail?: string) => void;
 }
 
-function GLBScene({ modelAsset, highlightedComponents, selectedComponent, onComponentSelect, onRegionClick, vehicleType }: GLBSceneProps) {
+function GLBScene({ modelAsset, highlightedComponents, selectedComponent, onComponentSelect, onRegionClick, vehicleType, onLoadStateChange }: GLBSceneProps) {
   const { scene } = useGLTF(modelAsset);
   const highlightMaterialsRef = React.useRef<Map<string, THREE.MeshStandardMaterial>>(new Map());
   const originalMaterialsRef = React.useRef<Map<THREE.Mesh, THREE.Material | THREE.Material[]>>(new Map());
+
+  React.useEffect(() => {
+    if (!scene) {
+      console.warn(`[Vehicle3DViewer] GLB scene is null for ${modelAsset}`);
+      onLoadStateChange?.('error', 'Scene is null');
+      return;
+    }
+
+    let meshCount = 0;
+    scene.traverse((object: THREE.Object3D) => {
+      if (object instanceof THREE.Mesh) {
+        meshCount++;
+      }
+    });
+
+    if (meshCount === 0) {
+      console.warn(`[Vehicle3DViewer] GLB loaded but contains no meshes: ${modelAsset}`);
+      onLoadStateChange?.('no-meshes', 'Model contains no meshes');
+    } else {
+      console.log(`[Vehicle3DViewer] GLB loaded successfully: ${modelAsset} (${meshCount} meshes)`);
+      onLoadStateChange?.('loaded');
+    }
+  }, [scene, modelAsset, onLoadStateChange]);
+
+  if (!scene) {
+    return null;
+  }
 
   useFrame(() => {
     scene.traverse((object: THREE.Object3D) => {
@@ -272,7 +300,6 @@ function GLBScene({ modelAsset, highlightedComponents, selectedComponent, onComp
         let matchedComponent: ComponentHighlight | null = null;
         let isSelected = false;
         
-        // Try to match using component-level resolver (prefers component_id mapping)
         for (const component of highlightedComponents) {
           const nodeNames = resolveNodeNamesForComponent(component, vehicleType);
           if (nodeNames.includes(nodeName)) {
@@ -290,7 +317,6 @@ function GLBScene({ modelAsset, highlightedComponents, selectedComponent, onComp
           }
           let highlightMat = highlightMaterialsRef.current.get(materialKey);
           if (!highlightMat) {
-            // Selected component gets stronger highlight (orange/red with higher emissive)
             const isSelectedComp = isSelected;
             highlightMat = new THREE.MeshStandardMaterial({
               color: isSelectedComp ? 0xff8800 : 0xffff00,
@@ -319,7 +345,6 @@ function GLBScene({ modelAsset, highlightedComponents, selectedComponent, onComp
       const mesh = target as THREE.Mesh;
       const componentId = mesh.userData.componentId;
       const region = mesh.userData.region;
-      // Prefer component_id for selection, fall back to region
       if (componentId) {
         onComponentSelect(componentId);
       } else if (region) {
@@ -340,13 +365,14 @@ interface GLBModelWrapperProps {
   onComponentSelect: (componentId: string) => void;
   onRegionClick: (region: string) => void;
   vehicleType: VehicleType;
+  onLoadStateChange?: (state: 'loading' | 'loaded' | 'error' | 'no-meshes', detail?: string) => void;
 }
 
-function GLBModelWrapper({ modelAsset, highlightedComponents, selectedComponent, onComponentSelect, onRegionClick, vehicleType }: GLBModelWrapperProps) {
+function GLBModelWrapper({ modelAsset, highlightedComponents, selectedComponent, onComponentSelect, onRegionClick, vehicleType, onLoadStateChange }: GLBModelWrapperProps) {
   const fallbackRegions = new Set(highlightedComponents.map(c => c.vehicle_region).filter((r): r is string => r !== undefined));
   return (
     <Suspense fallback={<GenericVehicleModel highlightedRegions={fallbackRegions} selectedComponent={selectedComponent} onRegionClick={onRegionClick} />}>
-      <GLBScene modelAsset={modelAsset} highlightedComponents={highlightedComponents} selectedComponent={selectedComponent} onComponentSelect={onComponentSelect} onRegionClick={onRegionClick} vehicleType={vehicleType} />
+      <GLBScene modelAsset={modelAsset} highlightedComponents={highlightedComponents} selectedComponent={selectedComponent} onComponentSelect={onComponentSelect} onRegionClick={onRegionClick} vehicleType={vehicleType} onLoadStateChange={onLoadStateChange} />
     </Suspense>
   );
 }
@@ -359,6 +385,18 @@ export function Vehicle3DViewer({
   className = '',
   children,
 }: Vehicle3DViewerProps) {
+  const [loadState, setLoadState] = React.useState<'idle' | 'loading' | 'loaded' | 'error' | 'no-meshes'>('idle');
+  const [loadError, setLoadError] = React.useState<string | null>(null);
+
+  const handleLoadStateChange = useCallback((state: 'loading' | 'loaded' | 'error' | 'no-meshes', detail?: string) => {
+    setLoadState(state);
+    if (state === 'error' || state === 'no-meshes') {
+      setLoadError(detail || 'Unknown error');
+    } else {
+      setLoadError(null);
+    }
+  }, []);
+
   const highlightedRegions = useMemo(() => {
     return new Set(
       highlightedComponents
@@ -388,9 +426,21 @@ export function Vehicle3DViewer({
   const fallback = (
     <div className="text-center py-4">
       <p className="text-xs text-slate-500">3D preview unavailable</p>
-      <p className="text-[10px] text-slate-400">
-        WebGL not supported or model loading failed
-      </p>
+      {loadState === 'error' && loadError && (
+        <p className="text-[10px] text-slate-400 mt-1">
+          Model failed to load: {loadError}
+        </p>
+      )}
+      {loadState === 'no-meshes' && loadError && (
+        <p className="text-[10px] text-slate-400 mt-1">
+          Model loaded but contains no displayable parts: {loadError}
+        </p>
+      )}
+      {loadState === 'idle' && (
+        <p className="text-[10px] text-slate-400 mt-1">
+          WebGL not supported or model loading failed
+        </p>
+      )}
     </div>
   );
 
@@ -409,6 +459,11 @@ export function Vehicle3DViewer({
             <div className="text-sm font-medium text-slate-500">3D Vehicle Visualization</div>
             <div className="mt-1 text-xs text-slate-400">
               <span className="font-medium">Vehicle type: {vehicleType}</span>
+              {modelAsset && (
+                <span className="ml-2 text-[10px] text-slate-400">
+                  ({modelAsset})
+                </span>
+              )}
             </div>
           </div>
           {isUsingFallback && (
@@ -446,6 +501,7 @@ export function Vehicle3DViewer({
                     onComponentSelect={handleComponentClick}
                     onRegionClick={handleRegionClick}
                     vehicleType={vehicleType}
+                    onLoadStateChange={handleLoadStateChange}
                   />
                 ) : (
                   <GenericVehicleModel highlightedRegions={highlightedRegions} selectedComponent={selectedComponent} onRegionClick={handleRegionClick} />

@@ -201,12 +201,19 @@ class DiagnosticAnalyzeRequest(BaseModel):
             if not code:
                 raise ValueError("DTC code must not be empty")
             if code in seen:
-                continue
-            if not _DTC_PATTERN.match(code):
-                raise ValueError(f"Invalid DTC code: {code}")
+                raise ValueError(f"Duplicate DTC code: {code}")
+            if not re.fullmatch(r"[PCBU][0-9]{4}", code):
+                raise ValueError(f"Invalid DTC code format: {code}")
             seen.add(code)
             normalized.append(code)
         return normalized
+
+    @field_validator("symptom_text", "follow_up_answer")
+    @classmethod
+    def _validate_non_empty_text(cls, value: str | None) -> str | None:
+        if value is not None and not value.strip():
+            raise ValueError("Text must not be empty or whitespace only")
+        return value
 
     def dtc_codes_text(self) -> str | None:
         if not self.dtc_codes:
