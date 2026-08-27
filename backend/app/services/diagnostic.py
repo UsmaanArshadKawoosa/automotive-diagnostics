@@ -1009,11 +1009,11 @@ Return a single JSON object with this schema:
                                 "type": ["integer", "null"]
                             },
                             "diy_repair": {
-                                "type": "object",
+                                "type": ["object", "null"],
                                 "properties": {
                                     "suitable": {"type": "boolean"},
                                     "suitability": {"type": "string"},
-                                    "difficulty": {"type": "string", "enum": ["easy", "moderate", "advanced"]},
+                                    "difficulty": {"type": ["string", "null"]},
                                     "estimated_time": {"type": ["string", "null"]},
                                     "tools": {"type": "array", "items": {"type": "string"}},
                                     "parts": {"type": "array", "items": {"type": "string"}},

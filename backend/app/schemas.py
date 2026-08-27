@@ -201,7 +201,7 @@ class DiagnosticAnalyzeRequest(BaseModel):
             if not code:
                 raise ValueError("DTC code must not be empty")
             if code in seen:
-                raise ValueError(f"Duplicate DTC code: {code}")
+                continue
             if not re.fullmatch(r"[PCBU][0-9]{4}", code):
                 raise ValueError(f"Invalid DTC code format: {code}")
             seen.add(code)

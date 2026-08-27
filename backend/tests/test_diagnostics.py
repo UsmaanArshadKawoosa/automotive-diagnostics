@@ -1698,3 +1698,104 @@ class TestIndependentRequests:
         session_id_b = data_b["session_id"]
 
         assert session_id_a != session_id_b
+
+
+class TestDIYRepairSchemaValidation:
+    def test_null_difficulty_when_suitable_false(self, db, clean_diagnostic_tables):
+        embedding_service = FakeEmbeddingService()
+        llm_response = json.dumps({
+            "status": "complete",
+            "follow_up_question": None,
+            "follow_up_reason": None,
+            "hypotheses": [
+                {
+                    "fault_description": "Cylinder 1 Misfire",
+                    "confidence_score": 0.85,
+                    "severity": "high",
+                    "supporting_evidence": ["P0301 code"],
+                    "recommended_checks": ["Inspect spark plug", "Check coil pack"],
+                    "repair_suggestion": "Replace spark plug or coil pack",
+                    "diy_repair": {
+                        "suitable": False,
+                        "suitability": "Professional recommended",
+                        "difficulty": None,
+                        "estimated_time": None,
+                        "tools": [],
+                        "parts": [],
+                        "safety_warnings": [],
+                        "preparation_steps": [],
+                        "steps": [],
+                        "verification_steps": [],
+                        "professional_help_conditions": [
+                            "High-voltage ignition system",
+                            "Special tools required"
+                        ]
+                    }
+                }
+            ]
+        })
+        llm_service = FakeLLMService(llm_response)
+        service = DiagnosticService(
+            app_settings=embedding_service._settings,
+            embedding_service=embedding_service,
+            llm_service=llm_service,
+        )
+        parsed = service._parse_llm_response(llm_response)
+
+        assert len(parsed["hypotheses"]) == 1
+        diy = parsed["hypotheses"][0].diy_repair
+        assert diy is not None
+        assert diy.suitable is False
+        assert diy.difficulty is None
+        assert diy.estimated_time is None
+
+    def test_valid_diy_response_with_difficulty(self, db, clean_diagnostic_tables):
+        embedding_service = FakeEmbeddingService()
+        llm_response = json.dumps({
+            "status": "complete",
+            "follow_up_question": None,
+            "follow_up_reason": None,
+            "hypotheses": [
+                {
+                    "fault_description": "Loose gas cap",
+                    "confidence_score": 0.9,
+                    "severity": "low",
+                    "supporting_evidence": ["P0455 code", "EVAP system leak"],
+                    "recommended_checks": ["Inspect gas cap", "Check for cracks"],
+                    "repair_suggestion": "Tighten or replace gas cap",
+                    "diy_repair": {
+                        "suitable": True,
+                        "suitability": "Recommended for DIY",
+                        "difficulty": "easy",
+                        "estimated_time": "5 minutes",
+                        "tools": ["None"],
+                        "parts": ["Gas cap"],
+                        "safety_warnings": [],
+                        "preparation_steps": [],
+                        "steps": ["Remove gas cap", "Inspect seal", "Install new cap"],
+                        "verification_steps": [
+                            "Clear codes",
+                            "Drive cycle",
+                            "Check for P0455 return"
+                        ],
+                        "professional_help_conditions": []
+                    }
+                }
+            ]
+        })
+        llm_service = FakeLLMService(llm_response)
+        service = DiagnosticService(
+            app_settings=embedding_service._settings,
+            embedding_service=embedding_service,
+            llm_service=llm_service,
+        )
+        parsed = service._parse_llm_response(llm_response)
+
+        assert len(parsed["hypotheses"]) == 1
+        diy = parsed["hypotheses"][0].diy_repair
+        assert diy is not None
+        assert diy.suitable is True
+        assert diy.difficulty == "easy"
+        assert diy.estimated_time == "5 minutes"
+        assert diy.tools == ["None"]
+        assert diy.parts == ["Gas cap"]
