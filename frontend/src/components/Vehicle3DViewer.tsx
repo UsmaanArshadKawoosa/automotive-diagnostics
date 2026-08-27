@@ -3,6 +3,7 @@ import * as React from 'react';
 import { Suspense, useMemo, useRef, useEffect, useCallback } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { OrbitControls, useGLTF } from '@react-three/drei';
+import { OrbitControls as OrbitControlsImpl } from 'three-stdlib';
 import * as THREE from 'three';
 import { getVehicleTypeConfig } from '../config/vehicleTypes';
 import { resolveNodeNamesForComponent, type VehicleType, getComponentCameraTarget } from '../config/glbMeshMapping';
@@ -150,12 +151,28 @@ function GenericVehicleModel({ highlightedRegions, selectedComponent, onRegionCl
 interface CameraControlsProps {
   selectedComponent: ComponentHighlight | null;
   activePreset: string;
+  controlsRef: React.RefObject<OrbitControlsImpl | null>;
 }
 
-function CameraControls({ selectedComponent, activePreset }: CameraControlsProps) {
-  const { camera, controls } = useThree();
+function CameraControls({ selectedComponent, activePreset, controlsRef }: CameraControlsProps) {
+  const { camera } = useThree();
   const isAnimatingRef = useRef(false);
   const lastPresetRef = useRef<string>(activePreset);
+  const animationFrameRef = useRef<number | null>(null);
+
+  const cancelAnimation = useCallback(() => {
+    if (animationFrameRef.current !== null) {
+      cancelAnimationFrame(animationFrameRef.current);
+      animationFrameRef.current = null;
+    }
+    isAnimatingRef.current = false;
+  }, []);
+
+  useEffect(() => {
+    return () => {
+      cancelAnimation();
+    };
+  }, [cancelAnimation]);
 
   // Handle preset button changes
   useEffect(() => {
@@ -164,8 +181,10 @@ function CameraControls({ selectedComponent, activePreset }: CameraControlsProps
     const preset = CAMERA_PRESETS[activePreset];
     if (!preset) return;
 
-    const orbitControls = controls as unknown as { target: THREE.Vector3; update: () => void };
+    const orbitControls = controlsRef.current;
+    if (!orbitControls) return;
     
+    cancelAnimation();
     isAnimatingRef.current = true;
     lastPresetRef.current = activePreset;
     const startPos = camera.position.clone();
@@ -187,14 +206,15 @@ function CameraControls({ selectedComponent, activePreset }: CameraControlsProps
       orbitControls.update();
 
       if (progress < 1) {
-        requestAnimationFrame(animate);
+        animationFrameRef.current = requestAnimationFrame(animate);
       } else {
         isAnimatingRef.current = false;
+        animationFrameRef.current = null;
       }
     };
 
-    requestAnimationFrame(animate);
-  }, [activePreset, camera, controls]);
+    animationFrameRef.current = requestAnimationFrame(animate);
+  }, [activePreset, camera, controlsRef, cancelAnimation]);
 
   // Auto-focus on selected component's region OR component-specific target
   useEffect(() => {
@@ -214,8 +234,10 @@ function CameraControls({ selectedComponent, activePreset }: CameraControlsProps
     
     if (!targetPreset) return;
 
-    const orbitControls = controls as unknown as { target: THREE.Vector3; update: () => void };
+    const orbitControls = controlsRef.current;
+    if (!orbitControls) return;
     
+    cancelAnimation();
     isAnimatingRef.current = true;
     const startPos = camera.position.clone();
     const startTarget = orbitControls.target.clone();
@@ -236,14 +258,15 @@ function CameraControls({ selectedComponent, activePreset }: CameraControlsProps
       orbitControls.update();
 
       if (progress < 1) {
-        requestAnimationFrame(animate);
+        animationFrameRef.current = requestAnimationFrame(animate);
       } else {
         isAnimatingRef.current = false;
+        animationFrameRef.current = null;
       }
     };
 
-    requestAnimationFrame(animate);
-  }, [selectedComponent, camera, controls]);
+    animationFrameRef.current = requestAnimationFrame(animate);
+  }, [selectedComponent, camera, controlsRef, cancelAnimation]);
 
   // This component doesn't render anything - it just handles camera animation
   return null;
@@ -418,6 +441,7 @@ export function Vehicle3DViewer({
   const { modelAsset } = getVehicleTypeConfig(vehicleType);
 
   const [activePreset, setActivePreset] = React.useState<string>('overview');
+  const controlsRef = useRef<OrbitControlsImpl | null>(null);
 
   const handlePresetChange = (preset: string) => {
     setActivePreset(preset);
@@ -489,7 +513,7 @@ export function Vehicle3DViewer({
           }>
             <div className="w-full overflow-hidden rounded-md">
               <Canvas camera={{ position: [0, 3, 8], fov: 45 }} style={{ height: 220, width: '100%' }}>
-                <OrbitControls enableZoom={true} enablePan={true} enableRotate={true} minDistance={3} maxDistance={15} />
+                <OrbitControls ref={controlsRef} enableZoom={true} enablePan={true} enableRotate={true} minDistance={3} maxDistance={15} />
                 <ambientLight intensity={0.5} />
                 <directionalLight position={[5, 5, 5]} intensity={0.8} />
 
@@ -507,7 +531,7 @@ export function Vehicle3DViewer({
                   <GenericVehicleModel highlightedRegions={highlightedRegions} selectedComponent={selectedComponent} onRegionClick={handleRegionClick} />
                 )}
                 
-                <CameraControls selectedComponent={selectedComponent} activePreset={activePreset} />
+                <CameraControls selectedComponent={selectedComponent} activePreset={activePreset} controlsRef={controlsRef} />
               </Canvas>
             </div>
           </Suspense>
