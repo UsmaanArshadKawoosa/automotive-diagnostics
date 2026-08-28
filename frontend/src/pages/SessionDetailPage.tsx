@@ -139,17 +139,17 @@ export function SessionDetailPage() {
     return (
       <div className="mx-auto max-w-4xl">
         <div className="mb-6 flex items-center justify-between">
-          <div className="h-8 w-48 animate-pulse rounded bg-slate-200" />
-          <div className="h-9 w-36 animate-pulse rounded bg-slate-200" />
+          <div className="h-8 w-48 animate-pulse rounded bg-surface-container-high" />
+          <div className="h-9 w-36 animate-pulse rounded bg-surface-container-high" />
         </div>
         <div className="grid gap-6 lg:grid-cols-3">
           <div className="lg:col-span-1 space-y-6">
-            <div className="h-48 animate-pulse rounded-lg border border-slate-200 bg-slate-100" />
-            <div className="h-32 animate-pulse rounded-lg border border-slate-200 bg-slate-100" />
+            <div className="h-48 animate-pulse rounded-lg border border-outline-variant bg-surface-container-high" />
+            <div className="h-32 animate-pulse rounded-lg border border-outline-variant bg-surface-container-high" />
           </div>
           <div className="lg:col-span-2 space-y-6">
-            <div className="h-32 animate-pulse rounded-lg border border-slate-200 bg-slate-100" />
-            <div className="h-64 animate-pulse rounded-lg border border-slate-200 bg-slate-100" />
+            <div className="h-32 animate-pulse rounded-lg border border-outline-variant bg-surface-container-high" />
+            <div className="h-64 animate-pulse rounded-lg border border-outline-variant bg-surface-container-high" />
           </div>
         </div>
       </div>
@@ -162,18 +162,18 @@ export function SessionDetailPage() {
       return (
         <div className="mx-auto max-w-4xl">
           <div className="mb-4">
-            <button type="button" onClick={() => navigate('/sessions')} className="text-sm text-brand-600 hover:text-brand-700">
+            <button type="button" onClick={() => navigate('/sessions')} className="text-sm text-primary hover:text-primary-fixed-dim">
               ← Back to Sessions
             </button>
           </div>
-          <div className="rounded-lg border border-amber-200 bg-amber-50 p-4 mb-6" role="status" aria-live="polite">
+          <div className="rounded-lg border border-secondary-container/40 bg-secondary-container/20 p-4 mb-6" role="status" aria-live="polite">
             <div className="flex items-start gap-3">
               <svg className="h-5 w-5 shrink-0 text-amber-400" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
                 <path fillRule="evenodd" d="M8.485 2.495c.673-1.167 2.357-1.167 3.03 0l6.28 10.88c.673 1.167-.17 2.625-1.516 2.625H3.72c-1.347 0-2.189-1.458-1.516-2.625l6.28-10.88zM10 6a.75.75 0 01.75.75v3.5a.75.75 0 01-1.5 0v-3.5A.75.75 0 0110 6zm0 9a1 1 0 100-2 1 1 0 000 2z" clipRule="evenodd" />
               </svg>
               <div>
-                <p className="text-sm font-medium text-amber-800">Viewing cached session data</p>
-                <p className="mt-0.5 text-xs text-amber-700">
+                <p className="text-sm font-medium text-secondary">Viewing cached session data</p>
+                <p className="mt-0.5 text-xs text-secondary">
                   This information was loaded previously and may not reflect the current state. Cached on {new Date(cachedSession.cachedAt).toLocaleString()}.
                 </p>
               </div>
@@ -187,26 +187,26 @@ export function SessionDetailPage() {
                   <dl className="space-y-3 text-sm">
                     {session.vin && (
                       <div>
-                        <dt className="text-slate-500">VIN</dt>
-                        <dd className="mt-0.5 font-mono text-slate-900">{session.vin}</dd>
+                        <dt className="text-on-surface-variant">VIN</dt>
+                        <dd className="mt-0.5 font-mono text-on-surface">{session.vin}</dd>
                       </div>
                     )}
                     {session.make && (
                       <div>
-                        <dt className="text-slate-500">Make</dt>
-                        <dd className="mt-0.5 text-slate-900">{session.make}</dd>
+                        <dt className="text-on-surface-variant">Make</dt>
+                        <dd className="mt-0.5 text-on-surface">{session.make}</dd>
                       </div>
                     )}
                     {session.model && (
                       <div>
-                        <dt className="text-slate-500">Model</dt>
-                        <dd className="mt-0.5 text-slate-900">{session.model}</dd>
+                        <dt className="text-on-surface-variant">Model</dt>
+                        <dd className="mt-0.5 text-on-surface">{session.model}</dd>
                       </div>
                     )}
                     {session.year && (
                       <div>
-                        <dt className="text-slate-500">Year</dt>
-                        <dd className="mt-0.5 text-slate-900">{session.year}</dd>
+                        <dt className="text-on-surface-variant">Year</dt>
+                        <dd className="mt-0.5 text-on-surface">{session.year}</dd>
                       </div>
                     )}
                   </dl>
@@ -217,16 +217,16 @@ export function SessionDetailPage() {
                 <CardBody>
                   <dl className="space-y-3 text-sm">
                     <div>
-                      <dt className="text-slate-500">Created</dt>
-                      <dd className="mt-0.5 text-slate-900">{new Date(session.created_at).toLocaleString()}</dd>
+                      <dt className="text-on-surface-variant">Created</dt>
+                      <dd className="mt-0.5 text-on-surface">{new Date(session.created_at).toLocaleString()}</dd>
                     </div>
                     <div>
-                      <dt className="text-slate-500">Updated</dt>
-                      <dd className="mt-0.5 text-slate-900">{new Date(session.updated_at).toLocaleString()}</dd>
+                      <dt className="text-on-surface-variant">Updated</dt>
+                      <dd className="mt-0.5 text-on-surface">{new Date(session.updated_at).toLocaleString()}</dd>
                     </div>
                     <div>
-                      <dt className="text-slate-500">Session ID</dt>
-                      <dd className="mt-0.5 break-all font-mono text-xs text-slate-600">{session.id}</dd>
+                      <dt className="text-on-surface-variant">Session ID</dt>
+                      <dd className="mt-0.5 break-all font-mono text-xs text-on-surface-variant">{session.id}</dd>
                     </div>
                   </dl>
                 </CardBody>
@@ -236,13 +236,13 @@ export function SessionDetailPage() {
               <Card>
                 <CardHeader title="Symptoms" />
                 <CardBody>
-                  <p className="text-sm text-slate-700 whitespace-pre-wrap">{session.symptom_text}</p>
+                  <p className="text-sm text-on-surface-variant whitespace-pre-wrap">{session.symptom_text}</p>
                   {session.dtc_codes && (
                     <div className="mt-3">
-                      <span className="text-xs font-medium uppercase tracking-wider text-slate-500">DTC Codes</span>
+                      <span className="text-xs font-medium uppercase tracking-wider text-on-surface-variant">DTC Codes</span>
                       <div className="mt-1.5 flex flex-wrap gap-2">
                         {session.dtc_codes.split(',').map((code) => (
-                          <span key={code.trim()} className="rounded-md bg-brand-50 px-2 py-1 font-mono text-sm text-brand-700 ring-1 ring-inset ring-brand-700/10">
+                          <span key={code.trim()} className="rounded-md bg-primary-container/20 px-2 py-1 font-mono text-sm text-primary-fixed-dim ring-1 ring-inset ring-primary/20">
                             {code.trim()}
                           </span>
                         ))}
@@ -253,7 +253,7 @@ export function SessionDetailPage() {
               </Card>
               {cachedSession.data.results.length > 0 && (
                 <div>
-                  <h3 className="text-base font-semibold text-slate-900 mb-3">
+                  <h3 className="text-base font-semibold text-on-surface mb-3">
                     Diagnostic Results ({cachedSession.data.results.length})
                   </h3>
                   <div className="space-y-4">
@@ -295,7 +295,7 @@ export function SessionDetailPage() {
     return (
       <div className="mx-auto max-w-3xl">
         <div className="mb-4">
-          <button type="button" onClick={() => navigate('/sessions')} className="text-sm text-brand-600 hover:text-brand-700">
+          <button type="button" onClick={() => navigate('/sessions')} className="text-sm text-primary hover:text-primary-fixed-dim">
             ← Back to Sessions
           </button>
         </div>
@@ -310,16 +310,16 @@ export function SessionDetailPage() {
     <div className="mx-auto max-w-4xl">
         <div className="mb-6 flex items-center justify-between">
           <div>
-            <button type="button" onClick={() => navigate('/sessions')} className="text-sm text-brand-600 hover:text-brand-700">
+            <button type="button" onClick={() => navigate('/sessions')} className="text-sm text-primary hover:text-primary-fixed-dim">
               ← Back to Sessions
             </button>
-            <h1 className="mt-2 text-2xl font-bold text-slate-900">
+            <h1 className="mt-2 text-2xl font-bold text-on-surface">
               Session {session.id.slice(0, 8)}...
             </h1>
           </div>
           <Link
             to={`/diagnose`}
-            className="inline-flex items-center rounded-md bg-brand-600 px-4 py-2 text-sm font-medium text-white hover:bg-brand-700"
+            className="inline-flex items-center rounded-md bg-primary-container px-4 py-2 text-sm font-medium text-white hover:bg-brand-700"
           >
             New Diagnosis
           </Link>
@@ -333,26 +333,26 @@ export function SessionDetailPage() {
                 <dl className="space-y-3 text-sm">
                   {session.vin && (
                     <div>
-                      <dt className="text-slate-500">VIN</dt>
-                      <dd className="mt-0.5 font-mono text-slate-900">{session.vin}</dd>
+                      <dt className="text-on-surface-variant">VIN</dt>
+                      <dd className="mt-0.5 font-mono text-on-surface">{session.vin}</dd>
                     </div>
                   )}
                   {session.make && (
                     <div>
-                      <dt className="text-slate-500">Make</dt>
-                      <dd className="mt-0.5 text-slate-900">{session.make}</dd>
+                      <dt className="text-on-surface-variant">Make</dt>
+                      <dd className="mt-0.5 text-on-surface">{session.make}</dd>
                     </div>
                   )}
                   {session.model && (
                     <div>
-                      <dt className="text-slate-500">Model</dt>
-                      <dd className="mt-0.5 text-slate-900">{session.model}</dd>
+                      <dt className="text-on-surface-variant">Model</dt>
+                      <dd className="mt-0.5 text-on-surface">{session.model}</dd>
                     </div>
                   )}
                   {session.year && (
                     <div>
-                      <dt className="text-slate-500">Year</dt>
-                      <dd className="mt-0.5 text-slate-900">{session.year}</dd>
+                      <dt className="text-on-surface-variant">Year</dt>
+                      <dd className="mt-0.5 text-on-surface">{session.year}</dd>
                     </div>
                   )}
                 </dl>
@@ -364,16 +364,16 @@ export function SessionDetailPage() {
               <CardBody>
                 <dl className="space-y-3 text-sm">
                   <div>
-                    <dt className="text-slate-500">Created</dt>
-                    <dd className="mt-0.5 text-slate-900">{formatDate(session.created_at)}</dd>
+                    <dt className="text-on-surface-variant">Created</dt>
+                    <dd className="mt-0.5 text-on-surface">{formatDate(session.created_at)}</dd>
                   </div>
                   <div>
-                    <dt className="text-slate-500">Updated</dt>
-                    <dd className="mt-0.5 text-slate-900">{formatDate(session.updated_at)}</dd>
+                    <dt className="text-on-surface-variant">Updated</dt>
+                    <dd className="mt-0.5 text-on-surface">{formatDate(session.updated_at)}</dd>
                   </div>
                   <div>
-                    <dt className="text-slate-500">Session ID</dt>
-                    <dd className="mt-0.5 break-all font-mono text-xs text-slate-600">{session.id}</dd>
+                    <dt className="text-on-surface-variant">Session ID</dt>
+                    <dd className="mt-0.5 break-all font-mono text-xs text-on-surface-variant">{session.id}</dd>
                   </div>
                 </dl>
               </CardBody>
@@ -384,13 +384,13 @@ export function SessionDetailPage() {
             <Card>
               <CardHeader title="Symptoms" />
               <CardBody>
-                <p className="text-sm text-slate-700 whitespace-pre-wrap">{session.symptom_text}</p>
+                <p className="text-sm text-on-surface-variant whitespace-pre-wrap">{session.symptom_text}</p>
                 {session.dtc_codes && (
                   <div className="mt-3">
-                    <span className="text-xs font-medium uppercase tracking-wider text-slate-500">DTC Codes</span>
+                    <span className="text-xs font-medium uppercase tracking-wider text-on-surface-variant">DTC Codes</span>
                     <div className="mt-1.5 flex flex-wrap gap-2">
                       {session.dtc_codes.split(',').map((code) => (
-                        <span key={code.trim()} className="rounded-md bg-brand-50 px-2 py-1 font-mono text-sm text-brand-700 ring-1 ring-inset ring-brand-700/10">
+                        <span key={code.trim()} className="rounded-md bg-primary-container/20 px-2 py-1 font-mono text-sm text-primary-fixed-dim ring-1 ring-inset ring-primary/20">
                           {code.trim()}
                         </span>
                       ))}
@@ -402,7 +402,7 @@ export function SessionDetailPage() {
 
             {results.length > 0 && (
               <div>
-                <h3 className="text-base font-semibold text-slate-900 mb-3">
+                <h3 className="text-base font-semibold text-on-surface mb-3">
                   Diagnostic Results ({results.length})
                 </h3>
                 <div className="space-y-4">
@@ -437,8 +437,8 @@ export function SessionDetailPage() {
             )}
 
             {results.length === 0 && (
-              <div className="rounded-lg border border-dashed border-slate-300 p-8 text-center">
-                <p className="text-sm text-slate-500">No diagnostic results yet for this session.</p>
+              <div className="rounded-lg border border-dashed border-outline-variant p-8 text-center">
+                <p className="text-sm text-on-surface-variant">No diagnostic results yet for this session.</p>
               </div>
             )}
 

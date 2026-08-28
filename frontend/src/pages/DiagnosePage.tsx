@@ -1,7 +1,7 @@
-﻿import { useState, useCallback, useEffect, useRef, useMemo, type FormEvent, type ReactNode } from 'react';
+import { useState, useCallback, useEffect, useRef, useMemo, type FormEvent, type ReactNode } from 'react';
 import { Input, Textarea, Button, Select } from '../components/Form';
 import { HypothesisCard } from '../components/DiagnosticResults';
-import { Vehicle3DViewer } from '../components/Vehicle3DViewer';
+import { VehicleViewer } from '../components/VehicleViewer';
 import type { ComponentHighlight } from '../components/Vehicle3DViewer';
 import { Alert, ErrorMessage } from '../components/Alert';
 import { useAnalyze, useAnalyzeInSession } from '../hooks/useDiagnostics';
@@ -59,22 +59,22 @@ const SAFETY_BANNER: Record<RepairSafetyTier, { label: string; description: stri
   diy_inspection: {
     label: 'Safe to inspect yourself',
     description: 'You can visually inspect this area. No disassembly or hazardous work is required.',
-    classes: 'border-green-200 bg-green-50 text-green-800',
+    classes: 'border-green-700/40 bg-green-900/30 text-green-300',
   },
   diy_repair: {
     label: 'DIY repair may be possible',
     description: 'With the right tools and guidance, this may be safe to address yourself.',
-    classes: 'border-amber-200 bg-amber-50 text-amber-800',
+    classes: 'border-secondary-container/40 bg-secondary-container/20 text-secondary',
   },
   mechanic_recommended: {
     label: 'Mechanic recommended',
     description: 'A qualified mechanic should handle this to avoid further damage or safety risk.',
-    classes: 'border-orange-200 bg-orange-50 text-orange-800',
+    classes: 'border-orange-700/40 bg-orange-900/30 text-orange-300',
   },
   immediate_professional: {
     label: 'Seek professional service immediately',
     description: 'Do not drive the vehicle. Contact a professional right away.',
-    classes: 'border-red-200 bg-red-50 text-red-800',
+    classes: 'border-error-container/40 bg-error-container/25 text-on-error-container',
   },
 };
 
@@ -92,8 +92,8 @@ function Section({
   return (
     <section className={cn('scroll-mt-20', className)}>
       <div className="mb-3 sm:mb-4">
-        <h2 className="text-base sm:text-lg font-semibold text-slate-900">{title}</h2>
-        {subtitle && <p className="mt-1 text-sm text-slate-500">{subtitle}</p>}
+        <h2 className="text-base sm:text-lg font-semibold text-on-surface">{title}</h2>
+        {subtitle && <p className="mt-1 text-sm text-on-surface-variant">{subtitle}</p>}
       </div>
       {children}
     </section>
@@ -397,24 +397,24 @@ export function DiagnosePage() {
     <div className="mx-auto max-w-4xl px-4 sm:px-6">
       {/* Hero */}
       <header className="pt-10 pb-8 sm:pt-14 sm:pb-10 text-center">
-        <h1 className="text-2xl sm:text-4xl font-bold tracking-tight text-slate-900">
+        <h1 className="text-2xl sm:text-4xl font-bold tracking-tight text-on-surface">
           Know what's wrong before you reach the workshop.
         </h1>
-        <p className="mx-auto mt-4 max-w-2xl text-sm sm:text-base text-slate-600">
+        <p className="mx-auto mt-4 max-w-2xl text-sm sm:text-base text-on-surface-variant">
           Describe what your vehicle is doing and get a structured, safety-first diagnostic assessment with likely
           causes, recommended checks, repair guidance, and a mechanic-ready report.
         </p>
-        <div className="mt-6 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-xs sm:text-sm text-slate-500">
+        <div className="mt-6 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-xs sm:text-sm text-on-surface-variant">
           <span className="inline-flex items-center gap-1.5">
-            <span className="h-1.5 w-1.5 rounded-full bg-brand-500" aria-hidden="true" />
+            <span className="h-1.5 w-1.5 rounded-full bg-primary-container/200" aria-hidden="true" />
             Safety prioritized
           </span>
           <span className="inline-flex items-center gap-1.5">
-            <span className="h-1.5 w-1.5 rounded-full bg-brand-500" aria-hidden="true" />
+            <span className="h-1.5 w-1.5 rounded-full bg-primary-container/200" aria-hidden="true" />
             Evidence explained
           </span>
           <span className="inline-flex items-center gap-1.5">
-            <span className="h-1.5 w-1.5 rounded-full bg-brand-500" aria-hidden="true" />
+            <span className="h-1.5 w-1.5 rounded-full bg-primary-container/200" aria-hidden="true" />
             Repair guidance
           </span>
         </div>
@@ -422,9 +422,9 @@ export function DiagnosePage() {
 
       {/* Diagnostic input */}
       <form onSubmit={handleSubmit} className="space-y-4">
-        <div className="rounded-2xl border border-slate-200 bg-white p-5 sm:p-6 shadow-sm">
-          <h2 className="text-lg font-semibold text-slate-900">What's happening with your vehicle?</h2>
-          <p className="mt-1 text-sm text-slate-500">
+        <div className="rounded-lg border border-outline-variant bg-surface-container p-5 sm:p-6 shadow-sm">
+          <h2 className="text-lg font-semibold text-on-surface">What's happening with your vehicle?</h2>
+          <p className="mt-1 text-sm text-on-surface-variant">
             Describe the symptoms in your own words. You don't need to know the technical cause.
           </p>
 
@@ -451,7 +451,7 @@ export function DiagnosePage() {
                 type="button"
                 onClick={() => setSymptomText(example)}
                 disabled={isAnalyzing}
-                className="rounded-full border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs text-slate-600 transition-colors hover:bg-slate-100 hover:text-slate-900 disabled:opacity-50"
+                className="rounded-full border border-outline-variant bg-surface-container-low px-3 py-1.5 text-xs text-on-surface-variant transition-colors hover:bg-slate-100 hover:text-on-surface disabled:opacity-50"
               >
                 {example}
               </button>
@@ -462,7 +462,7 @@ export function DiagnosePage() {
             <button
               type="button"
               onClick={() => setShowContext((v) => !v)}
-              className="text-sm font-medium text-brand-600 hover:text-brand-700"
+              className="text-sm font-medium text-primary hover:text-primary-fixed-dim"
             >
               {showContext ? 'Hide vehicle details' : 'Add vehicle details (optional)'}
             </button>
@@ -520,10 +520,10 @@ export function DiagnosePage() {
 
         {/* Follow-up question state */}
         {awaitingFollowUp && followUpQuestion && (
-          <div className="rounded-2xl border border-amber-200 bg-amber-50 p-5 sm:p-6 shadow-sm">
-            <h3 className="text-base font-semibold text-amber-900">One more thing</h3>
-            <p className="mt-2 text-sm text-amber-800">{followUpQuestion}</p>
-            {followUpReason && <p className="mt-1 text-xs text-amber-700">{followUpReason}</p>}
+          <div className="rounded-lg border border-secondary-container/40 bg-secondary-container/20 p-5 sm:p-6 shadow-sm">
+            <h3 className="text-base font-semibold text-secondary">One more thing</h3>
+            <p className="mt-2 text-sm text-secondary">{followUpQuestion}</p>
+            {followUpReason && <p className="mt-1 text-xs text-secondary">{followUpReason}</p>}
             <div className="mt-4">
               <Textarea
                 id="followUpAnswer"
@@ -565,29 +565,29 @@ export function DiagnosePage() {
 
       {/* Loading experience */}
       {isAnalyzing && !awaitingFollowUp && (
-        <div className="mt-6 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+        <div className="mt-6 rounded-lg border border-outline-variant bg-surface-container p-6 shadow-sm">
           <div className="flex items-center gap-3">
-            <svg className="h-5 w-5 animate-spin text-brand-600" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <svg className="h-5 w-5 animate-spin text-primary" viewBox="0 0 24 24" fill="none" aria-hidden="true">
               <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
               <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
             </svg>
-            <span className="text-sm font-medium text-slate-700">Analyzing your vehicle</span>
+            <span className="text-sm font-medium text-on-surface-variant">Analyzing your vehicle</span>
           </div>
-          <ul className="mt-4 space-y-2 text-sm text-slate-500">
+          <ul className="mt-4 space-y-2 text-sm text-on-surface-variant">
             <li className="flex items-center gap-2">
-              <span className="h-1.5 w-1.5 rounded-full bg-brand-400" aria-hidden="true" />
+              <span className="h-1.5 w-1.5 rounded-full bg-primary" aria-hidden="true" />
               Understanding your symptoms
             </li>
             <li className="flex items-center gap-2">
-              <span className="h-1.5 w-1.5 rounded-full bg-brand-400" aria-hidden="true" />
+              <span className="h-1.5 w-1.5 rounded-full bg-primary" aria-hidden="true" />
               Checking diagnostic evidence
             </li>
             <li className="flex items-center gap-2">
-              <span className="h-1.5 w-1.5 rounded-full bg-brand-400" aria-hidden="true" />
+              <span className="h-1.5 w-1.5 rounded-full bg-primary" aria-hidden="true" />
               Assessing possible causes
             </li>
             <li className="flex items-center gap-2">
-              <span className="h-1.5 w-1.5 rounded-full bg-brand-400" aria-hidden="true" />
+              <span className="h-1.5 w-1.5 rounded-full bg-primary" aria-hidden="true" />
               Preparing recommendations
             </li>
           </ul>
@@ -596,9 +596,9 @@ export function DiagnosePage() {
 
       {/* Empty state */}
       {!hasReport && !isAnalyzing && !awaitingFollowUp && (
-        <div className="mt-8 rounded-2xl border border-dashed border-slate-300 bg-white p-8 text-center">
-          <p className="text-sm font-medium text-slate-600">Your diagnostic report will appear here</p>
-          <p className="mx-auto mt-1 max-w-md text-xs text-slate-500">
+        <div className="mt-8 rounded-lg border border-dashed border-outline-variant bg-surface-container p-8 text-center">
+          <p className="text-sm font-medium text-on-surface-variant">Your diagnostic report will appear here</p>
+          <p className="mx-auto mt-1 max-w-md text-xs text-on-surface-variant">
             Possible causes, urgency, recommended checks, repair guidance, and a mechanic-ready summary.
           </p>
         </div>
@@ -608,7 +608,7 @@ export function DiagnosePage() {
       {hasReport && displayResults.length > 0 && (
         <div className="mt-8 space-y-8">
           {isFromCache && (
-            <div className="rounded-lg border border-amber-200 bg-amber-50 p-4" role="status" aria-live="polite">
+            <div className="rounded-lg border border-secondary-container/40 bg-secondary-container/20 p-4" role="status" aria-live="polite">
               <div className="flex items-start gap-3">
                 <svg className="h-5 w-5 shrink-0 text-amber-400" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
                   <path
@@ -618,8 +618,8 @@ export function DiagnosePage() {
                   />
                 </svg>
                 <div>
-                  <p className="text-sm font-medium text-amber-800">Viewing previous results</p>
-                  <p className="mt-0.5 text-xs text-amber-700">
+                  <p className="text-sm font-medium text-secondary">Viewing previous results</p>
+                  <p className="mt-0.5 text-xs text-secondary">
                     This information was loaded previously. Cached on {cachedSession ? new Date(cachedSession.cachedAt).toLocaleString() : ''}.
                   </p>
                 </div>
@@ -629,50 +629,50 @@ export function DiagnosePage() {
 
           {/* Summary */}
           <Section title="Diagnostic Assessment" subtitle="A structured overview of the most likely issue and how serious it is.">
-            <div className="rounded-2xl border border-slate-200 bg-white p-5 sm:p-6 shadow-sm">
+            <div className="rounded-lg border border-outline-variant bg-surface-container p-5 sm:p-6 shadow-sm">
               <div className="grid gap-5 sm:grid-cols-3">
                 <div className="sm:col-span-2">
-                  <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">Most likely issue</p>
-                  <p className="mt-1 text-lg font-semibold text-slate-900">{topHypothesis?.fault_description}</p>
+                  <p className="text-xs font-semibold uppercase tracking-wider text-on-surface-variant">Most likely issue</p>
+                  <p className="mt-1 text-lg font-semibold text-on-surface">{topHypothesis?.fault_description}</p>
                   {topHypothesis?.repair_suggestion && (
-                    <p className="mt-3 text-sm text-slate-600">{topHypothesis.repair_suggestion}</p>
+                    <p className="mt-3 text-sm text-on-surface-variant">{topHypothesis.repair_suggestion}</p>
                   )}
                   {topHypothesis?.recommended_checks?.length ? (
-                    <p className="mt-3 text-sm text-slate-600">
-                      <span className="font-medium text-slate-700">Recommended next step: </span>
+                    <p className="mt-3 text-sm text-on-surface-variant">
+                      <span className="font-medium text-on-surface-variant">Recommended next step: </span>
                       {topHypothesis.recommended_checks[0]}
                     </p>
                   ) : null}
                 </div>
                 <div className="space-y-3">
                   <div>
-                    <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">Confidence</p>
-                    <p className="mt-1 text-sm font-medium text-slate-900">
+                    <p className="text-xs font-semibold uppercase tracking-wider text-on-surface-variant">Confidence</p>
+                    <p className="mt-1 text-sm font-medium text-on-surface">
                       {topHypothesis ? `${confidenceLabel(topHypothesis.confidence_score)} (${Math.round(topHypothesis.confidence_score * 100)}%)` : '—'}
                     </p>
                   </div>
                   <div>
-                    <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">Severity</p>
-                    <p className="mt-1 text-sm font-medium text-slate-900">{topHypothesis?.severity ? topHypothesis.severity.charAt(0).toUpperCase() + topHypothesis.severity.slice(1) : '—'}</p>
+                    <p className="text-xs font-semibold uppercase tracking-wider text-on-surface-variant">Severity</p>
+                    <p className="mt-1 text-sm font-medium text-on-surface">{topHypothesis?.severity ? topHypothesis.severity.charAt(0).toUpperCase() + topHypothesis.severity.slice(1) : '—'}</p>
                   </div>
                 </div>
               </div>
 
               {overallSafetyTier && (
-                <div className={cn('mt-5 rounded-xl border p-4', SAFETY_BANNER[overallSafetyTier].classes)}>
+                <div className={cn('mt-5 rounded-lg border p-4', SAFETY_BANNER[overallSafetyTier].classes)}>
                   <p className="text-sm font-semibold">{SAFETY_BANNER[overallSafetyTier].label}</p>
                   <p className="mt-1 text-xs">{SAFETY_BANNER[overallSafetyTier].description}</p>
                 </div>
               )}
 
-              <div className="mt-5 flex flex-wrap items-center gap-x-6 gap-y-1 text-sm text-slate-500">
+              <div className="mt-5 flex flex-wrap items-center gap-x-6 gap-y-1 text-sm text-on-surface-variant">
                 <span>
-                  <span className="font-medium text-slate-700">{displayResults.length}</span>{' '}
+                  <span className="font-medium text-on-surface-variant">{displayResults.length}</span>{' '}
                   {displayResults.length === 1 ? 'possible cause' : 'possible causes'}
                 </span>
                 {vehicleContextSummary && (
                   <span>
-                    Vehicle: <span className="font-medium text-slate-700">{vehicleContextSummary}</span>
+                    Vehicle: <span className="font-medium text-on-surface-variant">{vehicleContextSummary}</span>
                   </span>
                 )}
               </div>
@@ -730,7 +730,7 @@ export function DiagnosePage() {
               title="Affected Areas"
               subtitle="Explore the components associated with the diagnostic assessment."
             >
-              <Vehicle3DViewer
+                  <VehicleViewer
                 vehicleType={responseVehicleType}
                 highlightedComponents={highlightedComponents}
                 selectedComponent={selectedComponent}
@@ -870,8 +870,8 @@ export function MechanicSummary({
 
   return (
     <Section title="Mechanic-Ready Summary" subtitle="A clean summary you can hand to a workshop.">
-      <div className="rounded-2xl border border-slate-200 bg-white p-5 sm:p-6 shadow-sm">
-        <pre className="max-h-80 overflow-auto whitespace-pre-wrap break-words font-mono text-xs leading-relaxed text-slate-700">
+      <div className="rounded-lg border border-outline-variant bg-surface-container p-5 sm:p-6 shadow-sm">
+        <pre className="max-h-80 overflow-auto whitespace-pre-wrap break-words font-mono text-xs leading-relaxed text-on-surface-variant">
           {summaryText}
         </pre>
         <div className="mt-4">

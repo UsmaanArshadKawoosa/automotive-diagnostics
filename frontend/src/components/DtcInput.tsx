@@ -58,14 +58,14 @@ export function DtcInput({ codes, onChange, error, disabled }: DtcInputProps) {
             <span
               key={code}
               className={cn(
-                'inline-flex items-center gap-1 rounded-md bg-brand-50 px-2.5 py-1 text-sm font-medium text-brand-700 ring-1 ring-inset ring-brand-700/10'
+                'inline-flex items-center gap-1 rounded-md bg-primary-container/20 px-2.5 py-1 text-sm font-medium text-primary-fixed-dim ring-1 ring-inset ring-primary/20'
               )}
             >
               <span className="font-mono">{code}</span>
                <button
                  type="button"
                  onClick={() => handleRemove(code)}
-                 className="ml-0.5 text-brand-400 hover:text-brand-600 min-w-[44px] min-h-[44px] flex items-center justify-center"
+                 className="ml-0.5 text-primary hover:text-primary min-w-[44px] min-h-[44px] flex items-center justify-center"
                  aria-label={`Remove ${code}`}
                  disabled={disabled}
                >

@@ -10,7 +10,7 @@ export function Card({ children, className }: CardProps) {
   return (
     <div
       className={cn(
-        'rounded-lg border border-slate-200 bg-white shadow-sm',
+        'rounded-lg border border-outline-variant bg-surface-container shadow-sm',
         className
       )}
     >
@@ -27,10 +27,10 @@ interface CardHeaderProps {
 
 export function CardHeader({ title, subtitle, action }: CardHeaderProps) {
   return (
-    <div className="flex items-start justify-between border-b border-slate-100 px-5 py-4">
+    <div className="flex items-start justify-between border-b border-outline-variant px-5 py-4">
       <div>
-        <h3 className="text-base font-semibold text-slate-900">{title}</h3>
-        {subtitle && <p className="mt-0.5 text-sm text-slate-500">{subtitle}</p>}
+        <h3 className="font-headline-md text-base font-semibold text-on-surface">{title}</h3>
+        {subtitle && <p className="mt-0.5 text-sm text-on-surface-variant">{subtitle}</p>}
       </div>
       {action && <div className="ml-4">{action}</div>}
     </div>
@@ -43,5 +43,5 @@ interface CardBodyProps {
 }
 
 export function CardBody({ children, className }: CardBodyProps) {
-  return <div className={cn('px-5 py-4', className)}>{children}</div>;
+  return <div className={cn('px-5 py-4 text-on-surface', className)}>{children}</div>;
 }

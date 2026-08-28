@@ -12,8 +12,8 @@ export function Label({ children, htmlFor, required }: LabelProps) {
     <label
       htmlFor={htmlFor}
       className={cn(
-        'block text-sm font-medium text-slate-700',
-        required && "after:ml-0.5 after:text-red-500 after:content-['*']"
+        'block text-sm font-medium text-on-surface-variant',
+        required && "after:ml-0.5 after:text-secondary after:content-['*']"
       )}
     >
       {children}
@@ -65,18 +65,18 @@ export function Input({
         maxLength={maxLength}
         disabled={disabled}
         className={cn(
-          'block w-full rounded-md border px-3 py-2.5 text-sm shadow-sm transition-colors min-h-[44px]',
-          'placeholder:text-slate-400',
-          'focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500',
+          'block w-full rounded-md border bg-surface-container-lowest px-3 py-2.5 text-sm text-on-surface shadow-sm transition-colors min-h-[44px]',
+          'placeholder:text-on-surface-variant/70',
+          'focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary',
           error
-            ? 'border-red-300 focus:ring-red-500 focus:border-red-500'
-            : 'border-slate-300',
-          disabled && 'bg-slate-50 text-slate-500',
+            ? 'border-error focus:ring-error/50 focus:border-error'
+            : 'border-outline-variant',
+          disabled && 'cursor-not-allowed opacity-50',
           className
         )}
       />
       {(error || helperText) && (
-        <p className={cn('text-xs', error ? 'text-red-600' : 'text-slate-500')}>
+        <p className={cn('text-xs', error ? 'text-error' : 'text-on-surface-variant')}>
           {error || helperText}
         </p>
       )}
@@ -123,18 +123,18 @@ export function Textarea({
         maxLength={maxLength}
         disabled={disabled}
         className={cn(
-          'block w-full rounded-md border px-3 py-2.5 text-sm shadow-sm transition-colors min-h-[44px]',
-          'placeholder:text-slate-400',
-          'focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500',
+          'block w-full rounded-md border bg-surface-container-lowest px-3 py-2.5 text-sm text-on-surface shadow-sm transition-colors min-h-[44px]',
+          'placeholder:text-on-surface-variant/70',
+          'focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary',
           'resize-y',
           error
-            ? 'border-red-300 focus:ring-red-500 focus:border-red-500'
-            : 'border-slate-300',
-          disabled && 'bg-slate-50 text-slate-500'
+            ? 'border-error focus:ring-error/50 focus:border-error'
+            : 'border-outline-variant',
+          disabled && 'cursor-not-allowed opacity-50'
         )}
       />
       {(error || helperText) && (
-        <p className={cn('text-xs', error ? 'text-red-600' : 'text-slate-500')}>
+        <p className={cn('text-xs', error ? 'text-error' : 'text-on-surface-variant')}>
           {error || helperText}
         </p>
       )}
@@ -176,10 +176,10 @@ export function Select({
         onChange={(e) => onChange(e.target.value)}
         disabled={disabled}
         className={cn(
-          'block w-full rounded-md border px-3 py-2.5 text-sm shadow-sm transition-colors min-h-[44px]',
-          'focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500',
-          disabled && 'bg-slate-50 text-slate-500',
-          'border-slate-300 bg-white text-slate-900',
+          'block w-full rounded-md border bg-surface-container-lowest px-3 py-2.5 text-sm text-on-surface shadow-sm transition-colors min-h-[44px]',
+          'focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary',
+          disabled && 'cursor-not-allowed opacity-50',
+          'border-outline-variant',
           className
         )}
       >
@@ -194,7 +194,7 @@ export function Select({
           </option>
         ))}
       </select>
-      {helperText && <p className="text-xs text-slate-500">{helperText}</p>}
+      {helperText && <p className="text-xs text-on-surface-variant">{helperText}</p>}
     </div>
   );
 }
@@ -221,16 +221,16 @@ export function Button({
   className,
 }: ButtonProps) {
   const base =
-    'inline-flex items-center justify-center gap-2 rounded-md font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed min-h-[44px]';
+    'inline-flex items-center justify-center gap-2 rounded-md font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-primary/40 disabled:opacity-50 disabled:cursor-not-allowed min-h-[44px]';
   const sizes = {
     sm: 'px-3 py-2 text-xs min-h-[40px]',
     md: 'px-4 py-2.5 text-sm',
   };
   const variants = {
-    primary: 'bg-brand-600 text-white hover:bg-brand-700 focus:ring-brand-500',
-    secondary: 'bg-white text-slate-700 border border-slate-300 hover:bg-slate-50 focus:ring-brand-500',
-    danger: 'bg-red-600 text-white hover:bg-red-700 focus:ring-red-500',
-    ghost: 'text-slate-600 hover:bg-slate-100',
+    primary: 'bg-primary-container text-on-primary-container hover:bg-primary-fixed shadow-sm active:scale-[0.98]',
+    secondary: 'bg-surface-container-high text-on-surface border border-outline-variant hover:bg-surface-container-highest active:scale-[0.98]',
+    danger: 'bg-error-container text-on-error-container hover:bg-error active:scale-[0.98]',
+    ghost: 'text-on-surface-variant hover:bg-surface-container-high',
   };
   return (
     <button

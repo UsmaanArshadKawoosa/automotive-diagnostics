@@ -4,27 +4,27 @@ import { cn } from '../utils/cn';
 const SEVERITY_CONFIG: Record<Severity, { label: string; bg: string; text: string; ring: string }> = {
   low: {
     label: 'Low',
-    bg: 'bg-green-50',
-    text: 'text-green-700',
-    ring: 'ring-green-600/20',
+    bg: 'bg-green-900/40',
+    text: 'text-green-300',
+    ring: 'ring-green-500/30',
   },
   medium: {
     label: 'Medium',
-    bg: 'bg-amber-50',
-    text: 'text-amber-700',
-    ring: 'ring-amber-600/20',
+    bg: 'bg-secondary-container/25',
+    text: 'text-secondary',
+    ring: 'ring-secondary/30',
   },
   high: {
     label: 'High',
-    bg: 'bg-red-50',
-    text: 'text-red-700',
-    ring: 'ring-red-600/20',
+    bg: 'bg-error-container/30',
+    text: 'text-error',
+    ring: 'ring-error/30',
   },
   critical: {
     label: 'Critical',
-    bg: 'bg-red-100',
-    text: 'text-red-900',
-    ring: 'ring-red-700/20',
+    bg: 'bg-error-container',
+    text: 'text-on-error-container',
+    ring: 'ring-error/40',
   },
 };
 
@@ -46,10 +46,10 @@ export function SeverityBadge({ severity }: { severity?: Severity | null }) {
 }
 
 const STATUS_CONFIG: Record<string, { label: string; bg: string; text: string }> = {
-  proposed: { label: 'Proposed', bg: 'bg-slate-100', text: 'text-slate-700' },
-  investigating: { label: 'Investigating', bg: 'bg-blue-50', text: 'text-blue-700' },
-  confirmed: { label: 'Confirmed', bg: 'bg-green-50', text: 'text-green-700' },
-  rejected: { label: 'Rejected', bg: 'bg-red-50', text: 'text-red-700' },
+  proposed: { label: 'Proposed', bg: 'bg-surface-container-high', text: 'text-on-surface-variant' },
+  investigating: { label: 'Investigating', bg: 'bg-primary-container/25', text: 'text-primary' },
+  confirmed: { label: 'Confirmed', bg: 'bg-green-900/40', text: 'text-green-300' },
+  rejected: { label: 'Rejected', bg: 'bg-error-container/25', text: 'text-error' },
 };
 
 export function StatusBadge({ status }: { status: string }) {
@@ -62,10 +62,10 @@ export function StatusBadge({ status }: { status: string }) {
 }
 
 const CHECK_CONFIG: Record<string, { label: string; bg: string; text: string }> = {
-  recommended: { label: 'Recommended', bg: 'bg-slate-100', text: 'text-slate-600' },
-  performed: { label: 'Performed', bg: 'bg-blue-50', text: 'text-blue-700' },
-  passed: { label: 'Passed', bg: 'bg-green-50', text: 'text-green-700' },
-  failed: { label: 'Failed', bg: 'bg-red-50', text: 'text-red-700' },
+  recommended: { label: 'Recommended', bg: 'bg-surface-container-high', text: 'text-on-surface-variant' },
+  performed: { label: 'Performed', bg: 'bg-primary-container/25', text: 'text-primary' },
+  passed: { label: 'Passed', bg: 'bg-green-900/40', text: 'text-green-300' },
+  failed: { label: 'Failed', bg: 'bg-error-container/25', text: 'text-error' },
 };
 
 export function CheckStatusBadge({ status }: { status: string }) {

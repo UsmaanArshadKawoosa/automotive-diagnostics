@@ -11,9 +11,9 @@ function AnalyticsSkeleton() {
           <CardHeader title={['Overview', 'Status', 'Checks', 'DTCs'][i] || 'Section'} />
           <CardBody>
             <div className="space-y-3">
-              <div className="h-4 w-full animate-pulse rounded bg-slate-200" />
-              <div className="h-4 w-5/6 animate-pulse rounded bg-slate-200" />
-              <div className="h-4 w-4/6 animate-pulse rounded bg-slate-200" />
+              <div className="h-4 w-full animate-pulse rounded bg-surface-container-high" />
+              <div className="h-4 w-5/6 animate-pulse rounded bg-surface-container-high" />
+              <div className="h-4 w-4/6 animate-pulse rounded bg-surface-container-high" />
             </div>
           </CardBody>
         </Card>
@@ -34,8 +34,8 @@ export function AnalyticsPage() {
   return (
     <div className="mx-auto max-w-5xl">
         <div className="mb-8">
-          <h1 className="text-2xl font-bold text-slate-900">Diagnostic Analytics</h1>
-          <p className="mt-1 text-slate-600">
+          <h1 className="text-2xl font-bold text-on-surface">Diagnostic Analytics</h1>
+          <p className="mt-1 text-on-surface-variant">
             Overview of diagnostic outcomes and trends across all sessions.
           </p>
         </div>
@@ -66,13 +66,13 @@ export function AnalyticsPage() {
                   <div className="space-y-2">
                     {Object.entries(data.hypothesis_status_distribution).map(([status, count]) => (
                       <div key={status} className="flex items-center justify-between">
-                        <span className="text-sm font-medium text-slate-700 capitalize">{status}</span>
-                        <span className="text-sm font-semibold text-slate-900">{count}</span>
+                        <span className="text-sm font-medium text-on-surface-variant capitalize">{status}</span>
+                        <span className="text-sm font-semibold text-on-surface">{count}</span>
                       </div>
                     ))}
                   </div>
                 ) : (
-                  <p className="text-sm text-slate-500">No data available.</p>
+                  <p className="text-sm text-on-surface-variant">No data available.</p>
                 )}
               </CardBody>
             </Card>
@@ -85,13 +85,13 @@ export function AnalyticsPage() {
                   <div className="space-y-2">
                     {Object.entries(data.check_status_distribution).map(([status, count]) => (
                       <div key={status} className="flex items-center justify-between">
-                        <span className="text-sm font-medium text-slate-700 capitalize">{status}</span>
-                        <span className="text-sm font-semibold text-slate-900">{count}</span>
+                        <span className="text-sm font-medium text-on-surface-variant capitalize">{status}</span>
+                        <span className="text-sm font-semibold text-on-surface">{count}</span>
                       </div>
                     ))}
                   </div>
                 ) : (
-                  <p className="text-sm text-slate-500">No data available.</p>
+                  <p className="text-sm text-on-surface-variant">No data available.</p>
                 )}
               </CardBody>
             </Card>
@@ -103,13 +103,13 @@ export function AnalyticsPage() {
                   <div className="space-y-2">
                     {data.common_dtcs.map((item) => (
                       <div key={item.code} className="flex items-center justify-between">
-                        <span className="font-mono text-sm font-medium text-slate-700">{item.code}</span>
-                        <span className="text-sm font-semibold text-slate-900">{item.count}</span>
+                        <span className="font-mono text-sm font-medium text-on-surface-variant">{item.code}</span>
+                        <span className="text-sm font-semibold text-on-surface">{item.count}</span>
                       </div>
                     ))}
                   </div>
                 ) : (
-                  <p className="text-sm text-slate-500">No DTC data available.</p>
+                  <p className="text-sm text-on-surface-variant">No DTC data available.</p>
                 )}
               </CardBody>
             </Card>
@@ -121,23 +121,23 @@ export function AnalyticsPage() {
                   <div className="overflow-x-auto">
                     <table className="min-w-full text-left text-sm">
                       <thead>
-                        <tr className="border-b border-slate-200">
-                          <th className="pb-2 pr-4 font-semibold text-slate-600">Fault Description</th>
-                          <th className="pb-2 text-right font-semibold text-slate-600">Occurrences</th>
+                        <tr className="border-b border-outline-variant">
+                          <th className="pb-2 pr-4 font-semibold text-on-surface-variant">Fault Description</th>
+                          <th className="pb-2 text-right font-semibold text-on-surface-variant">Occurrences</th>
                         </tr>
                       </thead>
                       <tbody>
                         {data.confirmed_faults.map((item) => (
-                          <tr key={item.fault_description} className="border-b border-slate-50 last:border-0">
-                            <td className="py-2 pr-4 text-slate-900">{item.fault_description}</td>
-                            <td className="py-2 text-right font-mono text-slate-600">{item.count}</td>
+                          <tr key={item.fault_description} className="border-b border-outline-variant last:border-0">
+                            <td className="py-2 pr-4 text-on-surface">{item.fault_description}</td>
+                            <td className="py-2 text-right font-mono text-on-surface-variant">{item.count}</td>
                           </tr>
                         ))}
                       </tbody>
                     </table>
                   </div>
                 ) : (
-                  <p className="text-sm text-slate-500">No confirmed faults recorded yet.</p>
+                  <p className="text-sm text-on-surface-variant">No confirmed faults recorded yet.</p>
                 )}
               </CardBody>
             </Card>
@@ -149,9 +149,9 @@ export function AnalyticsPage() {
 
 function Stat({ label, value }: { label: string; value: number }) {
   return (
-    <div className="rounded-md bg-slate-50 p-4">
-      <p className="text-2xl font-bold text-slate-900">{value}</p>
-      <p className="text-sm text-slate-500">{label}</p>
+    <div className="rounded-md bg-surface-container-low p-4">
+      <p className="text-2xl font-bold text-on-surface">{value}</p>
+      <p className="text-sm text-on-surface-variant">{label}</p>
     </div>
   );
 }

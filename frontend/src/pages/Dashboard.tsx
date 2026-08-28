@@ -6,8 +6,8 @@ export function Dashboard() {
   return (
     <div className="space-y-8">
       <section>
-        <h1 className="text-2xl font-bold text-slate-900">Automotive Diagnostic Engine</h1>
-        <p className="mt-2 text-slate-600">
+        <h1 className="text-2xl font-bold text-on-surface">Automotive Diagnostic Engine</h1>
+        <p className="mt-2 text-on-surface-variant">
           AI-powered diagnostic reasoning for vehicle symptoms and DTC codes.
           Enter your vehicle information and symptoms to receive structured diagnostic hypotheses.
         </p>
@@ -50,7 +50,7 @@ export function Dashboard() {
         <Card>
           <CardHeader title="How It Works" />
           <CardBody>
-            <ol className="space-y-4 text-sm text-slate-600">
+            <ol className="space-y-4 text-sm text-on-surface-variant">
               {[
                 'Enter your vehicle make, model, year, and any DTC codes',
                 'Describe the symptoms you are experiencing',
@@ -59,7 +59,7 @@ export function Dashboard() {
                 'Track outcomes by updating hypothesis status and check results',
               ].map((step, idx) => (
                 <li key={idx} className="flex gap-3">
-                  <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-brand-100 text-xs font-bold text-brand-700">
+                  <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-primary-container/25 text-xs font-bold text-primary-fixed-dim">
                     {idx + 1}
                   </span>
                   {step}
@@ -73,16 +73,16 @@ export function Dashboard() {
           <CardBody>
             <div className="space-y-3">
               {[
-                { severity: 'low', label: 'Low', desc: 'Minor issue. Monitor and address at next service.', dot: 'bg-green-500 ring-green-500/20' },
-                { severity: 'medium', label: 'Medium', desc: 'Should be addressed soon to prevent escalation.', dot: 'bg-amber-500 ring-amber-500/20' },
+                { severity: 'low', label: 'Low', desc: 'Minor issue. Monitor and address at next service.', dot: 'bg-green-900/300 ring-green-500/20' },
+                { severity: 'medium', label: 'Medium', desc: 'Should be addressed soon to prevent escalation.', dot: 'bg-secondary-container/200 ring-amber-500/20' },
                 { severity: 'high', label: 'High', desc: 'Urgent attention required. Address promptly.', dot: 'bg-red-500 ring-red-500/20' },
                 { severity: 'critical', label: 'Critical', desc: 'Immediate action required. Do not drive until resolved.', dot: 'bg-red-900 ring-red-900/20' },
               ].map((item) => (
                 <div key={item.severity} className="flex items-center gap-3">
                   <span className={cn('inline-flex h-2.5 w-2.5 rounded-full ring-4', item.dot)} />
                   <div>
-                    <span className="text-sm font-semibold text-slate-900">{item.label}</span>
-                    <span className="text-sm text-slate-500"> - {item.desc}</span>
+                    <span className="text-sm font-semibold text-on-surface">{item.label}</span>
+                    <span className="text-sm text-on-surface-variant"> - {item.desc}</span>
                   </div>
                 </div>
               ))}
@@ -110,12 +110,12 @@ function StatCard({
       <Card className="transition-shadow hover:shadow-md">
         <CardBody>
           <div className="flex items-start justify-between">
-            <div className="rounded-lg bg-brand-50 p-2 text-brand-600 group-hover:bg-brand-100 transition-colors">
+            <div className="rounded-lg bg-primary-container/20 p-2 text-primary group-hover:bg-primary-container/25 transition-colors">
               {icon}
             </div>
           </div>
-          <h3 className="mt-3 text-sm font-semibold text-slate-900">{title}</h3>
-          <p className="mt-1 text-sm text-slate-500">{description}</p>
+          <h3 className="mt-3 text-sm font-semibold text-on-surface">{title}</h3>
+          <p className="mt-1 text-sm text-on-surface-variant">{description}</p>
         </CardBody>
       </Card>
     </Link>

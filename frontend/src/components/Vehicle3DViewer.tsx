@@ -26,6 +26,12 @@ export interface Vehicle3DViewerProps {
   className?: string;
   height?: number;
   children?: ReactNode;
+  /** Controlled active camera preset (e.g. when wrapped by a HUD). */
+  activePreset?: string;
+  /** Called when the user requests a camera preset change. */
+  onPresetChange?: (preset: string) => void;
+  /** Hide the built-in camera/component controls (used when a HUD provides them). */
+  hideControls?: boolean;
 }
 
 const SAFETY_TIER_COLORS: Record<string, string> = {
@@ -410,7 +416,21 @@ export function Vehicle3DViewer({
   className = '',
   height = 320,
   children,
+  activePreset,
+  onPresetChange,
+  hideControls = false,
 }: Vehicle3DViewerProps) {
+  const isControlled = onPresetChange !== undefined;
+  const [internalPreset, setInternalPreset] = React.useState<string>('overview');
+  const activePresetValue = isControlled ? (activePreset ?? 'overview') : internalPreset;
+  const handlePresetChange = (preset: string) => {
+    if (isControlled) {
+      onPresetChange?.(preset);
+    } else {
+      setInternalPreset(preset);
+    }
+  };
+
   const [loadState, setLoadState] = React.useState<'idle' | 'loading' | 'loaded' | 'error' | 'no-meshes'>('idle');
   const [loadError, setLoadError] = React.useState<string | null>(null);
 
@@ -443,12 +463,7 @@ export function Vehicle3DViewer({
 
   const { modelAsset } = getVehicleTypeConfig(vehicleType);
 
-  const [activePreset, setActivePreset] = React.useState<string>('overview');
   const controlsRef = useRef<OrbitControlsImpl | null>(null);
-
-  const handlePresetChange = (preset: string) => {
-    setActivePreset(preset);
-  };
 
   const fallback = (
     <div className="text-center py-4">
@@ -476,15 +491,15 @@ export function Vehicle3DViewer({
   return (
     <div
       className={[
-        'flex flex-col items-center justify-center rounded-lg border border-dashed border-slate-300 bg-slate-50 p-3 sm:p-4 text-center sm:text-left',
+        'flex flex-col items-center justify-center rounded-lg border border-outline-variant bg-surface-container p-3 sm:p-4 text-center sm:text-left',
         className,
       ].join(' ')}
     >
       <div className="w-full">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 sm:gap-3">
           <div>
-            <div className="text-sm font-medium text-slate-500">3D Vehicle Visualization</div>
-            <div className="mt-1 text-xs text-slate-400">
+            <div className="text-sm font-medium text-on-surface">3D Vehicle Visualization</div>
+            <div className="mt-1 text-xs text-on-surface-variant">
               <span className="font-medium">Vehicle type: {vehicleType}</span>
               {modelAsset && (
                 <span className="ml-2 text-[10px] text-slate-400">
@@ -504,9 +519,9 @@ export function Vehicle3DViewer({
       <div className="mt-3 w-full">
         <ErrorBoundary fallback={fallback}>
           <Suspense fallback={
-            <div className="flex items-center justify-center rounded-lg border border-dashed border-slate-200 bg-white p-4 sm:p-6">
+            <div className="flex items-center justify-center rounded-lg border border-dashed border-outline-variant bg-surface-container-high p-4 sm:p-6">
               <div className="flex items-center gap-3">
-                <svg className="h-5 w-5 animate-spin text-brand-600" viewBox="0 0 24 24" fill="none">
+                <svg className="h-5 w-5 animate-spin text-primary" viewBox="0 0 24 24" fill="none">
                   <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                   <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
                 </svg>
@@ -534,7 +549,7 @@ export function Vehicle3DViewer({
                   <GenericVehicleModel highlightedRegions={highlightedRegions} selectedComponent={selectedComponent} onRegionClick={handleRegionClick} />
                 )}
                 
-                <CameraControls selectedComponent={selectedComponent} activePreset={activePreset} controlsRef={controlsRef} />
+                <CameraControls selectedComponent={selectedComponent} activePreset={activePresetValue} controlsRef={controlsRef} />
               </Canvas>
             </div>
           </Suspense>
@@ -542,42 +557,44 @@ export function Vehicle3DViewer({
       </div>
 
       {/* Camera Presets */}
-      <div className="mt-3 w-full">
-        <p className="text-xs font-medium uppercase tracking-wider text-slate-500 mb-1.5">Camera</p>
-        <div className="flex flex-wrap gap-1.5 sm:gap-2 justify-center">
-          {Object.keys(CAMERA_PRESETS).map((preset) => (
+      {!hideControls && (
+        <div className="mt-3 w-full">
+          <p className="text-xs font-medium uppercase tracking-wider text-on-surface-variant mb-1.5">Camera</p>
+          <div className="flex flex-wrap gap-1.5 sm:gap-2 justify-center">
+            {Object.keys(CAMERA_PRESETS).map((preset) => (
+              <button
+                key={preset}
+                type="button"
+                onClick={() => handlePresetChange(preset)}
+                className={[
+                  'rounded-md border px-2.5 py-2 text-xs transition-colors min-w-[44px] min-h-[44px]',
+                  activePresetValue === preset
+                    ? 'border-primary bg-primary-container/25 text-primary-fixed-dim'
+                    : 'border-outline-variant bg-surface-container-high text-on-surface-variant hover:bg-surface-container-highest',
+                ].join(' ')}
+                aria-label={`Camera preset ${preset}`}
+              >
+                {preset.charAt(0).toUpperCase() + preset.slice(1).replace('_', ' ')}
+              </button>
+            ))}
             <button
-              key={preset}
               type="button"
-              onClick={() => handlePresetChange(preset)}
+              onClick={() => handlePresetChange('overview')}
               className={[
                 'rounded-md border px-2.5 py-2 text-xs transition-colors min-w-[44px] min-h-[44px]',
-                activePreset === preset
-                  ? 'border-brand-500 bg-brand-50 text-brand-700'
-                  : 'border-slate-200 bg-white text-slate-600 hover:bg-slate-50',
+                'border-outline-variant bg-surface-container-high text-on-surface-variant hover:bg-surface-container-highest',
               ].join(' ')}
-              aria-label={`Camera preset ${preset}`}
+              aria-label="Reset camera to overview"
             >
-              {preset.charAt(0).toUpperCase() + preset.slice(1).replace('_', ' ')}
+              Reset
             </button>
-          ))}
-          <button
-            type="button"
-            onClick={() => handlePresetChange('overview')}
-            className={[
-              'rounded-md border px-2.5 py-2 text-xs transition-colors min-w-[44px] min-h-[44px]',
-              'border-slate-200 bg-white text-slate-600 hover:bg-slate-50',
-            ].join(' ')}
-            aria-label="Reset camera to overview"
-          >
-            Reset
-          </button>
+          </div>
         </div>
-      </div>
+      )}
 
-      {highlightedComponents.length > 0 && (
+      {!hideControls && highlightedComponents.length > 0 && (
         <div className="mt-3 w-full">
-          <p className="text-xs font-medium uppercase tracking-wider text-slate-500 mb-1.5">Highlighted</p>
+          <p className="text-xs font-medium uppercase tracking-wider text-on-surface-variant mb-1.5">Highlighted</p>
           <div className="flex flex-wrap gap-1.5 sm:gap-2">
             {highlightedComponents.map((c) => (
               <button
@@ -587,8 +604,8 @@ export function Vehicle3DViewer({
                 className={[
                   'rounded-md border px-2.5 py-2 text-xs transition-colors min-w-[44px] min-h-[44px]',
                   selectedComponent?.component_id === c.component_id
-                    ? 'border-brand-500 bg-brand-50 text-brand-700'
-                    : 'border-slate-200 bg-white text-slate-600 hover:bg-slate-50',
+                    ? 'border-primary bg-primary-container/25 text-primary-fixed-dim'
+                    : 'border-outline-variant bg-surface-container-high text-on-surface-variant hover:bg-surface-container-highest',
                 ].join(' ')}
               >
                 {c.component_id.replace(/_/g, ' ')}
@@ -599,15 +616,15 @@ export function Vehicle3DViewer({
       )}
 
       {selectedComponent && (
-        <div className="mt-2 flex items-center gap-2 text-xs text-brand-700">
-          <span className="inline-flex h-2 w-2 shrink-0 rounded-full bg-brand-500" aria-hidden="true" />
+        <div className="mt-2 flex items-center gap-2 text-xs text-primary-fixed-dim">
+          <span className="inline-flex h-2 w-2 shrink-0 rounded-full bg-primary" aria-hidden="true" />
           <span className="font-medium">Selected: {selectedComponent.component_id.replace(/_/g, ' ')}</span>
         </div>
       )}
 
       {selectedComponent && selectedComponent.safety_tier && (
         <div className="mt-3 w-full">
-          <div className="rounded-md border border-slate-200 bg-slate-50 p-3">
+          <div className="rounded-md border border-outline-variant bg-surface-container-low p-3">
             <div className="flex items-start gap-2">
               <div className={[
                 'flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center',
@@ -634,17 +651,17 @@ export function Vehicle3DViewer({
               <div className="flex-1 min-w-0">
                 <p className={[
                   'font-medium text-sm',
-                  SAFETY_TIER_COLORS[selectedComponent.safety_tier] ? SAFETY_TIER_COLORS[selectedComponent.safety_tier].replace('bg-', 'text-') : 'text-slate-600',
+                  SAFETY_TIER_COLORS[selectedComponent.safety_tier] ? SAFETY_TIER_COLORS[selectedComponent.safety_tier].replace('bg-', 'text-') : 'text-on-surface',
                 ].join(' ')}>
                   {selectedComponent.safety_tier_label || SAFETY_TIER_LABELS[selectedComponent.safety_tier] || 'Unknown safety tier'}
                 </p>
-                <p className="mt-1 text-sm text-slate-600">
+                <p className="mt-1 text-sm text-on-surface-variant">
                   {selectedComponent.safety_tier_description || SAFETY_TIER_ACTIONS[selectedComponent.safety_tier] || 'No safety guidance available.'}
                 </p>
                 {selectedComponent.safety_tier_reasoning && selectedComponent.safety_tier_reasoning.length > 0 && (
                   <div className="mt-2">
-                    <p className="text-xs font-medium text-slate-500">Why:</p>
-                    <ul className="mt-1 list-disc space-y-1 pl-4 text-xs text-slate-500">
+                    <p className="text-xs font-medium text-on-surface-variant">Why:</p>
+                    <ul className="mt-1 list-disc space-y-1 pl-4 text-xs text-on-surface-variant">
                       {selectedComponent.safety_tier_reasoning.map((reason, idx) => (
                         <li key={idx}>{reason}</li>
                       ))}
@@ -658,7 +675,7 @@ export function Vehicle3DViewer({
       )}
 
       {children}
-      <div className="mt-3 text-[10px] text-slate-400">
+      <div className="mt-3 text-[10px] text-on-surface-variant/70">
         Three.js renderer active
       </div>
     </div>

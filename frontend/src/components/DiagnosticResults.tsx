@@ -83,36 +83,36 @@ interface DIYRepairSectionProps {
 
 function DIYRepairSection({ diy }: DIYRepairSectionProps) {
   const suitabilityColors: Record<string, string> = {
-    'Recommended for DIY': 'border-green-200 bg-green-50 text-green-800',
-    'Possible with caution': 'border-amber-200 bg-amber-50 text-amber-800',
-    'Professional recommended': 'border-red-200 bg-red-50 text-red-800',
+    'Recommended for DIY': 'border-green-700/40 bg-green-900/30 text-green-300',
+    'Possible with caution': 'border-secondary-container/40 bg-secondary-container/20 text-secondary',
+    'Professional recommended': 'border-error-container/40 bg-error-container/25 text-on-error-container',
   };
 
   const difficultyColors: Record<string, string> = {
-    easy: 'bg-green-100 text-green-700',
-    moderate: 'bg-amber-100 text-amber-700',
-    advanced: 'bg-red-100 text-red-700',
+    easy: 'bg-green-900/40 text-green-300',
+    moderate: 'bg-secondary-container/25 text-secondary',
+    advanced: 'bg-error-container/25 text-on-error-container',
   };
 
   return (
-    <div className="mt-4 rounded-lg border border-slate-200 bg-white overflow-hidden">
-      <div className="border-b border-slate-100 px-4 py-3 bg-slate-50">
-        <h5 className="text-sm font-semibold text-slate-900">
+    <div className="mt-4 rounded-lg border border-outline-variant bg-surface-container-high overflow-hidden">
+      <div className="border-b border-outline-variant px-4 py-3 bg-surface-container">
+        <h5 className="text-sm font-semibold text-on-surface">
           {diy.suitable ? 'DIY Repair Guide' : 'Professional Service Recommended'}
         </h5>
         <div className="mt-1 flex items-center gap-2 flex-wrap">
           {diy.suitability && (
-            <span className={cn('text-xs font-medium px-2 py-0.5 rounded-full', suitabilityColors[diy.suitability] || 'bg-slate-100 text-slate-700')}>
+            <span className={cn('text-xs font-medium px-2 py-0.5 rounded-full', suitabilityColors[diy.suitability] || 'bg-surface-container-high text-on-surface-variant')}>
               {diy.suitability}
             </span>
           )}
           {diy.difficulty && (
-            <span className={cn('text-xs font-medium px-2 py-0.5 rounded-full', difficultyColors[diy.difficulty] || 'bg-slate-100 text-slate-700')}>
+            <span className={cn('text-xs font-medium px-2 py-0.5 rounded-full', difficultyColors[diy.difficulty] || 'bg-surface-container-high text-on-surface-variant')}>
               {diy.difficulty.charAt(0).toUpperCase() + diy.difficulty.slice(1)}
             </span>
           )}
           {diy.estimated_time && (
-            <span className="text-xs text-slate-600">
+            <span className="text-xs text-on-surface-variant">
               Est. time: {diy.estimated_time}
             </span>
           )}
@@ -122,8 +122,8 @@ function DIYRepairSection({ diy }: DIYRepairSectionProps) {
       <div className="p-4 space-y-4">
         {(diy.tools?.length ?? 0) > 0 && (
           <div>
-            <h6 className="text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">Tools Required</h6>
-            <ul className="list-disc space-y-1 pl-4 text-sm text-slate-700">
+            <h6 className="text-xs font-semibold uppercase tracking-wider text-on-surface-variant mb-1">Tools Required</h6>
+            <ul className="list-disc space-y-1 pl-4 text-sm text-on-surface-variant">
               {diy.tools?.map((tool, idx) => (
                 <li key={idx}>{tool}</li>
               ))}
@@ -133,8 +133,8 @@ function DIYRepairSection({ diy }: DIYRepairSectionProps) {
 
         {(diy.parts?.length ?? 0) > 0 && (
           <div>
-            <h6 className="text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">Parts / Materials</h6>
-            <ul className="list-disc space-y-1 pl-4 text-sm text-slate-700">
+            <h6 className="text-xs font-semibold uppercase tracking-wider text-on-surface-variant mb-1">Parts / Materials</h6>
+            <ul className="list-disc space-y-1 pl-4 text-sm text-on-surface-variant">
               {diy.parts?.map((part, idx) => (
                 <li key={idx}>{part}</li>
               ))}
@@ -143,9 +143,9 @@ function DIYRepairSection({ diy }: DIYRepairSectionProps) {
         )}
 
         {(diy.safety_warnings?.length ?? 0) > 0 && (
-          <div className="rounded-md border border-red-200 bg-red-50 p-3">
-            <h6 className="text-xs font-semibold uppercase tracking-wider text-red-800 mb-1">Safety Precautions</h6>
-            <ul className="list-disc space-y-1 pl-4 text-sm text-red-900">
+          <div className="rounded-md border border-error-container/40 bg-error-container/25 p-3">
+            <h6 className="text-xs font-semibold uppercase tracking-wider text-on-error-container mb-1">Safety Precautions</h6>
+            <ul className="list-disc space-y-1 pl-4 text-sm text-on-error-container">
               {diy.safety_warnings?.map((warning, idx) => (
                 <li key={idx}>{warning}</li>
               ))}
@@ -155,8 +155,8 @@ function DIYRepairSection({ diy }: DIYRepairSectionProps) {
 
         {(diy.preparation_steps?.length ?? 0) > 0 && (
           <div>
-            <h6 className="text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">Preparation</h6>
-            <ol className="list-decimal space-y-1 pl-4 text-sm text-slate-700">
+            <h6 className="text-xs font-semibold uppercase tracking-wider text-on-surface-variant mb-1">Preparation</h6>
+            <ol className="list-decimal space-y-1 pl-4 text-sm text-on-surface-variant">
               {diy.preparation_steps?.map((step, idx) => (
                 <li key={idx}>{step}</li>
               ))}
@@ -166,8 +166,8 @@ function DIYRepairSection({ diy }: DIYRepairSectionProps) {
 
         {(diy.steps?.length ?? 0) > 0 && (
           <div>
-            <h6 className="text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">Steps</h6>
-            <ol className="list-decimal space-y-1 pl-4 text-sm text-slate-700">
+            <h6 className="text-xs font-semibold uppercase tracking-wider text-on-surface-variant mb-1">Steps</h6>
+            <ol className="list-decimal space-y-1 pl-4 text-sm text-on-surface-variant">
               {diy.steps?.map((step, idx) => (
                 <li key={idx}>{step}</li>
               ))}
@@ -177,8 +177,8 @@ function DIYRepairSection({ diy }: DIYRepairSectionProps) {
 
         {(diy.verification_steps?.length ?? 0) > 0 && (
           <div>
-            <h6 className="text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">After Repair — Verification</h6>
-            <ol className="list-decimal space-y-1 pl-4 text-sm text-slate-700">
+            <h6 className="text-xs font-semibold uppercase tracking-wider text-on-surface-variant mb-1">After Repair — Verification</h6>
+            <ol className="list-decimal space-y-1 pl-4 text-sm text-on-surface-variant">
               {diy.verification_steps?.map((step, idx) => (
                 <li key={idx}>{step}</li>
               ))}
@@ -187,9 +187,9 @@ function DIYRepairSection({ diy }: DIYRepairSectionProps) {
         )}
 
         {(diy.professional_help_conditions?.length ?? 0) > 0 && (
-          <div className="rounded-md border border-amber-200 bg-amber-50 p-3">
-            <h6 className="text-xs font-semibold uppercase tracking-wider text-amber-800 mb-1">When to Seek Professional Help</h6>
-            <ul className="list-disc space-y-1 pl-4 text-sm text-amber-900">
+          <div className="rounded-md border border-secondary-container/40 bg-secondary-container/20 p-3">
+            <h6 className="text-xs font-semibold uppercase tracking-wider text-secondary mb-1">When to Seek Professional Help</h6>
+            <ul className="list-disc space-y-1 pl-4 text-sm text-secondary">
               {diy.professional_help_conditions?.map((condition, idx) => (
                 <li key={idx}>{condition}</li>
               ))}
@@ -257,9 +257,9 @@ export const HypothesisCard = forwardRef<HTMLDivElement, HypothesisCardProps>(({
       className={cn(
         'rounded-lg border p-4 sm:p-5 transition-all duration-200',
         isTopHypothesis
-          ? 'border-brand-500 bg-brand-50/50 shadow-md'
-          : 'border-slate-200 bg-white hover:shadow-md',
-        isSelected && 'ring-2 ring-brand-500/30',
+          ? 'border-primary/60 bg-surface-container-high shadow-md shadow-primary/10'
+          : 'border-outline-variant bg-surface-container hover:border-outline',
+        isSelected && 'ring-2 ring-primary/40',
         onSelect && 'cursor-pointer',
         className
       )}
@@ -269,16 +269,16 @@ export const HypothesisCard = forwardRef<HTMLDivElement, HypothesisCardProps>(({
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 flex-wrap">
             {isTopHypothesis && (
-              <span className="inline-flex items-center rounded-md bg-brand-100 px-2 py-0.5 text-xs font-semibold text-brand-800 ring-1 ring-inset ring-brand-700/10">
+              <span className="inline-flex items-center rounded-md bg-primary-container/25 px-2 py-0.5 text-xs font-semibold text-primary ring-1 ring-inset ring-primary/20">
                 Top Hypothesis
               </span>
             )}
             {differentialRank && (
-              <span className="inline-flex items-center rounded-md bg-slate-100 px-2 py-0.5 text-xs font-medium text-slate-700 ring-1 ring-inset ring-slate-700/10">
+              <span className="inline-flex items-center rounded-md bg-surface-container-high px-2 py-0.5 text-xs font-medium text-on-surface-variant ring-1 ring-inset ring-outline-variant">
                 #{differentialRank}
               </span>
             )}
-            <h4 className="text-sm font-semibold text-slate-900">{hypothesis.fault_description}</h4>
+            <h4 className="text-sm font-semibold text-on-surface">{hypothesis.fault_description}</h4>
           </div>
           <div className="mt-2 flex items-center gap-2 flex-wrap">
             {hypothesis.severity && (
@@ -292,7 +292,7 @@ export const HypothesisCard = forwardRef<HTMLDivElement, HypothesisCardProps>(({
               </span>
             )}
             {evidenceQuality && (
-              <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-slate-100 text-slate-700 ring-1 ring-inset ring-slate-700/10">
+              <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-surface-container-high text-on-surface-variant ring-1 ring-inset ring-outline-variant">
                 {evidenceQuality} evidence
               </span>
             )}
@@ -305,13 +305,13 @@ export const HypothesisCard = forwardRef<HTMLDivElement, HypothesisCardProps>(({
 
       <div className="mt-4">
         <div className="flex items-center justify-between text-sm">
-          <span className="text-slate-600">Confidence</span>
+          <span className="text-on-surface-variant">Confidence</span>
           <div className="flex items-center gap-2">
-            <span className="text-xs text-slate-500">{confidenceLabel}</span>
-            <span className="font-medium text-slate-900">{confidencePercent}%</span>
+            <span className="text-xs text-on-surface-variant">{confidenceLabel}</span>
+            <span className="font-medium text-on-surface">{confidencePercent}%</span>
           </div>
         </div>
-        <div className="mt-1.5 h-2 w-full overflow-hidden rounded-full bg-slate-100">
+        <div className="mt-1.5 h-2 w-full overflow-hidden rounded-full bg-surface-container-low">
           <div
             className={cn('h-full rounded-full transition-all duration-500', confidenceColor)}
             style={{ width: `${confidencePercent}%` }}
@@ -320,22 +320,22 @@ export const HypothesisCard = forwardRef<HTMLDivElement, HypothesisCardProps>(({
       </div>
 
       {(hypothesis.component_id || hypothesis.system_category || hypothesis.vehicle_region) && (
-        <div className={cn('mt-4 rounded-md border p-3', isTopHypothesis ? 'border-brand-200 bg-white' : 'border-slate-200 bg-slate-50')}>
-          <h5 className="text-xs font-semibold uppercase tracking-wider text-slate-500">Affected Component</h5>
-          <div className="mt-1 space-y-1 text-sm text-slate-700">
+        <div className={cn('mt-4 rounded-md border p-3', isTopHypothesis ? 'border-primary/30 bg-surface-container-high' : 'border-outline-variant bg-surface-container-low')}>
+          <h5 className="text-xs font-semibold uppercase tracking-wider text-on-surface-variant">Affected Component</h5>
+          <div className="mt-1 space-y-1 text-sm text-on-surface-variant">
             {hypothesis.component_id && (
               <p>
-                <span className="font-medium">Component:</span> {hypothesis.component_id.replace(/_/g, ' ')}
+                <span className="font-medium text-on-surface">Component:</span> {hypothesis.component_id.replace(/_/g, ' ')}
               </p>
             )}
             {hypothesis.system_category && (
               <p>
-                <span className="font-medium">System:</span> {hypothesis.system_category.replace(/_/g, ' ')}
+                <span className="font-medium text-on-surface">System:</span> {hypothesis.system_category.replace(/_/g, ' ')}
               </p>
             )}
             {hypothesis.vehicle_region && (
               <p>
-                <span className="font-medium">Location:</span> {hypothesis.vehicle_region.replace(/_/g, ' ')}
+                <span className="font-medium text-on-surface">Location:</span> {hypothesis.vehicle_region.replace(/_/g, ' ')}
               </p>
             )}
           </div>
@@ -343,7 +343,7 @@ export const HypothesisCard = forwardRef<HTMLDivElement, HypothesisCardProps>(({
       )}
 
       {safetyTier && (
-        <div className={cn('mt-4 rounded-md border p-3', isTopHypothesis ? 'border-brand-200 bg-white' : 'border-slate-200 bg-slate-50')}>
+        <div className={cn('mt-4 rounded-md border p-3', isTopHypothesis ? 'border-primary/30 bg-surface-container-high' : 'border-outline-variant bg-surface-container-low')}>
           <div className="flex items-start gap-3">
             <div className={cn('flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center', safetyTierColor)}>
               <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -368,11 +368,11 @@ export const HypothesisCard = forwardRef<HTMLDivElement, HypothesisCardProps>(({
               <p className={cn('font-medium text-sm', safetyTierColor)}>
                 {safetyTierLabel}
               </p>
-              <p className="mt-1 text-sm text-slate-600">{safetyTierAction}</p>
+              <p className="mt-1 text-sm text-on-surface-variant">{safetyTierAction}</p>
               {hypothesis.safety_tier_reasoning && hypothesis.safety_tier_reasoning.length > 0 && (
                 <div className="mt-2">
-                  <p className="text-xs font-medium text-slate-500">Why:</p>
-                  <ul className="mt-1 list-disc space-y-1 pl-4 text-xs text-slate-500">
+                  <p className="text-xs font-medium text-on-surface-variant">Why:</p>
+                  <ul className="mt-1 list-disc space-y-1 pl-4 text-xs text-on-surface-variant">
                     {hypothesis.safety_tier_reasoning.map((reason, idx) => (
                       <li key={idx}>{reason}</li>
                     ))}
@@ -380,7 +380,7 @@ export const HypothesisCard = forwardRef<HTMLDivElement, HypothesisCardProps>(({
                 </div>
               )}
               {hypothesis.safety_tier_description && (
-                <p className="mt-2 text-xs text-slate-500">{hypothesis.safety_tier_description}</p>
+                <p className="mt-2 text-xs text-on-surface-variant">{hypothesis.safety_tier_description}</p>
               )}
             </div>
           </div>
@@ -389,8 +389,8 @@ export const HypothesisCard = forwardRef<HTMLDivElement, HypothesisCardProps>(({
 
       {hypothesis.repair_suggestion && (
         <div className="mt-4">
-          <h5 className="text-xs font-semibold uppercase tracking-wider text-slate-500">Repair Suggestion</h5>
-          <p className="mt-1 text-sm text-slate-700">{hypothesis.repair_suggestion}</p>
+          <h5 className="text-xs font-semibold uppercase tracking-wider text-on-surface-variant">Repair Suggestion</h5>
+          <p className="mt-1 text-sm text-on-surface-variant">{hypothesis.repair_suggestion}</p>
         </div>
       )}
 
@@ -400,7 +400,7 @@ export const HypothesisCard = forwardRef<HTMLDivElement, HypothesisCardProps>(({
 
       {hypothesis.resources && hypothesis.resources.length > 0 && (
         <div className="mt-4">
-          <h5 className="text-xs font-semibold uppercase tracking-wider text-slate-500 mb-2">Helpful Resources</h5>
+          <h5 className="text-xs font-semibold uppercase tracking-wider text-on-surface-variant mb-2">Helpful Resources</h5>
           <div className="space-y-3">
             {hypothesis.resources.map((resource, idx) => (
               <a
@@ -408,7 +408,7 @@ export const HypothesisCard = forwardRef<HTMLDivElement, HypothesisCardProps>(({
                 href={resource.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="block text-sm text-brand-600 hover:text-brand-700"
+                className="block text-sm text-primary hover:text-primary-fixed-dim"
               >
                 <span className="font-medium">{resource.title}</span>
                 {resource.type === 'youtube' ? (
@@ -416,7 +416,7 @@ export const HypothesisCard = forwardRef<HTMLDivElement, HypothesisCardProps>(({
                 ) : (
                   <span className="ml-1 font-medium">— View Guide →</span>
                 )}
-                <span className="block text-xs text-slate-500">{resource.source}</span>
+                <span className="block text-xs text-on-surface-variant">{resource.source}</span>
               </a>
             ))}
           </div>
@@ -425,11 +425,11 @@ export const HypothesisCard = forwardRef<HTMLDivElement, HypothesisCardProps>(({
 
       {hypothesis.supporting_evidence.length > 0 && (
         <div className="mt-4">
-          <h5 className="text-xs font-semibold uppercase tracking-wider text-slate-500">Supporting Evidence</h5>
-          <ul className="mt-1.5 space-y-1.5 text-sm text-slate-600">
+          <h5 className="text-xs font-semibold uppercase tracking-wider text-on-surface-variant">Supporting Evidence</h5>
+          <ul className="mt-1.5 space-y-1.5 text-sm text-on-surface-variant">
             {hypothesis.supporting_evidence.map((item, idx) => (
               <li key={idx} className="flex items-start gap-2">
-                <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-slate-400" aria-hidden="true" />
+                <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-outline" aria-hidden="true" />
                 <span>{item}</span>
               </li>
             ))}
@@ -438,12 +438,12 @@ export const HypothesisCard = forwardRef<HTMLDivElement, HypothesisCardProps>(({
       )}
 
       {hypothesis.recommended_checks.length > 0 && (
-        <div className="mt-4 rounded-md border border-amber-200 bg-amber-50 p-3">
-          <h5 className="text-xs font-semibold uppercase tracking-wider text-amber-800">What to check next</h5>
-          <ul className="mt-1.5 space-y-1.5 text-sm text-amber-900">
+        <div className="mt-4 rounded-md border border-secondary-container/40 bg-secondary-container/15 p-3">
+          <h5 className="text-xs font-semibold uppercase tracking-wider text-secondary">What to check next</h5>
+          <ul className="mt-1.5 space-y-1.5 text-sm text-secondary">
             {hypothesis.recommended_checks.map((check, idx) => (
               <li key={idx} className="flex items-start gap-2">
-                <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-amber-500" aria-hidden="true" />
+                <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-secondary" aria-hidden="true" />
                 <span>{check}</span>
               </li>
             ))}
@@ -452,8 +452,8 @@ export const HypothesisCard = forwardRef<HTMLDivElement, HypothesisCardProps>(({
       )}
 
       {!feedbackGiven && (
-        <div className="mt-5 pt-4 border-t border-slate-100">
-          <h5 className="text-xs font-semibold uppercase tracking-wider text-slate-500 mb-2">
+        <div className="mt-5 pt-4 border-t border-outline-variant">
+          <h5 className="text-xs font-semibold uppercase tracking-wider text-on-surface-variant mb-2">
             Was this helpful?
           </h5>
           <div className="flex flex-wrap gap-2">
@@ -478,8 +478,8 @@ export const HypothesisCard = forwardRef<HTMLDivElement, HypothesisCardProps>(({
       )}
 
       {feedbackGiven && (
-        <div className="mt-5 pt-4 border-t border-slate-100">
-          <p className="text-sm text-slate-600">Thanks for your feedback! This helps improve future diagnoses.</p>
+        <div className="mt-5 pt-4 border-t border-outline-variant">
+          <p className="text-sm text-on-surface-variant">Thanks for your feedback! This helps improve future diagnoses.</p>
         </div>
       )}
 
@@ -487,7 +487,7 @@ export const HypothesisCard = forwardRef<HTMLDivElement, HypothesisCardProps>(({
         <button
           type="button"
           onClick={() => setShowDetails(!showDetails)}
-          className="text-sm text-brand-600 hover:text-brand-700 font-medium"
+          className="text-sm text-primary hover:text-primary-fixed-dim font-medium"
         >
           {showDetails ? 'Hide technical details' : 'Show technical details'}
         </button>
@@ -495,11 +495,11 @@ export const HypothesisCard = forwardRef<HTMLDivElement, HypothesisCardProps>(({
           <div className="mt-3 space-y-3">
             {hypothesis.supporting_evidence.length > 0 && (
               <div>
-                <h5 className="text-xs font-semibold uppercase tracking-wider text-slate-500 mb-2">Supporting Evidence</h5>
-                <ul className="space-y-1.5 text-sm text-slate-600">
+                <h5 className="text-xs font-semibold uppercase tracking-wider text-on-surface-variant mb-2">Supporting Evidence</h5>
+                <ul className="space-y-1.5 text-sm text-on-surface-variant">
                   {hypothesis.supporting_evidence.map((item, idx) => (
                     <li key={idx} className="flex items-start gap-2">
-                      <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-slate-400" aria-hidden="true" />
+                      <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-outline" aria-hidden="true" />
                       <span>{item}</span>
                     </li>
                   ))}
@@ -508,17 +508,17 @@ export const HypothesisCard = forwardRef<HTMLDivElement, HypothesisCardProps>(({
             )}
 
             {(hypothesis.component_id || hypothesis.system_category || hypothesis.vehicle_region) && (
-              <div className="rounded-md border p-3 bg-slate-50">
-                <h5 className="text-xs font-semibold uppercase tracking-wider text-slate-500 mb-2">Technical Details</h5>
-                <div className="space-y-1 text-sm text-slate-700">
+              <div className="rounded-md border p-3 bg-surface-container-low">
+                <h5 className="text-xs font-semibold uppercase tracking-wider text-on-surface-variant mb-2">Technical Details</h5>
+                <div className="space-y-1 text-sm text-on-surface-variant">
                   {hypothesis.component_id && (
-                    <p><span className="font-medium">Component:</span> {hypothesis.component_id.replace(/_/g, ' ')}</p>
+                    <p><span className="font-medium text-on-surface">Component:</span> {hypothesis.component_id.replace(/_/g, ' ')}</p>
                   )}
                   {hypothesis.system_category && (
-                    <p><span className="font-medium">System:</span> {hypothesis.system_category.replace(/_/g, ' ')}</p>
+                    <p><span className="font-medium text-on-surface">System:</span> {hypothesis.system_category.replace(/_/g, ' ')}</p>
                   )}
                   {hypothesis.vehicle_region && (
-                    <p><span className="font-medium">Location:</span> {hypothesis.vehicle_region.replace(/_/g, ' ')}</p>
+                    <p><span className="font-medium text-on-surface">Location:</span> {hypothesis.vehicle_region.replace(/_/g, ' ')}</p>
                   )}
                 </div>
               </div>
@@ -595,20 +595,20 @@ export function CheckOutcomeSection({
   const availableNext = (status: string) => STATUS_FLOW[status] || [];
 
   return (
-    <div className="mt-4 rounded-lg border border-slate-200 bg-white">
-      <div className="border-b border-slate-100 px-4 py-3">
-        <h5 className="text-sm font-semibold text-slate-900">Diagnostic Check Outcomes</h5>
+    <div className="mt-4 rounded-lg border border-outline-variant bg-surface-container-high">
+      <div className="border-b border-outline-variant px-4 py-3">
+        <h5 className="text-sm font-semibold text-on-surface">Diagnostic Check Outcomes</h5>
       </div>
 
       {pendingRecommendations.length > 0 && (
-        <div className="border-b border-slate-100 px-4 py-3 bg-slate-50">
-          <p className="text-xs font-medium uppercase tracking-wider text-slate-500 mb-2">
+        <div className="border-b border-outline-variant px-4 py-3 bg-surface-container">
+          <p className="text-xs font-medium uppercase tracking-wider text-on-surface-variant mb-2">
             Recommended Checks
           </p>
           <div className="space-y-2">
             {pendingRecommendations.map((desc, idx) => (
               <div key={idx} className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-                <span className="text-sm text-slate-700">{desc}</span>
+                <span className="text-sm text-on-surface-variant">{desc}</span>
                 <Button
                   size="sm"
                   variant="secondary"
@@ -624,25 +624,25 @@ export function CheckOutcomeSection({
         </div>
       )}
 
-      <div className="divide-y divide-slate-100">
+      <div className="divide-y divide-outline-variant">
         {checks.length === 0 && pendingRecommendations.length === 0 && (
-          <p className="px-4 py-3 text-sm text-slate-500">No check outcomes recorded yet.</p>
+          <p className="px-4 py-3 text-sm text-on-surface-variant">No check outcomes recorded yet.</p>
         )}
         {checks.map((check) => (
           <div key={check.id} className="px-4 py-3">
             <div className="flex items-start justify-between gap-4">
               <div className="flex-1">
                 <div className="flex items-center gap-2 flex-wrap">
-                  <span className="text-sm font-medium text-slate-900">{check.check_description}</span>
+                  <span className="text-sm font-medium text-on-surface">{check.check_description}</span>
                   <CheckStatusBadge status={check.status} />
                 </div>
                 {check.observed_result && (
-                  <p className="mt-1 text-sm text-slate-600">
+                  <p className="mt-1 text-sm text-on-surface-variant">
                     <span className="font-medium">Result:</span> {check.observed_result}
                   </p>
                 )}
                 {check.technician_note && (
-                  <p className="mt-1 text-sm text-slate-500 italic">{check.technician_note}</p>
+                  <p className="mt-1 text-sm text-on-surface-variant italic">{check.technician_note}</p>
                 )}
               </div>
             </div>
@@ -654,7 +654,7 @@ export function CheckOutcomeSection({
                     type="button"
                     onClick={() => onUpdateCheck(check.id, nextStatus)}
                     disabled={loading}
-                    className="rounded-md border border-slate-200 px-2.5 py-2 text-xs font-medium text-slate-600 hover:bg-slate-50 disabled:opacity-50 min-h-[44px]"
+                    className="rounded-md border border-outline-variant px-2.5 py-2 text-xs font-medium text-on-surface-variant hover:bg-surface-container-highest disabled:opacity-50 min-h-[44px]"
                   >
                     Mark {nextStatus.charAt(0).toUpperCase() + nextStatus.slice(1)}
                   </button>
@@ -664,14 +664,14 @@ export function CheckOutcomeSection({
           </div>
         ))}
       </div>
-      <div className="border-t border-slate-100 px-4 py-3">
+      <div className="border-t border-outline-variant px-4 py-3">
         <div className="flex gap-2">
           <input
             type="text"
             value={newCheck}
             onChange={(e) => setNewCheck(e.target.value)}
             placeholder="Add a diagnostic check..."
-            className="block flex-1 rounded-md border border-slate-300 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500 min-h-[44px]"
+            className="block flex-1 rounded-md border border-outline-variant bg-surface-container-lowest px-3 py-2.5 text-sm text-on-surface focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary min-h-[44px]"
           />
           <Button size="sm" onClick={handleCreate} disabled={loading || !newCheck.trim()} className="min-h-[44px]">
             Add
